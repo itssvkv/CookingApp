@@ -1,0 +1,43 @@
+package com.example.cookingapp.navigation
+
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.navigation.NavDestination
+import androidx.navigation.NavHost
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import com.example.cookingapp.presentation.screen.home.HomeScreen
+import com.example.cookingapp.presentation.screen.login.LoginScreen
+import com.example.cookingapp.presentation.screen.onboarding.OnBoardingScreen
+import com.example.cookingapp.presentation.screen.signup.SignupScreen
+import com.example.cookingapp.presentation.screen.splash.SplashScreen
+
+@Composable
+fun SetupNavGraph(
+    navHostController: NavHostController,
+    startDestination: Screen = Screen.SplashScreen
+) {
+
+    NavHost(navController = navHostController, startDestination = startDestination) {
+        composable<Screen.SplashScreen> {
+            SplashScreen(
+                navHostController = navHostController
+            )
+        }
+        composable<Screen.OnBoardingScreen> {
+            OnBoardingScreen()
+        }
+        composable<Screen.LoginScreen> {
+            LoginScreen()
+        }
+        composable<Screen.SignupScreen> {
+            SignupScreen()
+        }
+        composable<Screen.HomeScreen> {
+            HomeScreen()
+        }
+
+    }
+
+}
