@@ -45,37 +45,24 @@ fun SplashScreen(
             painter = painterResource(id = R.drawable.logo),
             contentDescription = "logo"
         )
-        Text(text = "hhhhhhh")
     }
     LaunchedEffect(key1 = true) {
         delay(2000L)
         splashViewModel.splashScreenState.collectLatest { state ->
             if (state.navigateToHomeScreen) {
+                navHostController.popBackStack()
                 navHostController.navigate(Screen.HomeScreen)
             } else if (state.navigateToLoginScreen) {
+                navHostController.popBackStack()
                 navHostController.navigate(Screen.LoginScreen)
             } else {
+                navHostController.popBackStack()
                 navHostController.navigate(Screen.OnBoardingScreen)
                 splashViewModel.saveFirstOpenStateToDataStore()
             }
 
         }
+//        navHostController.navigate(Screen.OnBoardingScreen)
     }
-
-
-//    LaunchedEffect(key1 = true) {
-//        delay(2000L)
-//        if (!isFirstTime) {
-//            if (isLoggedIn) {
-//                navHostController.navigate(Screen.HomeScreen)
-//            } else {
-//                navHostController.navigate(Screen.LoginScreen)
-//            }
-//        } else {
-//            navHostController.navigate(Screen.OnBoardingScreen)
-//            splashViewModel.saveFirstOpenStateToDataStore()
-//
-//        }
-//    }
 
 }

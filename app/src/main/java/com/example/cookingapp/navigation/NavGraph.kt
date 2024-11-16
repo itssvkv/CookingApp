@@ -26,7 +26,7 @@ fun SetupNavGraph(
             )
         }
         composable<Screen.OnBoardingScreen> {
-            OnBoardingScreen()
+            OnBoardingScreen(navHostController = navHostController)
         }
         composable<Screen.LoginScreen> {
             LoginScreen()
