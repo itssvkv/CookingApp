@@ -12,4 +12,10 @@ object Common {
 
     var isFirstTime = true
     var isLoggedIn = false
+
+    enum class CustomTextFieldLabel{
+        EMAIL,
+        PASSWORD
+    }
 }
+

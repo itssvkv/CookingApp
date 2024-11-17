@@ -37,6 +37,7 @@ import com.example.cookingapp.R
 import com.example.cookingapp.navigation.Screen
 import com.example.cookingapp.utils.MainBoxShape
 import inversePrimaryLight
+import mainButtonColor
 import primaryContainerLight
 
 @Composable
@@ -146,7 +147,7 @@ fun OnBoardingScreen(
                 colors = ButtonDefaults
                     .buttonColors(
                         contentColor = Color.White,
-                        containerColor = Color.Black
+                        containerColor = mainButtonColor
                     ),
                 shape = RoundedCornerShape(6.dp),
                 onClick = {

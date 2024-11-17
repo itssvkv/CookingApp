@@ -3,14 +3,11 @@ package com.example.cookingapp.presentation.screen.splash
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cookingapp.data.local.datastore.DataStoreRepository
-import com.example.cookingapp.model.screenstate.SplashScreenState
-import com.example.cookingapp.navigation.Screen
+import com.example.cookingapp.model.uistate.SplashScreenState
 import com.example.cookingapp.utils.Common.IS_FIRST_TIME
 import com.example.cookingapp.utils.Common.isFirstTime
 import com.example.cookingapp.utils.Common.isLoggedIn
-import dagger.hilt.android.HiltAndroidApp
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
