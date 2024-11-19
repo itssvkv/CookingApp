@@ -2,7 +2,9 @@ package com.example.cookingapp.presentation.screen.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.cookingapp.data.local.datastore.DataStoreRepository
 import com.example.cookingapp.model.uistate.MainButtonStateValue
+import com.example.cookingapp.utils.onResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -29,9 +31,8 @@ class LoginScreenViewModel @Inject constructor(
         _uiState.update { it.copy(password = newValue) }
     }
 
-    fun checkTheLoginProcess(
-        email: String,
-        password: String
+    fun onLoginButtonClicked(
+
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.update {
@@ -40,7 +41,7 @@ class LoginScreenViewModel @Inject constructor(
                 )
             }
             delay(2000L)
-            if (email == password) {
+            if (uiState.value.email == uiState.value.password) {
                 _uiState.update {
                     it.copy(
                         isLoading = false,
@@ -60,5 +61,6 @@ class LoginScreenViewModel @Inject constructor(
         }
 
     }
+
 
 }

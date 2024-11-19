@@ -2,9 +2,9 @@ package com.example.cookingapp
 
 import android.app.Application
 import com.example.cookingapp.data.local.datastore.DataStoreRepository
-import com.example.cookingapp.utils.Common
-import com.example.cookingapp.utils.Common.IS_FIRST_TIME
-import com.example.cookingapp.utils.Common.IS_LOGGED_IN
+import com.example.cookingapp.utils.Constants
+import com.example.cookingapp.utils.Constants.IS_FIRST_TIME
+import com.example.cookingapp.utils.Constants.IS_LOGGED_IN
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -24,8 +24,8 @@ class MyApplication : Application() {
             val isLoggedIn = dataStoreRepository.getFromDataStore(key = IS_LOGGED_IN) ?: false
             val isFirstTime = dataStoreRepository.getFromDataStore(key = IS_FIRST_TIME) ?: true
 
-            Common.isLoggedIn = isLoggedIn
-            Common.isFirstTime = isFirstTime
+            Constants.isLoggedIn = isLoggedIn
+            Constants.isFirstTime = isFirstTime
         }
     }
 

@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cookingapp.data.local.datastore.DataStoreRepository
 import com.example.cookingapp.model.uistate.SplashScreenState
-import com.example.cookingapp.utils.Common.IS_FIRST_TIME
-import com.example.cookingapp.utils.Common.isFirstTime
-import com.example.cookingapp.utils.Common.isLoggedIn
+import com.example.cookingapp.utils.Constants.IS_FIRST_TIME
+import com.example.cookingapp.utils.Constants.isFirstTime
+import com.example.cookingapp.utils.Constants.isLoggedIn
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

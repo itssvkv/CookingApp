@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.cookingapp.R
 import com.example.cookingapp.navigation.Screen
-import com.example.cookingapp.utils.MainBoxShape
+import com.example.cookingapp.presentation.components.MainBoxShape
 import inversePrimaryLight
 import mainButtonColor
 import primaryContainerLight

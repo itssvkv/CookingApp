@@ -6,18 +6,22 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.cookingapp.data.local.datastore.DataStoreRepository
 import com.example.cookingapp.data.local.datastore.DataStoreRepositoryImpl
-import com.example.cookingapp.utils.Common
+import com.example.cookingapp.utils.Constants
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
+
 @Module
 @InstallIn(SingletonComponent::class)
-object LocalDataModule {
+object MainModule {
 
-    private val Context.appDataStore by preferencesDataStore(name = Common.APP_NAME)
+    private val Context.appDataStore by preferencesDataStore(name = Constants.APP_NAME)
 
     @Provides
     @Singleton
@@ -28,8 +32,7 @@ object LocalDataModule {
 
     @Provides
     @Singleton
-    fun providesDataStoreRepository(dataStore: DataStore<Preferences>) : DataStoreRepository {
-
-        return DataStoreRepositoryImpl(dataStore)
+    fun providesFirebaseAuth(): FirebaseAuth {
+        return Firebase.auth
     }
 }

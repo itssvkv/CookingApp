@@ -2,7 +2,7 @@ package com.example.cookingapp.utils
 
 import androidx.datastore.preferences.core.booleanPreferencesKey
 
-object Common {
+object Constants {
     const val TAG = "itssvkv"
     val IS_FIRST_TIME = booleanPreferencesKey("IS_FIRST_TIME")
     val IS_LOGGED_IN = booleanPreferencesKey("IS_LOGGED_IN")
