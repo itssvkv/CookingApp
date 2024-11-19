@@ -65,7 +65,6 @@ fun MainTextField(
         singleLine = singleLine,
         modifier = modifier
             .fillMaxWidth()
-            .padding(4.dp)
             .clip(roundedShape)
             .onFocusChanged { isFocused = it.isFocused },
         colors = OutlinedTextFieldDefaults.colors(

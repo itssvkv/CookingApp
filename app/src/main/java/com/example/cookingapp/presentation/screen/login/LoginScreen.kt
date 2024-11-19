@@ -99,7 +99,9 @@ fun LoginScreenContent(
                 isButtonLoading = uiState.isLoading,
                 onLoginClicked = onLoginClicked,
                 onForgetPasswordClicked = onForgetPasswordClicked,
-                onNavigateToRegister = onNavigateToRegister
+                onNavigateToRegister = onNavigateToRegister,
+                isError = uiState.isError,
+                errorType = uiState.errorType
             )
         }
 
@@ -116,7 +118,9 @@ fun LoginDataSection(
     isButtonLoading: Boolean,
     onLoginClicked: () -> Unit,
     onForgetPasswordClicked: () -> Unit,
-    onNavigateToRegister: () -> Unit = {}
+    onNavigateToRegister: () -> Unit = {},
+    isError: Boolean,
+    errorType: String? = null
 ) {
 
     Column(modifier = modifier.fillMaxWidth()) {
@@ -133,6 +137,9 @@ fun LoginDataSection(
             isPassword = true,
             trailingText = "Show"
         )
+        if (isError) {
+            Text(text = errorType!!, style = MaterialTheme.typography.bodySmall, color = Color.Red)
+        }
         ForgetPasswordSection(onForgetPasswordClicked = onForgetPasswordClicked)
         MainButton(
             text = "Log In",
@@ -229,7 +236,9 @@ fun LoginScreenFooter(
         )
         Image(
             painter = painterResource(id = R.drawable.login_door), contentDescription = "door",
-            modifier = Modifier.padding(vertical = 24.dp).size(200.dp)
+            modifier = Modifier
+                .padding(vertical = 24.dp)
+                .size(200.dp)
         )
 
     }

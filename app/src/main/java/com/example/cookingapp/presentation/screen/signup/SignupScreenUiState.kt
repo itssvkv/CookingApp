@@ -6,5 +6,6 @@ data class SignupScreenUiState(
     val confirmPassword: String = "",
     val isLoading: Boolean = false,
     val isRegisterSuccessful: Boolean = false,
-    val isError: Boolean = false
+    val isError: Boolean = false,
+    val errorType: String? = null
 )

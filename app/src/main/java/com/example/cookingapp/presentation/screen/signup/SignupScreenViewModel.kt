@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cookingapp.data.local.datastore.DataStoreRepository
 import com.example.cookingapp.data.remote.firebase.FirebaseRepository
+import com.example.cookingapp.utils.Constants.IS_LOGGED_IN
 import com.example.cookingapp.utils.Constants.TAG
 import com.example.cookingapp.utils.onResponse
 import com.google.firebase.Firebase
@@ -21,7 +22,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignupScreenViewModel @Inject constructor(
-    private val firebaseRepository: FirebaseRepository
+    private val firebaseRepository: FirebaseRepository,
+    private val dataStoreRepository: DataStoreRepository
 ) : ViewModel() {
     private lateinit var auth: FirebaseAuth
     private val _uiState = MutableStateFlow(SignupScreenUiState())
@@ -44,15 +46,27 @@ class SignupScreenViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             firebaseRepository.signupUsingFirebaseAuth(
                 email = _uiState.value.email,
-                password = _uiState.value.password
+                password = _uiState.value.password,
+                confirmPassword = _uiState.value.confirmPassword
             ).onResponse(
-                onSuccess = { reponse ->
-                    Log.d(TAG, "onSignupButtonClicked: ${reponse?.email}")
+                onSuccess = { response ->
+                    Log.d(TAG, "onSignupButtonClicked: ${response?.email}")
+                    viewModelScope.launch(Dispatchers.IO) {
+                        dataStoreRepository.saveToDataStore(key = IS_LOGGED_IN, value = true)
+
+                    }
                     _uiState.update { it.copy(isRegisterSuccessful = true, isLoading = false) }
                 },
                 onFailure = { msg ->
                     Log.d(TAG, "onSignupButtonClicked: $msg")
-                    _uiState.update { it.copy(isRegisterSuccessful = false, isLoading = false) }
+                    _uiState.update {
+                        it.copy(
+                            isRegisterSuccessful = false,
+                            isLoading = false,
+                            isError = true,
+                            errorType = msg
+                        )
+                    }
                 },
                 onLoading = {
                     _uiState.update { it.copy(isLoading = true) }

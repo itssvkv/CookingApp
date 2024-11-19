@@ -1,9 +1,13 @@
 package com.example.cookingapp.presentation.screen.login
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cookingapp.data.local.datastore.DataStoreRepository
+import com.example.cookingapp.data.remote.firebase.FirebaseRepository
 import com.example.cookingapp.model.uistate.MainButtonStateValue
+import com.example.cookingapp.utils.Constants.IS_LOGGED_IN
+import com.example.cookingapp.utils.Constants.TAG
 import com.example.cookingapp.utils.onResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -17,7 +21,8 @@ import kotlin.math.truncate
 
 @HiltViewModel
 class LoginScreenViewModel @Inject constructor(
-
+    private val firebaseRepository: FirebaseRepository,
+    private val dataStoreRepository: DataStoreRepository
 ) : ViewModel() {
 
     private var _uiState = MutableStateFlow(LoginScreenUiState())
@@ -35,29 +40,34 @@ class LoginScreenViewModel @Inject constructor(
 
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            _uiState.update {
-                it.copy(
-                    isLoading = true
-                )
-            }
-            delay(2000L)
-            if (uiState.value.email == uiState.value.password) {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        isLoginSuccessful = true,
-                        isError = false
-                    )
+            firebaseRepository.loginUsingFirebaseAuth(
+                email = _uiState.value.email,
+                password = _uiState.value.password
+
+            ).onResponse(
+                onSuccess = { response ->
+                    Log.d(TAG, "onSignupButtonClicked: ${response?.email}")
+                    viewModelScope.launch(Dispatchers.IO) {
+                        dataStoreRepository.saveToDataStore(key = IS_LOGGED_IN, value = true)
+
+                    }
+                    _uiState.update { it.copy(isLoginSuccessful = true, isLoading = false) }
+                },
+                onFailure = { msg ->
+                    Log.d(TAG, "onSignupButtonClicked: $msg")
+                    _uiState.update {
+                        it.copy(
+                            isLoginSuccessful = false,
+                            isLoading = false,
+                            isError = true,
+                            errorType = msg
+                        )
+                    }
+                },
+                onLoading = {
+                    _uiState.update { it.copy(isLoading = true) }
                 }
-            } else {
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        isLoginSuccessful = false,
-                        isError = true
-                    )
-                }
-            }
+            )
         }
 
     }

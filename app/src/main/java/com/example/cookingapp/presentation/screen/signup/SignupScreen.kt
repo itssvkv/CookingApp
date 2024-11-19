@@ -82,8 +82,7 @@ fun SignupScreenContent(
             .fillMaxSize()
             .navigationBarsPadding()
             .statusBarsPadding()
-            .padding(horizontal = 16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(horizontal = 16.dp), horizontalAlignment = Alignment.CenterHorizontally
     ) {
         item {
             HeaderSection(
@@ -103,7 +102,9 @@ fun SignupScreenContent(
                 onConfirmPasswordChanged = onConfirmPasswordChanged,
                 onSignupClicked = onSignupClicked,
                 onLoginClicked = onLoginClicked,
-                isButtonLoading = uiState.isLoading
+                isButtonLoading = uiState.isLoading,
+                isError = uiState.isError,
+                errorType = uiState.errorType
             )
         }
 
@@ -114,17 +115,14 @@ fun SignupScreenContent(
 
 @Composable
 fun HeaderSection(
-    modifier: Modifier = Modifier,
-    onBackClicked: () -> Unit
+    modifier: Modifier = Modifier, onBackClicked: () -> Unit
 ) {
 
     Column(
-        modifier = modifier
-            .fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -175,7 +173,9 @@ fun SignupScreenDataSection(
     onConfirmPasswordChanged: (String) -> Unit,
     isButtonLoading: Boolean,
     onSignupClicked: () -> Unit,
-    onLoginClicked: () -> Unit
+    onLoginClicked: () -> Unit,
+    isError: Boolean,
+    errorType: String? = null
 ) {
 
     Column(modifier = modifier.fillMaxWidth()) {
@@ -200,10 +200,13 @@ fun SignupScreenDataSection(
             isPassword = true,
             trailingText = "Show"
         )
+        if (isError) {
+            Text(text = errorType!!, style = MaterialTheme.typography.bodySmall, color = Color.Red)
+        }
         MainButton(
             text = "Sign up",
             isLoading = isButtonLoading,
-            isEnabled = !isButtonLoading && email.isNotEmpty() && password.isNotEmpty(),
+            isEnabled = !isButtonLoading && email.isNotEmpty() && password.isNotEmpty() && confirmPassword.isNotEmpty(),
             onButtonClicked = onSignupClicked
         )
         SignupScreenFooter(
@@ -216,8 +219,7 @@ fun SignupScreenDataSection(
 
 @Composable
 fun SignupScreenFooter(
-    modifier: Modifier = Modifier,
-    onLoginClicked: () -> Unit = {}
+    modifier: Modifier = Modifier, onLoginClicked: () -> Unit = {}
 ) {
 
     Column(
@@ -228,12 +230,12 @@ fun SignupScreenFooter(
     ) {
         Text(
             text = "Already have an account?",
-            modifier = Modifier
-                .clickable { onLoginClicked() },
+            modifier = Modifier.clickable { onLoginClicked() },
             style = MaterialTheme.typography.bodySmall
         )
         Image(
-            painter = painterResource(id = R.drawable.signup_door), contentDescription = "door",
+            painter = painterResource(id = R.drawable.signup_door),
+            contentDescription = "door",
             modifier = Modifier
                 .padding(vertical = 24.dp)
                 .size(200.dp)

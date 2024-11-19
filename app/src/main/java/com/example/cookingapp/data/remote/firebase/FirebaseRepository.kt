@@ -10,6 +10,12 @@ interface FirebaseRepository {
 
     suspend fun signupUsingFirebaseAuth(
         email: String,
+        password: String,
+        confirmPassword: String
+    ): Flow<Resource<FirebaseUser?>>
+
+    suspend fun loginUsingFirebaseAuth(
+        email: String,
         password: String
     ): Flow<Resource<FirebaseUser?>>
 
