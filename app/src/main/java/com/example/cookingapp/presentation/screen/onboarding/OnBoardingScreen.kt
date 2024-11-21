@@ -61,8 +61,17 @@ fun OnBoardingScreen(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            MainBoxShape {
-                Icon(painter = painterResource(id = R.drawable.logo), contentDescription = "Logo")
+            Box(
+                modifier = Modifier
+                    .width(40.dp)
+                    .height(40.dp),
+            contentAlignment = Alignment.Center){
+                MainBoxShape {
+                    Icon(
+                        painter = painterResource(id = R.drawable.logo),
+                        contentDescription = "Logo"
+                    )
+                }
             }
             Spacer(modifier = Modifier.width(8.dp))
             Text(

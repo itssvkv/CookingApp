@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -81,21 +82,23 @@ fun SingleMealCard(
             contentDescription = meal.strMeal,
             contentScale = ContentScale.Crop,
             modifier = Modifier
-                .weight(4f)
                 .size(mealImageSize)
                 .clip(CircleShape),
         )
+        Spacer(modifier = Modifier.height(20.dp))
         Text(
             text = meal.strMeal!!,
             style = mealNameTextStyle,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.weight(2f),
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
+        Spacer(modifier = Modifier.height(20.dp))
+
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .weight(2f),
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -119,8 +122,8 @@ fun SingleMealCard(
                 textAlign = TextAlign.Center
             )
         }
+        Spacer(modifier = Modifier.height(20.dp))
         Text(
-            modifier = Modifier.weight(2f),
             text = meal.strInstructions!!,
             style = mealDescription,
             textAlign = TextAlign.Center,

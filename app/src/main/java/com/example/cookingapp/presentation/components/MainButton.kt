@@ -10,6 +10,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
@@ -34,8 +35,7 @@ fun MainButton(
 
     Button(
         modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 16.dp),
+            .fillMaxWidth(),
         colors = ButtonDefaults
             .buttonColors(
                 contentColor = contentColor,
@@ -52,7 +52,7 @@ fun MainButton(
                 style = MaterialTheme.typography.bodyLarge,
                 color = Color.White,
                 modifier = Modifier
-                    .padding(8.dp)
+                    .align(Alignment.CenterVertically)
             )
         }
         if (isLoading) {
