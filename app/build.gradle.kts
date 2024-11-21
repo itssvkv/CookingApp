@@ -81,6 +81,9 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
+    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.2")
+    implementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2")
+
 
     // KotlinX Serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
@@ -99,7 +102,9 @@ dependencies {
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
     // Coil
-    implementation("io.coil-kt:coil-compose:1.3.2")
+
+    implementation("io.coil-kt.coil3:coil-compose:3.0.3")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:3.0.3")
 
     // Splash API
     implementation ("androidx.core:core-splashscreen:1.0.1")

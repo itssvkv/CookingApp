@@ -9,13 +9,19 @@ object Constants {
     const val APP_NAME = "CookingApp"
 
 
-
     var isFirstTime = true
     var isLoggedIn = false
 
-    enum class CustomTextFieldLabel{
+    const val BASE_URL = "https://www.themealdb.com/"
+    const val COMMON_URL = "api/json/v1/1/"
+    const val LIST = "list.php"
+    const val ALL_CATEGORIES = COMMON_URL + "categories.php"
+    const val RANDOM_MEAL = COMMON_URL + "random.php"
+
+    enum class CustomTextFieldLabel {
         EMAIL,
-        PASSWORD
+        PASSWORD,
+        SEARCH
     }
 }
 

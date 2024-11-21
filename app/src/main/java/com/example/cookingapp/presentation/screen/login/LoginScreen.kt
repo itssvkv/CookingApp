@@ -20,8 +20,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -47,6 +49,9 @@ fun LoginScreen(
 ) {
 
     val uiState by viewModel.uiState.collectAsState()
+    val focusRequester = remember {
+        FocusRequester()
+    }
 
     LoginScreenContent(
         modifier = modifier,
@@ -55,7 +60,9 @@ fun LoginScreen(
         onPasswordChange = viewModel::onPasswordChanged,
         onLoginClicked = viewModel::onLoginButtonClicked,
         onForgetPasswordClicked = onNavigateToForgetPassword,
-        onNavigateToRegister = onNavigateToRegister
+        onNavigateToRegister = onNavigateToRegister,
+        isFocusedChanged = viewModel::isFocusedChanged,
+        focusRequester = focusRequester
     )
 
     LaunchedEffect(key1 = uiState.isLoginSuccessful) {
@@ -75,6 +82,8 @@ fun LoginScreenContent(
     onLoginClicked: () -> Unit,
     onForgetPasswordClicked: () -> Unit,
     onNavigateToRegister: () -> Unit = {},
+    isFocusedChanged: (Boolean) -> Unit,
+    focusRequester: FocusRequester
 ) {
     LazyColumn(
         modifier = modifier
@@ -101,7 +110,10 @@ fun LoginScreenContent(
                 onForgetPasswordClicked = onForgetPasswordClicked,
                 onNavigateToRegister = onNavigateToRegister,
                 isError = uiState.isError,
-                errorType = uiState.errorType
+                errorType = uiState.errorType,
+                isFocusedChanged = isFocusedChanged,
+                focusRequester = focusRequester,
+                isFocused = uiState.isFocused
             )
         }
 
@@ -120,7 +132,10 @@ fun LoginDataSection(
     onForgetPasswordClicked: () -> Unit,
     onNavigateToRegister: () -> Unit = {},
     isError: Boolean,
-    errorType: String? = null
+    errorType: String? = null,
+    isFocusedChanged: (Boolean) -> Unit,
+    focusRequester: FocusRequester,
+    isFocused: Boolean = false
 ) {
 
     Column(modifier = modifier.fillMaxWidth()) {
@@ -128,6 +143,9 @@ fun LoginDataSection(
             value = email,
             onValueChange = onEmailChange,
             label = Constants.CustomTextFieldLabel.EMAIL,
+            isFocusedChanged = isFocusedChanged,
+            focusRequester = focusRequester,
+            isFocused = isFocused
         )
         Spacer(modifier = Modifier.height(20.dp))
         MainTextField(
@@ -135,7 +153,10 @@ fun LoginDataSection(
             onValueChange = onPasswordChange,
             label = Constants.CustomTextFieldLabel.PASSWORD,
             isPassword = true,
-            trailingText = "Show"
+            trailingText = "Show",
+            isFocusedChanged = isFocusedChanged,
+            focusRequester = focusRequester,
+            isFocused = isFocused
         )
         if (isError) {
             Text(text = errorType!!, style = MaterialTheme.typography.bodySmall, color = Color.Red)

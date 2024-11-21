@@ -216,9 +216,12 @@ val surfaceContainerDarkHighContrast = Color(0xFF1D2024)
 val surfaceContainerHighDarkHighContrast = Color(0xFF272A2F)
 val surfaceContainerHighestDarkHighContrast = Color(0xFF32353A)
 
-val focusedTextFieldColor = Color(0xFF757575)
-val unfocusedTextFieldColor = Color(0xFFEBEBEB)
+val primary = Color(0xFF757575)
+val onPrimary = Color(0xFFEBEBEB)
 val mainButtonColor = Color(0xFF333333)
+val randomColor = Color(0xFFFFDBD1)
+val randomColor1 = Color(0xFFDED2F9)
+val randomColor2 = Color(0xFFC9EAFD)
 
 
 

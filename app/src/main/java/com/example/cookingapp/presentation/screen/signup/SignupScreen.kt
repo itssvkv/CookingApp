@@ -24,8 +24,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -47,6 +49,9 @@ fun SignupScreen(
 ) {
 
     val uiState by viewModel.uiState.collectAsState()
+    val focusRequester = remember {
+        FocusRequester()
+    }
     SignupScreenContent(
         uiState = uiState,
         onEmailChanged = viewModel::onEmailChanged,
@@ -54,7 +59,9 @@ fun SignupScreen(
         onConfirmPasswordChanged = viewModel::onConfirmPasswordChanged,
         onSignupClicked = { viewModel.onSignupButtonClicked() },
         onLoginClicked = onNavigateToLogin,
-        onBackClicked = onBackClicked
+        onBackClicked = onBackClicked,
+        isFocusedChanged = viewModel::isFocusedChanged,
+        focusRequester = focusRequester
     )
 
     LaunchedEffect(key1 = uiState.isRegisterSuccessful) {
@@ -74,7 +81,9 @@ fun SignupScreenContent(
     onConfirmPasswordChanged: (String) -> Unit,
     onSignupClicked: () -> Unit,
     onLoginClicked: () -> Unit,
-    onBackClicked: () -> Unit
+    onBackClicked: () -> Unit,
+    isFocusedChanged: (Boolean) -> Unit,
+    focusRequester: FocusRequester
 ) {
 
     LazyColumn(
@@ -104,7 +113,10 @@ fun SignupScreenContent(
                 onLoginClicked = onLoginClicked,
                 isButtonLoading = uiState.isLoading,
                 isError = uiState.isError,
-                errorType = uiState.errorType
+                errorType = uiState.errorType,
+                isFocusedChanged = isFocusedChanged,
+                focusRequester = focusRequester,
+                isFocused = uiState.isFocused
             )
         }
 
@@ -175,7 +187,10 @@ fun SignupScreenDataSection(
     onSignupClicked: () -> Unit,
     onLoginClicked: () -> Unit,
     isError: Boolean,
-    errorType: String? = null
+    errorType: String? = null,
+    isFocusedChanged: (Boolean) -> Unit,
+    focusRequester: FocusRequester,
+    isFocused: Boolean = false
 ) {
 
     Column(modifier = modifier.fillMaxWidth()) {
@@ -183,6 +198,9 @@ fun SignupScreenDataSection(
             value = email,
             onValueChange = onEmailChanged,
             label = Constants.CustomTextFieldLabel.EMAIL,
+            isFocusedChanged = isFocusedChanged,
+            focusRequester = focusRequester,
+            isFocused = isFocused
         )
         Spacer(modifier = Modifier.height(20.dp))
         MainTextField(
@@ -190,7 +208,10 @@ fun SignupScreenDataSection(
             onValueChange = onPasswordChanged,
             label = Constants.CustomTextFieldLabel.PASSWORD,
             isPassword = true,
-            trailingText = "Show"
+            trailingText = "Show",
+            isFocusedChanged = isFocusedChanged,
+            focusRequester = focusRequester,
+            isFocused = isFocused
         )
         Spacer(modifier = Modifier.height(20.dp))
         MainTextField(
@@ -198,7 +219,10 @@ fun SignupScreenDataSection(
             onValueChange = onConfirmPasswordChanged,
             label = Constants.CustomTextFieldLabel.PASSWORD,
             isPassword = true,
-            trailingText = "Show"
+            trailingText = "Show",
+            isFocusedChanged = isFocusedChanged,
+            focusRequester = focusRequester,
+            isFocused = isFocused
         )
         if (isError) {
             Text(text = errorType!!, style = MaterialTheme.typography.bodySmall, color = Color.Red)

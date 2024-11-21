@@ -41,6 +41,9 @@ class SignupScreenViewModel @Inject constructor(
     fun onConfirmPasswordChanged(confirmPassword: String) {
         _uiState.update { it.copy(confirmPassword = confirmPassword) }
     }
+    fun isFocusedChanged(isFocused: Boolean) {
+        _uiState.update { it.copy(isFocused = isFocused) }
+    }
 
     fun onSignupButtonClicked() {
         viewModelScope.launch(Dispatchers.IO) {

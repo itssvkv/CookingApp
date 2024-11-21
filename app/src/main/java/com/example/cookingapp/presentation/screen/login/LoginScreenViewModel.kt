@@ -36,6 +36,10 @@ class LoginScreenViewModel @Inject constructor(
         _uiState.update { it.copy(password = newValue) }
     }
 
+    fun isFocusedChanged(isFocused: Boolean) {
+        _uiState.update { it.copy(isFocused = isFocused) }
+    }
+
     fun onLoginButtonClicked(
 
     ) {

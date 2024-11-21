@@ -6,5 +6,6 @@ data class LoginScreenUiState(
     val isLoading: Boolean = false,
     val isLoginSuccessful: Boolean = false,
     val isError: Boolean = false,
-    val errorType: String? = null
+    val errorType: String? = null,
+    val isFocused: Boolean = false
 )

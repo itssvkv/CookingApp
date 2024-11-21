@@ -31,13 +31,17 @@ fun SetupNavGraph(
         composable<Screen.LoginScreen> {
             LoginScreen(
                 onNavigateToRegister = { navHostController.navigate(Screen.SignupScreen) },
-                onNavigateToHome = { navHostController.navigate(Screen.HomeScreen) },
+                onNavigateToHome = {
+                    navHostController.popBackStack()
+                    navHostController.navigate(Screen.HomeScreen) },
                 onNavigateToForgetPassword = {}
             )
         }
         composable<Screen.SignupScreen> {
             SignupScreen(
-                onNavigateToHome = { navHostController.navigate(Screen.HomeScreen) },
+                onNavigateToHome = {
+                    navHostController.popBackStack()
+                    navHostController.navigate(Screen.HomeScreen) },
                 onNavigateToLogin = { navHostController.navigate(Screen.LoginScreen) },
                 onBackClicked = { navHostController.popBackStack() }
             )
