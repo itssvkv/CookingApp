@@ -56,20 +56,19 @@ class HomeScreenViewModel @Inject constructor(
         }
     }
 
-    private fun getRandomMeals() {
+    fun getRandomMeals() {
         viewModelScope.launch(Dispatchers.IO) {
             networkRepository.getRandomMeal().onResponse(
                 onLoading = {
-                    _uiState.update { it.copy(isLoading = true) }
+                    _uiState.update { it.copy(isLoadingMoreMeals = true) }
                 },
                 onFailure = { error ->
                     Log.d(TAG, "getRandomMeals: $error")
-                    _uiState.update { it.copy(isLoading = false) }
+                    _uiState.update { it.copy(isLoadingMoreMeals = false) }
                 },
                 onSuccess = { meals ->
                     _uiState.update {
-                        it.copy(meals = meals, isLoading = false)
-
+                        it.copy(meals = it.meals + (meals!!), isLoadingMoreMeals = false)
                     }
                     Log.d(TAG, "getRandomMeals: ${meals?.get(0)}")
                 }

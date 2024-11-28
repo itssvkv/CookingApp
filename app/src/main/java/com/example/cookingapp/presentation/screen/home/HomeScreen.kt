@@ -31,19 +31,33 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.HeartBroken
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
@@ -53,6 +67,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.cookingapp.R
 import com.example.cookingapp.data.remote.api.dto.CategoriesDto
 import com.example.cookingapp.model.RandomMeal
+import com.example.cookingapp.presentation.components.BottomNavigationBar
 import com.example.cookingapp.presentation.components.MainBoxShape
 import com.example.cookingapp.presentation.components.MainButton
 import com.example.cookingapp.presentation.components.MainTextField
@@ -69,22 +84,44 @@ import randomColor2
 import tertiaryDark
 import kotlin.random.Random
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    viewModel: HomeScreenViewModel = hiltViewModel()
+    viewModel: HomeScreenViewModel = hiltViewModel(),
+    isNavigateToHome: () -> Unit = {},
+    isNavigateToLibrary: () -> Unit = {},
+    isNavigateToGenerateRecipe: () -> Unit = {},
+    isNavigateToFavorite: () -> Unit = {},
+    isNavigateToProfile: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val focusRequester = remember {
         FocusRequester()
     }
-    HomeScreenContent(
-        modifier = modifier,
-        uiState = uiState,
-        onSearchQueryChanged = viewModel::onSearchQueryChange,
-        isFocusedChanged = viewModel::isFocusedChanged,
-        focusRequester = focusRequester
-    )
+    Scaffold(
+        bottomBar = {
+            BottomNavigationBar(
+                selectedItem = 0,
+                isNavigateToHome = isNavigateToHome,
+                isNavigateToLibrary = isNavigateToLibrary,
+                isNavigateToGenerateRecipe = isNavigateToGenerateRecipe,
+                isNavigateToFavorite = isNavigateToFavorite,
+                isNavigateToProfile = isNavigateToProfile
+            )
+        },
+        containerColor = Color.White
+    ) {
+        HomeScreenContent(
+            modifier = modifier,
+            uiState = uiState,
+            onSearchQueryChanged = viewModel::onSearchQueryChange,
+            isFocusedChanged = viewModel::isFocusedChanged,
+            focusRequester = focusRequester,
+            isMealsReachingTheEnd = { viewModel.getRandomMeals() },
+        )
+    }
+
 }
 
 @Composable
@@ -93,14 +130,16 @@ fun HomeScreenContent(
     uiState: HomeScreenUiState,
     onSearchQueryChanged: (String) -> Unit,
     isFocusedChanged: (Boolean) -> Unit,
-    focusRequester: FocusRequester
+    focusRequester: FocusRequester,
+    isMealsReachingTheEnd: () -> Unit,
 ) {
+
     LazyColumn(
         modifier = modifier
-            .fillMaxSize()
+            .fillMaxWidth()
             .navigationBarsPadding()
             .statusBarsPadding()
-            .padding(16.dp),
+            .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         item {
@@ -119,15 +158,14 @@ fun HomeScreenContent(
                 isLoading = uiState.categories == null
             )
         }
-
-
-
         item {
             MealsSection(
-                title = "Random Recipes",
+                title = "Random recipes",
                 onSeeAllClicked = { },
-                meals = uiState.meals ?: emptyList(),
-                isLoading = uiState.meals == null
+                meals = uiState.meals,
+                isLoading = uiState.meals.isEmpty(),
+                isMealsReachingTheEnd = isMealsReachingTheEnd,
+                isLoadingMoreMeals = uiState.isLoadingMoreMeals
             )
 
 
@@ -136,7 +174,37 @@ fun HomeScreenContent(
             GenerateRecipeSection()
         }
 
+        item {
+            MealsSection(
+                title = "Favourite recipes",
+                onSeeAllClicked = { },
+                meals = uiState.meals,
+                isLoading = uiState.meals.isEmpty(),
+                isMealsReachingTheEnd = isMealsReachingTheEnd,
+                isLoadingMoreMeals = uiState.isLoadingMoreMeals
+            )
+        }
+
     }
+//    HomeTabsFooter(
+//        tabViewIcons = listOf(
+//            painterResource(id = R.drawable.home),
+//            painterResource(id = R.drawable.liberary),
+//            painterResource(id = R.drawable.repeat),
+//            painterResource(id = R.drawable.fav),
+//            painterResource(id = R.drawable.profile),
+//        )
+//    ) {
+//        when (it) {
+//            0 -> isNavigateToHome()
+//            1 -> isNavigateToLibrary()
+//            2 -> isNavigateToGenerateRecipe()
+//            3 -> isNavigateToFavorite()
+//            4 -> isNavigateToProfile()
+//            else -> isNavigateToHome()
+//        }
+//    }
+
 
 }
 
@@ -259,13 +327,14 @@ fun MealsSection(
     title: String,
     onSeeAllClicked: () -> Unit,
     meals: List<RandomMeal> = emptyList(),
-    isLoading: Boolean
+    isLoading: Boolean,
+    isMealsReachingTheEnd: () -> Unit,
+    isLoadingMoreMeals: Boolean
 ) {
 
     Column(
         modifier = modifier
-            .fillMaxWidth()
-            .padding(top = 16.dp),
+            .fillMaxWidth(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -293,7 +362,9 @@ fun MealsSection(
         Spacer(modifier = Modifier.height(8.dp))
         MealsSectionBody(
             meals = meals,
-            isLoading = isLoading
+            isLoading = isLoading,
+            isMealsReachingTheEnd = isMealsReachingTheEnd,
+            isLoadingMoreMeals = isLoadingMoreMeals
         )
 
     }
@@ -310,7 +381,9 @@ fun MealsSectionBody(
         randomColor2
     ),
     meals: List<RandomMeal> = emptyList(),
-    isLoading: Boolean
+    isLoading: Boolean,
+    isMealsReachingTheEnd: () -> Unit,
+    isLoadingMoreMeals: Boolean
 ) {
     val loadingContentAlpha = animateFloatAsState(
         targetValue = if (isLoading) 1f else 0f,
@@ -332,11 +405,23 @@ fun MealsSectionBody(
 
         ) {
             items(meals.size) { index: Int ->
+                Log.d(TAG, "MealsSectionBody: Index$index")
                 val num = Random.nextInt(0, 5)
                 SingleMealCard(
                     meal = meals[index],
                     backgroundColor = listOfColors[num]
                 )
+                LaunchedEffect(key1 = meals.size) {
+                    if (index == meals.size - 1) {
+                        isMealsReachingTheEnd()
+                    }
+                }
+
+            }
+            if (isLoadingMoreMeals) {
+                item {
+                    CircularProgressIndicator()
+                }
             }
         }
     }
@@ -505,6 +590,47 @@ fun GenerateRecipeBody(
                     .weight(5f)
                     .size(140.dp)
             )
+        }
+    }
+}
+
+
+@Composable
+fun HomeTabsFooter(
+    modifier: Modifier = Modifier,
+    tabViewIcons: List<Painter>,
+    onTabSelected: (selectedIndex: Int) -> Unit
+) {
+    var selectedIndex by remember {
+        mutableIntStateOf(0)
+    }
+    val inactiveColor = Color(0xFF777777)
+
+    TabRow(
+        selectedTabIndex = selectedIndex,
+        containerColor = Color.White,
+        contentColor = Color.Black,
+        modifier = modifier
+    ) {
+        tabViewIcons.forEachIndexed { index, item ->
+            Tab(
+                selected = selectedIndex == index,
+                onClick = {
+                    selectedIndex = index
+                    onTabSelected(index)
+                },
+                selectedContentColor = Color.Black,
+                unselectedContentColor = primary
+            ) {
+                Icon(
+                    painter = item,
+                    contentDescription = "",
+                    tint = if (selectedIndex == index) Color.Black else primary,
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .size(20.dp)
+                )
+            }
         }
     }
 }

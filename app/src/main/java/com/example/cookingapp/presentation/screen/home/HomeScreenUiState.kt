@@ -9,6 +9,8 @@ data class HomeScreenUiState(
     val isLoading: Boolean = false,
     val categories: HomeCategoriesResponse? = null,
     val isFocused: Boolean = false,
-    val meals: List<RandomMeal>? = null
+    val meals: List<RandomMeal> = emptyList(),
+    val isLoadingMoreMeals: Boolean = false,
+    val isMealsReachingTheEnd: Boolean = false
 )
 

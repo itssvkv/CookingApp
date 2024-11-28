@@ -8,6 +8,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.cookingapp.presentation.screen.home.HomeScreen
+import com.example.cookingapp.presentation.screen.library.LibraryScreen
 import com.example.cookingapp.presentation.screen.login.LoginScreen
 import com.example.cookingapp.presentation.screen.onboarding.OnBoardingScreen
 import com.example.cookingapp.presentation.screen.signup.SignupScreen
@@ -33,7 +34,8 @@ fun SetupNavGraph(
                 onNavigateToRegister = { navHostController.navigate(Screen.SignupScreen) },
                 onNavigateToHome = {
                     navHostController.popBackStack()
-                    navHostController.navigate(Screen.HomeScreen) },
+                    navHostController.navigate(Screen.HomeScreen)
+                },
                 onNavigateToForgetPassword = {}
             )
         }
@@ -41,13 +43,20 @@ fun SetupNavGraph(
             SignupScreen(
                 onNavigateToHome = {
                     navHostController.popBackStack()
-                    navHostController.navigate(Screen.HomeScreen) },
+                    navHostController.navigate(Screen.HomeScreen)
+                },
                 onNavigateToLogin = { navHostController.navigate(Screen.LoginScreen) },
                 onBackClicked = { navHostController.popBackStack() }
             )
         }
         composable<Screen.HomeScreen> {
-            HomeScreen()
+            HomeScreen(
+                isNavigateToLibrary = { navHostController.navigate(Screen.LibraryScreen) }
+            )
+        }
+
+        composable<Screen.LibraryScreen> {
+            LibraryScreen()
         }
 
     }

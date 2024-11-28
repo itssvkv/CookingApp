@@ -14,4 +14,6 @@ sealed class Screen() {
     data object SignupScreen: Screen()
     @Serializable
     data object HomeScreen: Screen()
+    @Serializable
+    data object LibraryScreen: Screen()
 }
