@@ -46,9 +46,19 @@ fun NavGraphBuilder.appNavGraph(
 
             ) {
             val uiState by sharedViewModelNavigationGraph.uiState.collectAsState()
-            AllRecipesScreen(meals = uiState.meals, title = uiState.title, onBackIconClicked = {
-                navController.popBackStack()
-            })
+            AllRecipesScreen(
+                meals = uiState.meals, title = uiState.title,
+                onBackIconClicked = {
+                    navController.popBackStack()
+                },
+                onNavigateToSingleRecipeScreen = { singleMeal, color ->
+                    sharedViewModelNavigationGraph.updateSingleMealState(
+                        meal = singleMeal,
+                        color = color
+                    )
+                    navController.navigate(HomeScreens.SingleRecipeScreen.route)
+
+                })
         }
         composable(route = HomeScreens.SingleRecipeScreen.route) {
             val uiState by sharedViewModelNavigationGraph.uiState.collectAsState()

@@ -2,7 +2,7 @@ package com.example.cookingapp.navigation
 
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
-import com.example.cookingapp.model.RandomMeal
+import com.example.cookingapp.model.SingleMeal
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,11 +15,11 @@ class SharedViewModelNavigationGraph @Inject constructor() : ViewModel() {
     private var _uiState = MutableStateFlow(SharedUiStateNavigationGraph())
     val uiState = _uiState.asStateFlow()
 
-    fun updateUiState(meals: List<RandomMeal>, title: String) {
+    fun updateUiState(meals: List<SingleMeal>, title: String) {
         _uiState.update { it.copy(meals = meals, title = title) }
     }
 
-    fun updateSingleMealState(meal: RandomMeal, color: Color) {
+    fun updateSingleMealState(meal: SingleMeal, color: Color) {
         _uiState.update { it.copy(singleMeal = meal, singleMealColor = color) }
     }
 

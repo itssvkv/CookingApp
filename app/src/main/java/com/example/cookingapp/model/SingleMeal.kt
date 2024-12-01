@@ -1,8 +1,6 @@
 package com.example.cookingapp.model
 
-import com.google.gson.annotations.SerializedName
-
-data class RandomMeal(
+data class SingleMeal(
     var idMeal: String? = null,
     var strMeal: String? = null,
     var strDrinkAlternate: String? = null,
@@ -12,6 +10,7 @@ data class RandomMeal(
     var strMealThumb: String? = null,
     var strTags: String? = null,
     var strYoutube: String? = null,
+    var strSource: String? = null,
     val ingredient: List<String?> = emptyList(),
     val measure: List<String?> = emptyList(),
     val prepTime: Int = 0,

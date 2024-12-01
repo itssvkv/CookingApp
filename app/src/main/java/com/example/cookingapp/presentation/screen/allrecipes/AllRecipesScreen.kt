@@ -1,25 +1,15 @@
 package com.example.cookingapp.presentation.screen.allrecipes
 
 import android.util.Log
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Search
@@ -34,21 +24,16 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.cookingapp.R
-import com.example.cookingapp.model.RandomMeal
-import com.example.cookingapp.navigation.HomeScreens
+import com.example.cookingapp.model.SingleMeal
 import com.example.cookingapp.presentation.components.MainTextField
 import com.example.cookingapp.presentation.components.SingleMealCard
-import com.example.cookingapp.presentation.screen.home.MealsSectionBody
-import com.example.cookingapp.presentation.screen.home.MealsSectionLoadingState
 import com.example.cookingapp.utils.Constants
 import com.example.cookingapp.utils.Constants.TAG
 import primaryDark
@@ -56,15 +41,15 @@ import randomColor
 import randomColor1
 import randomColor2
 import tertiaryDark
-import kotlin.random.Random
 
 @Composable
 fun AllRecipesScreen(
     modifier: Modifier = Modifier,
     viewModel: AllRecipesViewModel = hiltViewModel(),
-    meals: List<RandomMeal>,
+    meals: List<SingleMeal>,
     title: String,
-    onBackIconClicked: () -> Unit = {}
+    onBackIconClicked: () -> Unit = {},
+    onNavigateToSingleRecipeScreen: (SingleMeal, Color) -> Unit
 ) {
 //    viewModel.onReceiveMeals(meals = meals)
     val uiState by viewModel.uiState.collectAsState()
@@ -75,7 +60,8 @@ fun AllRecipesScreen(
         isMealsReachingTheEnd = { viewModel.getRandomMeals() },
         meals = meals,
         title = title,
-        onBackIconClicked = onBackIconClicked
+        onBackIconClicked = onBackIconClicked,
+        onItemClicked = onNavigateToSingleRecipeScreen
     )
 }
 
@@ -85,9 +71,10 @@ fun ScreenContent(
     uiState: AllRecipesScreenUiState,
     onSearchQueryChanged: (String) -> Unit,
     isMealsReachingTheEnd: () -> Unit = {},
-    meals:List<RandomMeal>,
+    meals: List<SingleMeal>,
     title: String,
-    onBackIconClicked: () -> Unit = {}
+    onBackIconClicked: () -> Unit = {},
+    onItemClicked: (SingleMeal, Color) -> Unit
 ) {
     LazyColumn(
         modifier = modifier
@@ -108,7 +95,8 @@ fun ScreenContent(
         mealsSectionBody(
             meals = meals + uiState.meals,
             isMealsReachingTheEnd = isMealsReachingTheEnd,
-            isLoading = uiState.isLoading
+            isLoading = uiState.isLoading,
+            onItemClicked = onItemClicked
         )
 
     }
@@ -174,10 +162,11 @@ fun LazyListScope.mealsSectionBody(
         randomColor1,
         randomColor2
     ),
-    meals: List<RandomMeal> = emptyList(),
+    meals: List<SingleMeal> = emptyList(),
     isLoading: Boolean = false,
     isMealsReachingTheEnd: () -> Unit = {},
-    onFavIconClicked: (Boolean) -> Unit = {}
+    onFavIconClicked: (Boolean) -> Unit = {},
+    onItemClicked: (SingleMeal, Color) -> Unit
 ) {
     items(meals.size) { index: Int ->
         Log.d(TAG, "MealsSectionBody: Index$index")
@@ -189,7 +178,8 @@ fun LazyListScope.mealsSectionBody(
             width = 345.dp,
             height = 405.dp,
             favIcon = painterResource(id = R.drawable.fav),
-            onFacIconClicked = onFavIconClicked
+            onFacIconClicked = onFavIconClicked,
+            onItemClicked = { onItemClicked(meals[index], listOfColors[num]) }
         )
         LaunchedEffect(key1 = meals.size) {
             if (index == meals.size - 1) {
@@ -214,6 +204,9 @@ private fun AllRecipesScreenPreview() {
             .fillMaxWidth()
             .background(Color.White)
     ) {
-        AllRecipesScreen(meals = emptyList(), title = "")
+        AllRecipesScreen(
+            meals = emptyList(),
+            title = "",
+            onNavigateToSingleRecipeScreen = { _, _ -> })
     }
 }

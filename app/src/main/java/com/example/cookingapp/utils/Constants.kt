@@ -17,6 +17,9 @@ object Constants {
     const val LIST = "list.php"
     const val ALL_CATEGORIES = COMMON_URL + "categories.php"
     const val RANDOM_MEAL = COMMON_URL + "random.php"
+    const val INGREDIENT = "https://www.themealdb.com/images/ingredients/"
+    val theIngredient = ""
+    val INGREDIENT_CALL_URL = "$INGREDIENT$theIngredient.png"
 
     enum class CustomTextFieldLabel {
         EMAIL,

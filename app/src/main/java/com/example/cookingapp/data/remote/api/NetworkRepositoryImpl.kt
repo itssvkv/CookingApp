@@ -1,10 +1,9 @@
 package com.example.cookingapp.data.remote.api
 
 import com.example.cookingapp.model.HomeCategoriesResponse
-import com.example.cookingapp.model.RandomMeal
+import com.example.cookingapp.model.SingleMeal
 import com.example.cookingapp.utils.Resource
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
 import java.io.IOException
@@ -31,8 +30,8 @@ class NetworkRepositoryImpl @Inject constructor(
 
     override suspend fun getRandomMeal(
 
-    ): Flow<Resource<List<RandomMeal>>> {
-        var list: List<RandomMeal> = emptyList()
+    ): Flow<Resource<List<SingleMeal>>> {
+        var list: List<SingleMeal> = emptyList()
 
         return flow {
             emit(Resource.Loading())

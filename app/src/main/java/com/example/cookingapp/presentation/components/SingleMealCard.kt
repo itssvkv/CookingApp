@@ -42,7 +42,7 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.example.cookingapp.R
-import com.example.cookingapp.model.RandomMeal
+import com.example.cookingapp.model.SingleMeal
 import com.example.cookingapp.utils.Constants.TAG
 
 @Composable
@@ -51,7 +51,7 @@ fun SingleMealCard(
     width: Dp = 200.dp,
     height: Dp = 240.dp,
     paddingValue: Dp = 16.dp,
-    meal: RandomMeal,
+    meal: SingleMeal,
     mealImageSize: Dp = if (width > 200.dp) 150.dp else 60.dp,
     mealNameTextStyle: TextStyle =
         if (width > 200.dp) MaterialTheme.typography.bodyLarge
@@ -74,15 +74,15 @@ fun SingleMealCard(
     val isSmall = if (width <= 200.dp) 16.dp else 0.dp
     Column(
         modifier = modifier
-            .clickable {
-                onItemClicked()
-            }
             .width(width)
             .height(height)
             .padding(end = isSmall)
             .padding(bottom = isLarge)
             .clip(RoundedCornerShape(16.dp))
             .background(backgroundColor)
+            .clickable {
+                onItemClicked()
+            }
             .padding(paddingValue),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

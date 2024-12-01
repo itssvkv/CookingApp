@@ -4,8 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cookingapp.data.remote.api.NetworkRepository
-import com.example.cookingapp.data.remote.api.dto.CategoriesDto
-import com.example.cookingapp.model.RandomMeal
+import com.example.cookingapp.model.SingleMeal
 import com.example.cookingapp.utils.Constants.TAG
 import com.example.cookingapp.utils.onResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -73,7 +72,7 @@ class HomeScreenViewModel @Inject constructor(
                         val prepTime = Random.nextInt(10, 40)
                         val cookTime = Random.nextInt(10, 40)
                         val totalTime = prepTime + cookTime
-                        RandomMeal(
+                        SingleMeal(
                             idMeal = it.idMeal,
                             strMeal = it.strMeal,
                             strDrinkAlternate = it.strDrinkAlternate,
@@ -84,6 +83,7 @@ class HomeScreenViewModel @Inject constructor(
                             strTags = it.strTags,
                             strYoutube = it.strYoutube,
                             ingredient = it.ingredient,
+                            strSource = it.strSource,
                             measure = it.measure,
                             prepTime = prepTime,
                             cookTime = cookTime,

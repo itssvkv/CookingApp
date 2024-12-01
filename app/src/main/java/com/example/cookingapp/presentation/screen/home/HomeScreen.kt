@@ -19,10 +19,8 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -31,15 +29,10 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.HeartBroken
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.MenuBook
-import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -57,7 +50,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
@@ -66,9 +58,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.cookingapp.R
 import com.example.cookingapp.data.remote.api.dto.CategoriesDto
-import com.example.cookingapp.model.RandomMeal
-import com.example.cookingapp.navigation.SharedViewModelNavigationGraph
-import com.example.cookingapp.presentation.components.BottomNavigationBar
+import com.example.cookingapp.model.SingleMeal
 import com.example.cookingapp.presentation.components.MainBoxShape
 import com.example.cookingapp.presentation.components.MainButton
 import com.example.cookingapp.presentation.components.MainTextField
@@ -78,20 +68,20 @@ import com.example.cookingapp.utils.Constants
 import com.example.cookingapp.utils.Constants.TAG
 import dots
 import primary
+import primaryContainerLight
 import primaryDark
 import randomColor
 import randomColor1
 import randomColor2
 import tertiaryDark
-import kotlin.random.Random
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeScreenViewModel = hiltViewModel(),
-    onNavigateToAllRecipesScreen: (List<RandomMeal>, String) -> Unit,
-    onNavigateToSingleRecipeScreen: (RandomMeal, Color) -> Unit
+    onNavigateToAllRecipesScreen: (List<SingleMeal>, String) -> Unit,
+    onNavigateToSingleRecipeScreen: (SingleMeal, Color) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val focusRequester = remember {
@@ -121,8 +111,8 @@ fun HomeScreenContent(
     isFocusedChanged: (Boolean) -> Unit,
     focusRequester: FocusRequester,
     isMealsReachingTheEnd: () -> Unit,
-    onNavigateToAllRecipesScreen: (List<RandomMeal>, String) -> Unit,
-    onItemClicked: (RandomMeal, Color) -> Unit
+    onNavigateToAllRecipesScreen: (List<SingleMeal>, String) -> Unit,
+    onItemClicked: (SingleMeal, Color) -> Unit
 ) {
 
     LazyColumn(
@@ -161,7 +151,12 @@ fun HomeScreenContent(
 
         }
         item {
-            GenerateRecipeSection()
+            GenerateRecipeSection(
+                firstDescription = "Don't know what to eat?",
+                secondDescription = "*based on your preferences",
+                title = "Generate recipe",
+                buttonText = "Generate"
+            )
         }
 
         item {
@@ -255,6 +250,7 @@ fun HomeScreenCategoriesSection(
                             color = primary.copy(alpha = .5f),
                             shape = RoundedCornerShape(20.dp)
                         )
+                        .clip(RoundedCornerShape(20.dp))
                         .clickable {
                             onItemClicked(index)
                         }
@@ -317,11 +313,11 @@ fun MealsSection(
     modifier: Modifier = Modifier,
     title: String,
     onSeeAllClicked: () -> Unit,
-    meals: List<RandomMeal> = emptyList(),
+    meals: List<SingleMeal> = emptyList(),
     isLoading: Boolean,
     isMealsReachingTheEnd: () -> Unit,
     isLoadingMoreMeals: Boolean,
-    onItemClicked: (RandomMeal, Color) -> Unit
+    onItemClicked: (SingleMeal, Color) -> Unit
 ) {
 
     Column(
@@ -373,11 +369,11 @@ fun MealsSectionBody(
         randomColor1,
         randomColor2
     ),
-    meals: List<RandomMeal> = emptyList(),
+    meals: List<SingleMeal> = emptyList(),
     isLoading: Boolean,
     isMealsReachingTheEnd: () -> Unit,
     isLoadingMoreMeals: Boolean,
-    onItemClicked: (RandomMeal, Color) -> Unit
+    onItemClicked: (SingleMeal, Color) -> Unit
 ) {
     val loadingContentAlpha = animateFloatAsState(
         targetValue = if (isLoading) 1f else 0f,
@@ -487,7 +483,14 @@ fun MealsSectionLoadingState(
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 fun GenerateRecipeSection(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    backgroundTopBoxColor: Color = primaryContainerLight,
+    title: String = "",
+    firstDescription: String = "",
+    secondDescription: String = "",
+    buttonText: String = "",
+    onGenerateClicked: () -> Unit = {},
+    painter: Painter = painterResource(id = R.drawable.gernerate_woman)
 ) {
     BoxWithConstraints(
         modifier = modifier
@@ -503,21 +506,35 @@ fun GenerateRecipeSection(
             boxWidth = weight - blackColorRadius,
             boxHeight = height - blackColorRadius,
             blackColorRadius = blackColorRadius,
-            shapeRadius = 12.dp
+            shapeRadius = 12.dp,
+            backgroundTopBoxColor = backgroundTopBoxColor
         ) {
-            GenerateRecipeBody()
+            GenerateRecipeBody(
+                firstDescription = firstDescription,
+                title = title,
+                secondDescription = secondDescription,
+                buttonText = buttonText,
+                onGenerateClicked = onGenerateClicked,
+                painter = painter
+            )
         }
     }
 }
 
 @Composable
 fun GenerateRecipeBody(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    title: String = "",
+    firstDescription: String = "",
+    secondDescription: String = "",
+    buttonText: String = "",
+    onGenerateClicked: () -> Unit = {},
+    painter: Painter = painterResource(id = R.drawable.gernerate_woman)
 ) {
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(start = 20.dp, top = 16.dp),
+            .padding(start = 20.dp, top = 16.dp, bottom = 16.dp),
         contentAlignment = Alignment.Center
     ) {
         Row(
@@ -528,7 +545,8 @@ fun GenerateRecipeBody(
             Column(
                 modifier = Modifier
                     .fillMaxHeight()
-                    .weight(5f)
+                    .weight(6f),
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
                 LazyVerticalGrid(
                     modifier = Modifier
@@ -549,20 +567,31 @@ fun GenerateRecipeBody(
                     }
                 }
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "Don't know what to eat?",
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.SemiBold
-                )
+
+                if (firstDescription.isNotEmpty()) {
+                    Text(
+                        text = firstDescription,
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                } else {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
+                }
+
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Generate recipe",
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "*based on your preferences",
+                    text = secondDescription,
                     style = MaterialTheme.typography.bodySmall
                 )
                 Spacer(modifier = Modifier.height(8.dp))
@@ -571,18 +600,17 @@ fun GenerateRecipeBody(
                         .fillMaxWidth()
                         .height(40.dp)
                         .padding(end = 16.dp),
-                    text = "Generate",
-                    onButtonClicked = {
+                    text = buttonText,
+                    onButtonClicked = onGenerateClicked
 
-                    }
                 )
             }
 
             Image(
-                painter = painterResource(id = R.drawable.gernerate_woman),
+                painter = painter,
                 contentDescription = "woman",
                 modifier = Modifier
-                    .weight(5f)
+                    .weight(4f)
                     .size(140.dp)
             )
         }

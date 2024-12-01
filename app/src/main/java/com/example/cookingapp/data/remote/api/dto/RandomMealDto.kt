@@ -1,6 +1,6 @@
 package com.example.cookingapp.data.remote.api.dto
 
-import com.example.cookingapp.model.RandomMeal
+import com.example.cookingapp.model.SingleMeal
 import com.google.gson.annotations.SerializedName
 
 
@@ -69,8 +69,8 @@ data class RandomMealDto(
 
     }
 
-    fun toRandomMeal(): RandomMeal {
-        return RandomMeal(
+    fun toRandomMeal(): SingleMeal {
+        return SingleMeal(
             idMeal = this.meals[0].idMeal,
             strMeal = this.meals[0].strMeal,
             strDrinkAlternate = this.meals[0].strDrinkAlternate,
@@ -80,6 +80,7 @@ data class RandomMealDto(
             strMealThumb = this.meals[0].strMealThumb,
             strTags = this.meals[0].strTags,
             strYoutube = this.meals[0].strYoutube,
+            strSource = this.meals[0].strSource,
             ingredient = listOf(
                 this.meals[0].strIngredient1,
                 this.meals[0].strIngredient2,

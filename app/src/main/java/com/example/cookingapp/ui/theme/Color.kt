@@ -224,6 +224,8 @@ val randomColor1 = Color(0xFFDED2F9)
 val randomColor2 = Color(0xFFC9EAFD)
 val dots = Color(0xFF5E98AE)
 val timeColor = Color(0xFFEE7A08)
+val veryLightWhite = Color(0xFFF1F9F9)
+val linkColor = Color(0xFF0000EE)
 
 
 
