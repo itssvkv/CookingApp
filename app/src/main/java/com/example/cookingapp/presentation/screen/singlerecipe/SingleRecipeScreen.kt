@@ -39,7 +39,7 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.example.cookingapp.R
-import com.example.cookingapp.model.SingleMeal
+import com.example.cookingapp.model.SingleMealLocal
 import com.example.cookingapp.utils.Constants.INGREDIENT
 import com.example.cookingapp.utils.Constants.TAG
 import linkColor
@@ -49,7 +49,7 @@ import veryLightWhite
 @Composable
 fun SingleRecipeScreen(
     modifier: Modifier = Modifier,
-    mealInfo: SingleMeal,
+    mealInfo: SingleMealLocal,
     onBackIconClicked: () -> Unit,
     mealColor: Color
 ) {
@@ -75,7 +75,7 @@ fun SingleRecipeScreen(
 @Composable
 fun ScreenContent(
     modifier: Modifier = Modifier,
-    mealInfo: SingleMeal,
+    mealInfo: SingleMealLocal,
     onBackIconClicked: () -> Unit,
     onFavIconClicked: () -> Unit,
     mealColor: Color,
@@ -144,7 +144,7 @@ fun ScreenHeader(
 @Composable
 fun ScreenBody(
     modifier: Modifier = Modifier,
-    mealInfo: SingleMeal,
+    mealInfo: SingleMealLocal,
     mealColor: Color,
     onTheMealImageLinkClicked: (String) -> Unit = {},
     onYoutubeLinkClicked: (String) -> Unit = {},

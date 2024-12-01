@@ -1,7 +1,14 @@
 package com.example.cookingapp.model
 
-data class SingleMeal(
-    var idMeal: String? = null,
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import kotlinx.serialization.Serializable
+
+@Serializable
+@Entity(tableName = "my_recipes")
+data class SingleMealLocal(
+    @PrimaryKey(autoGenerate = true)
+    var idMeal: Int? = null,
     var strMeal: String? = null,
     var strDrinkAlternate: String? = null,
     var strCategory: String? = null,

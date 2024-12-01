@@ -14,9 +14,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -38,13 +40,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             AppTheme {
                 val navController = rememberNavController()
-//                SetupNavGraph(
-//                    navHostController = navHostController
-//                )
-//                RootNavGraph(
-//                    navController = navHostController,
-//                    startGraph = if (Constants.isLoggedIn) BOTTOM_BAR_GRAPH_ROUTE else MAIN_GRAPH_ROUTE
-//                )
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
 
@@ -53,17 +48,21 @@ class MainActivity : ComponentActivity() {
 
                 val bottomBarState = remember { (mutableStateOf(true)) }
                 val topBarState = remember { (mutableStateOf(true)) }
-
+                var selectedItem by remember {
+                    mutableIntStateOf(0)
+                }
                 // Control TopBar and BottomBar
                 when (navBackStackEntry?.destination?.route) {
                     HomeScreens.HomeScreen.route -> {
                         bottomBarState.value = true
                         topBarState.value = true
+                        selectedItem = 0
                     }
 
                     HomeScreens.LibraryScreen.route -> {
                         bottomBarState.value = true
                         topBarState.value = true
+                        selectedItem = 1
                     }
 
                     HomeScreens.AllRecipesScreen.route -> {
@@ -82,7 +81,11 @@ class MainActivity : ComponentActivity() {
                     },
                     bottomBar = {
                         if (bottomBarState.value) {
-                            BottomNavigationBar(navController = navController)
+                            BottomNavigationBar(
+                                navController = navController,
+                                currentRoute = currentRoute,
+                                selectedItem = selectedItem
+                            )
                         }
                     },
                     containerColor = Color.White

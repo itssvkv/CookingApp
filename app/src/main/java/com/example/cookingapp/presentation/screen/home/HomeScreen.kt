@@ -58,7 +58,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.cookingapp.R
 import com.example.cookingapp.data.remote.api.dto.CategoriesDto
-import com.example.cookingapp.model.SingleMeal
+import com.example.cookingapp.model.SingleMealLocal
 import com.example.cookingapp.presentation.components.MainBoxShape
 import com.example.cookingapp.presentation.components.MainButton
 import com.example.cookingapp.presentation.components.MainTextField
@@ -80,8 +80,8 @@ import tertiaryDark
 fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeScreenViewModel = hiltViewModel(),
-    onNavigateToAllRecipesScreen: (List<SingleMeal>, String) -> Unit,
-    onNavigateToSingleRecipeScreen: (SingleMeal, Color) -> Unit
+    onNavigateToAllRecipesScreen: (List<SingleMealLocal>, String) -> Unit,
+    onNavigateToSingleRecipeScreen: (SingleMealLocal, Color) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val focusRequester = remember {
@@ -96,7 +96,8 @@ fun HomeScreen(
         focusRequester = focusRequester,
         isMealsReachingTheEnd = { viewModel.getRandomMeals() },
         onNavigateToAllRecipesScreen = onNavigateToAllRecipesScreen,
-        onItemClicked = onNavigateToSingleRecipeScreen
+        onItemClicked = onNavigateToSingleRecipeScreen,
+        onButtonClicked = { viewModel.addTooRoom(uiState.meals[0]) }
 
     )
 
@@ -111,8 +112,9 @@ fun HomeScreenContent(
     isFocusedChanged: (Boolean) -> Unit,
     focusRequester: FocusRequester,
     isMealsReachingTheEnd: () -> Unit,
-    onNavigateToAllRecipesScreen: (List<SingleMeal>, String) -> Unit,
-    onItemClicked: (SingleMeal, Color) -> Unit
+    onNavigateToAllRecipesScreen: (List<SingleMealLocal>, String) -> Unit,
+    onItemClicked: (SingleMealLocal, Color) -> Unit,
+    onButtonClicked: () -> Unit = {},
 ) {
 
     LazyColumn(
@@ -155,7 +157,8 @@ fun HomeScreenContent(
                 firstDescription = "Don't know what to eat?",
                 secondDescription = "*based on your preferences",
                 title = "Generate recipe",
-                buttonText = "Generate"
+                buttonText = "Generate",
+                onButtonClicked = onButtonClicked
             )
         }
 
@@ -313,11 +316,11 @@ fun MealsSection(
     modifier: Modifier = Modifier,
     title: String,
     onSeeAllClicked: () -> Unit,
-    meals: List<SingleMeal> = emptyList(),
+    meals: List<SingleMealLocal> = emptyList(),
     isLoading: Boolean,
     isMealsReachingTheEnd: () -> Unit,
     isLoadingMoreMeals: Boolean,
-    onItemClicked: (SingleMeal, Color) -> Unit
+    onItemClicked: (SingleMealLocal, Color) -> Unit
 ) {
 
     Column(
@@ -369,11 +372,11 @@ fun MealsSectionBody(
         randomColor1,
         randomColor2
     ),
-    meals: List<SingleMeal> = emptyList(),
+    meals: List<SingleMealLocal> = emptyList(),
     isLoading: Boolean,
     isMealsReachingTheEnd: () -> Unit,
     isLoadingMoreMeals: Boolean,
-    onItemClicked: (SingleMeal, Color) -> Unit
+    onItemClicked: (SingleMealLocal, Color) -> Unit
 ) {
     val loadingContentAlpha = animateFloatAsState(
         targetValue = if (isLoading) 1f else 0f,
@@ -489,7 +492,7 @@ fun GenerateRecipeSection(
     firstDescription: String = "",
     secondDescription: String = "",
     buttonText: String = "",
-    onGenerateClicked: () -> Unit = {},
+    onButtonClicked: () -> Unit = {},
     painter: Painter = painterResource(id = R.drawable.gernerate_woman)
 ) {
     BoxWithConstraints(
@@ -514,7 +517,7 @@ fun GenerateRecipeSection(
                 title = title,
                 secondDescription = secondDescription,
                 buttonText = buttonText,
-                onGenerateClicked = onGenerateClicked,
+                onButtonClicked = onButtonClicked,
                 painter = painter
             )
         }
@@ -528,7 +531,7 @@ fun GenerateRecipeBody(
     firstDescription: String = "",
     secondDescription: String = "",
     buttonText: String = "",
-    onGenerateClicked: () -> Unit = {},
+    onButtonClicked: () -> Unit = {},
     painter: Painter = painterResource(id = R.drawable.gernerate_woman)
 ) {
     Box(
@@ -601,7 +604,7 @@ fun GenerateRecipeBody(
                         .height(40.dp)
                         .padding(end = 16.dp),
                     text = buttonText,
-                    onButtonClicked = onGenerateClicked
+                    onButtonClicked = onButtonClicked
 
                 )
             }

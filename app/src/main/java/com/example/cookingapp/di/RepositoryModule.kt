@@ -4,6 +4,10 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import com.example.cookingapp.data.local.datastore.DataStoreRepository
 import com.example.cookingapp.data.local.datastore.DataStoreRepositoryImpl
+import com.example.cookingapp.data.local.room.LocalDatabase
+import com.example.cookingapp.data.local.room.dao.MyRecipesDao
+import com.example.cookingapp.data.local.room.repository.RoomRepository
+import com.example.cookingapp.data.local.room.repository.RoomRepositoryImpl
 import com.example.cookingapp.data.remote.api.MealsAPI
 import com.example.cookingapp.data.remote.api.NetworkRepository
 import com.example.cookingapp.data.remote.api.NetworkRepositoryImpl
@@ -37,6 +41,12 @@ object RepositoryModule {
     @Singleton
     fun providesNetworkRepository(api: MealsAPI): NetworkRepository {
         return NetworkRepositoryImpl(api = api)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDatabaseRepository(myRecipes: MyRecipesDao, db: LocalDatabase): RoomRepository {
+        return RoomRepositoryImpl(dao = myRecipes, db = db)
     }
 
 }

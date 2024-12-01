@@ -3,8 +3,9 @@ package com.example.cookingapp.presentation.screen.home
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.cookingapp.data.local.room.repository.RoomRepository
 import com.example.cookingapp.data.remote.api.NetworkRepository
-import com.example.cookingapp.model.SingleMeal
+import com.example.cookingapp.model.SingleMealLocal
 import com.example.cookingapp.utils.Constants.TAG
 import com.example.cookingapp.utils.onResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,7 +19,8 @@ import kotlin.random.Random
 
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
-    private val networkRepository: NetworkRepository
+    private val networkRepository: NetworkRepository,
+    private val roomRepository: RoomRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(HomeScreenUiState())
     val uiState = _uiState.asStateFlow()
@@ -72,7 +74,7 @@ class HomeScreenViewModel @Inject constructor(
                         val prepTime = Random.nextInt(10, 40)
                         val cookTime = Random.nextInt(10, 40)
                         val totalTime = prepTime + cookTime
-                        SingleMeal(
+                        SingleMealLocal(
                             idMeal = it.idMeal,
                             strMeal = it.strMeal,
                             strDrinkAlternate = it.strDrinkAlternate,
@@ -97,6 +99,13 @@ class HomeScreenViewModel @Inject constructor(
                 }
             )
         }
+    }
+
+    fun addTooRoom(recipe: SingleMealLocal) {
+        viewModelScope.launch {
+            roomRepository.insertRecipe(recipe)
+        }
+
     }
 
 }

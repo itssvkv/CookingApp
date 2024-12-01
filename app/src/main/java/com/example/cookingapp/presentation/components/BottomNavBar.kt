@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -21,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.cookingapp.R
 import com.example.cookingapp.navigation.HomeScreens
 import com.example.cookingapp.navigation.MainScreens
@@ -32,6 +34,8 @@ import primary
 fun BottomNavigationBar(
     modifier: Modifier = Modifier,
     navController: NavHostController,
+    currentRoute: String?,
+    selectedItem: Int,
     isNavigateToHome: () -> Unit = {},
     isNavigateToLibrary: () -> Unit = {},
     isNavigateToGenerateRecipe: () -> Unit = {},
@@ -39,40 +43,41 @@ fun BottomNavigationBar(
     isNavigateToProfile: () -> Unit = {}
 ) {
 
-    var selectedItem by remember {
-        mutableIntStateOf(0)
-    }
+
     val isSelected by remember {
         mutableStateOf(false)
     }
+
+
+
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(40.dp)
+            .height(60.dp)
             .background(color = Color.White),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
         for (i in 0..4) {
-            Column(
-                modifier = Modifier
-                    .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null
-                ) {
-                    selectedItem = i
-                    when (i) {
-                        0 -> navController.navigate(HomeScreens.HomeScreen.route)
-                        1 -> navController.navigate(HomeScreens.LibraryScreen.route)
-                        2 -> isNavigateToGenerateRecipe()
-                        3 -> isNavigateToFavorite()
-                        4 -> isNavigateToProfile()
+            IconButton(onClick = {
+                when (i) {
+                    0 -> {
+                        if (currentRoute != HomeScreens.HomeScreen.route) {
+                            navController.navigate(
+                                HomeScreens.HomeScreen.route
+                            )
+                        }
                     }
 
-                },
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
+                    1 -> {
+                        if (currentRoute != HomeScreens.LibraryScreen.route) {
+                            navController.navigate(
+                                HomeScreens.LibraryScreen.route
+                            )
+                        }
+                    }
+                }
+            }) {
                 Icon(
                     painter = painterResource(
                         id = when (i) {
@@ -89,7 +94,5 @@ fun BottomNavigationBar(
                 )
             }
         }
-
-
     }
 }

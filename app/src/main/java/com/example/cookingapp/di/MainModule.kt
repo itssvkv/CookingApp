@@ -5,8 +5,10 @@ import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
+import androidx.room.Room
 import com.example.cookingapp.data.local.datastore.DataStoreRepository
 import com.example.cookingapp.data.local.datastore.DataStoreRepositoryImpl
+import com.example.cookingapp.data.local.room.LocalDatabase
 import com.example.cookingapp.data.remote.api.MealsAPI
 import com.example.cookingapp.utils.Constants
 import com.example.cookingapp.utils.Constants.BASE_URL
@@ -76,5 +78,23 @@ object MainModule {
             .build()
             .create(MealsAPI::class.java)
     }
+
+    @Provides
+    @Singleton
+    fun provideDatabase(
+        @ApplicationContext context: Context
+    ): LocalDatabase {
+        return Room.databaseBuilder(
+            context,
+            LocalDatabase::class.java,
+            "local_database"
+        )
+            .fallbackToDestructiveMigration()
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun providesMyRecipesDao(database: LocalDatabase) = database.recipeDao()
 
 }

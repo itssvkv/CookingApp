@@ -42,7 +42,7 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.example.cookingapp.R
-import com.example.cookingapp.model.SingleMeal
+import com.example.cookingapp.model.SingleMealLocal
 import com.example.cookingapp.utils.Constants.TAG
 
 @Composable
@@ -51,7 +51,7 @@ fun SingleMealCard(
     width: Dp = 200.dp,
     height: Dp = 240.dp,
     paddingValue: Dp = 16.dp,
-    meal: SingleMeal,
+    meal: SingleMealLocal,
     mealImageSize: Dp = if (width > 200.dp) 150.dp else 60.dp,
     mealNameTextStyle: TextStyle =
         if (width > 200.dp) MaterialTheme.typography.bodyLarge

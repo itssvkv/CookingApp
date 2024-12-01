@@ -38,7 +38,12 @@ fun NavGraphBuilder.appNavGraph(
         }
 
         composable(HomeScreens.LibraryScreen.route) {
-            LibraryScreen()
+            LibraryScreen(
+                onItemClicked = { singleMeal, color ->
+                    sharedViewModelNavigationGraph.updateSingleMealState(meal = singleMeal, color)
+                    navController.navigate(HomeScreens.SingleRecipeScreen.route)
+                }
+            )
         }
         composable(
             route = HomeScreens.AllRecipesScreen.route,

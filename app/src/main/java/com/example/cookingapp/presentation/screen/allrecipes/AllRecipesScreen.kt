@@ -31,7 +31,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.cookingapp.R
-import com.example.cookingapp.model.SingleMeal
+import com.example.cookingapp.model.SingleMealLocal
+import com.example.cookingapp.presentation.components.CommonHeaderSection
 import com.example.cookingapp.presentation.components.MainTextField
 import com.example.cookingapp.presentation.components.SingleMealCard
 import com.example.cookingapp.utils.Constants
@@ -46,10 +47,10 @@ import tertiaryDark
 fun AllRecipesScreen(
     modifier: Modifier = Modifier,
     viewModel: AllRecipesViewModel = hiltViewModel(),
-    meals: List<SingleMeal>,
+    meals: List<SingleMealLocal>,
     title: String,
     onBackIconClicked: () -> Unit = {},
-    onNavigateToSingleRecipeScreen: (SingleMeal, Color) -> Unit
+    onNavigateToSingleRecipeScreen: (SingleMealLocal, Color) -> Unit
 ) {
 //    viewModel.onReceiveMeals(meals = meals)
     val uiState by viewModel.uiState.collectAsState()
@@ -71,10 +72,10 @@ fun ScreenContent(
     uiState: AllRecipesScreenUiState,
     onSearchQueryChanged: (String) -> Unit,
     isMealsReachingTheEnd: () -> Unit = {},
-    meals: List<SingleMeal>,
+    meals: List<SingleMealLocal>,
     title: String,
     onBackIconClicked: () -> Unit = {},
-    onItemClicked: (SingleMeal, Color) -> Unit
+    onItemClicked: (SingleMealLocal, Color) -> Unit
 ) {
     LazyColumn(
         modifier = modifier
@@ -82,7 +83,7 @@ fun ScreenContent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         item {
-            HeaderSection(title = title, onBackIconClicked = onBackIconClicked)
+            CommonHeaderSection(title = title, onBackIconClicked = onBackIconClicked)
         }
         item {
             AllRecipesScreenSearchBar(
@@ -102,42 +103,7 @@ fun ScreenContent(
     }
 }
 
-@Composable
-fun HeaderSection(
-    modifier: Modifier = Modifier,
-    title: String,
-    onBackIconClicked: () -> Unit = {}
-) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.weight(3.5f)
-        ) {
-            IconButton(onClick = onBackIconClicked) {
-                Icon(imageVector = Icons.Filled.ArrowBackIosNew, contentDescription = "back")
-            }
-            Text(
-                text = "Back", style = MaterialTheme.typography.bodyLarge,
-                color = Color.Black,
-                fontWeight = FontWeight.Bold
-            )
-        }
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.weight(6.5f)
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleLarge,
-                color = Color.Black,
-                fontWeight = FontWeight.Bold
-            )
-        }
-    }
-}
+
 
 @Composable
 fun AllRecipesScreenSearchBar(
@@ -162,11 +128,11 @@ fun LazyListScope.mealsSectionBody(
         randomColor1,
         randomColor2
     ),
-    meals: List<SingleMeal> = emptyList(),
+    meals: List<SingleMealLocal> = emptyList(),
     isLoading: Boolean = false,
     isMealsReachingTheEnd: () -> Unit = {},
     onFavIconClicked: (Boolean) -> Unit = {},
-    onItemClicked: (SingleMeal, Color) -> Unit
+    onItemClicked: (SingleMealLocal, Color) -> Unit
 ) {
     items(meals.size) { index: Int ->
         Log.d(TAG, "MealsSectionBody: Index$index")
