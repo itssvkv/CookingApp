@@ -50,8 +50,8 @@ fun MainTextField(
     label: Constants.CustomTextFieldLabel = Constants.CustomTextFieldLabel.EMAIL,
     trailingText: String? = null,
     leadingIcon: ImageVector? = null,
-    isFocusedChanged: (Boolean) -> Unit,
-    focusRequester: FocusRequester,
+    isFocusedChanged: (Boolean) -> Unit = {},
+    focusRequester: FocusRequester = FocusRequester(),
     isFocused: Boolean = false
 ) {
 

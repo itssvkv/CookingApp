@@ -1,63 +1,56 @@
 package com.example.cookingapp.navigation
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.navigation.NavDestination
-import androidx.navigation.NavHost
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navigation
 import com.example.cookingapp.presentation.screen.home.HomeScreen
 import com.example.cookingapp.presentation.screen.library.LibraryScreen
 import com.example.cookingapp.presentation.screen.login.LoginScreen
 import com.example.cookingapp.presentation.screen.onboarding.OnBoardingScreen
 import com.example.cookingapp.presentation.screen.signup.SignupScreen
 import com.example.cookingapp.presentation.screen.splash.SplashScreen
+import com.example.cookingapp.utils.Constants.BOTTOM_BAR_GRAPH_ROUTE
+import com.example.cookingapp.utils.Constants.MAIN_GRAPH_ROUTE
 
-@Composable
-fun SetupNavGraph(
-    navHostController: NavHostController,
-    startDestination: Screen = Screen.SplashScreen
+
+fun NavGraphBuilder.mainNavGraph(
+    navController: NavHostController,
 ) {
 
-    NavHost(navController = navHostController, startDestination = startDestination) {
-        composable<Screen.SplashScreen> {
+    navigation(
+        route = MAIN_GRAPH_ROUTE,
+        startDestination = MainScreens.SplashScreen.route
+    ) {
+        composable(route = MainScreens.SplashScreen.route) {
             SplashScreen(
-                navHostController = navHostController
+                navHostController = navController
             )
         }
-        composable<Screen.OnBoardingScreen> {
-            OnBoardingScreen(navHostController = navHostController)
+        composable(route = MainScreens.OnBoardingScreen.route) {
+            OnBoardingScreen(navHostController = navController)
         }
-        composable<Screen.LoginScreen> {
+        composable(route = MainScreens.LoginScreen.route) {
             LoginScreen(
-                onNavigateToRegister = { navHostController.navigate(Screen.SignupScreen) },
+                onNavigateToRegister = { navController.navigate(MainScreens.SignupScreen.route) },
                 onNavigateToHome = {
-                    navHostController.popBackStack()
-                    navHostController.navigate(Screen.HomeScreen)
+                    navController.popBackStack()
+                    navController.navigate(route = BOTTOM_BAR_GRAPH_ROUTE)
                 },
                 onNavigateToForgetPassword = {}
             )
         }
-        composable<Screen.SignupScreen> {
+        composable(MainScreens.SignupScreen.route) {
             SignupScreen(
                 onNavigateToHome = {
-                    navHostController.popBackStack()
-                    navHostController.navigate(Screen.HomeScreen)
+                    navController.popBackStack()
+                    navController.navigate(route = BOTTOM_BAR_GRAPH_ROUTE)
                 },
-                onNavigateToLogin = { navHostController.navigate(Screen.LoginScreen) },
-                onBackClicked = { navHostController.popBackStack() }
-            )
-        }
-        composable<Screen.HomeScreen> {
-            HomeScreen(
-                isNavigateToLibrary = { navHostController.navigate(Screen.LibraryScreen) }
+                onNavigateToLogin = { navController.navigate(MainScreens.LoginScreen.route) },
+                onBackClicked = { navController.popBackStack() }
             )
         }
 
-        composable<Screen.LibraryScreen> {
-            LibraryScreen()
-        }
 
     }
 

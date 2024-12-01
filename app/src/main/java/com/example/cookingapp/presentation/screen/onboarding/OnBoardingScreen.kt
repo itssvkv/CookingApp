@@ -1,10 +1,8 @@
 package com.example.cookingapp.presentation.screen.onboarding
 
-import android.widget.Space
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,7 +32,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.cookingapp.R
-import com.example.cookingapp.navigation.Screen
+import com.example.cookingapp.navigation.MainScreens
 import com.example.cookingapp.presentation.components.MainBoxShape
 import inversePrimaryLight
 import mainButtonColor
@@ -139,7 +137,7 @@ fun OnBoardingScreen(
                 shape = RoundedCornerShape(6.dp),
                 onClick = {
                     navHostController.popBackStack()
-                    navHostController.navigate(Screen.LoginScreen)
+                    navHostController.navigate(MainScreens.LoginScreen.route)
                 }
             ) {
                 Text(
@@ -161,7 +159,7 @@ fun OnBoardingScreen(
                 shape = RoundedCornerShape(6.dp),
                 onClick = {
                     navHostController.popBackStack()
-                    navHostController.navigate(Screen.SignupScreen)
+                    navHostController.navigate(MainScreens.SignupScreen.route)
                 }
             ) {
                 Text(

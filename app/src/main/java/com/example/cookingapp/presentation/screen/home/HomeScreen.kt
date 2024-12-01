@@ -67,6 +67,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.cookingapp.R
 import com.example.cookingapp.data.remote.api.dto.CategoriesDto
 import com.example.cookingapp.model.RandomMeal
+import com.example.cookingapp.navigation.SharedViewModelNavigationGraph
 import com.example.cookingapp.presentation.components.BottomNavigationBar
 import com.example.cookingapp.presentation.components.MainBoxShape
 import com.example.cookingapp.presentation.components.MainButton
@@ -89,38 +90,24 @@ import kotlin.random.Random
 fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeScreenViewModel = hiltViewModel(),
-    isNavigateToHome: () -> Unit = {},
-    isNavigateToLibrary: () -> Unit = {},
-    isNavigateToGenerateRecipe: () -> Unit = {},
-    isNavigateToFavorite: () -> Unit = {},
-    isNavigateToProfile: () -> Unit = {}
+    onNavigateToAllRecipesScreen: (List<RandomMeal>, String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val focusRequester = remember {
         FocusRequester()
     }
-    Scaffold(
-        bottomBar = {
-            BottomNavigationBar(
-                selectedItem = 0,
-                isNavigateToHome = isNavigateToHome,
-                isNavigateToLibrary = isNavigateToLibrary,
-                isNavigateToGenerateRecipe = isNavigateToGenerateRecipe,
-                isNavigateToFavorite = isNavigateToFavorite,
-                isNavigateToProfile = isNavigateToProfile
-            )
-        },
-        containerColor = Color.White
-    ) {
-        HomeScreenContent(
-            modifier = modifier,
-            uiState = uiState,
-            onSearchQueryChanged = viewModel::onSearchQueryChange,
-            isFocusedChanged = viewModel::isFocusedChanged,
-            focusRequester = focusRequester,
-            isMealsReachingTheEnd = { viewModel.getRandomMeals() },
-        )
-    }
+
+    HomeScreenContent(
+        modifier = modifier,
+        uiState = uiState,
+        onSearchQueryChanged = viewModel::onSearchQueryChange,
+        isFocusedChanged = viewModel::isFocusedChanged,
+        focusRequester = focusRequester,
+        isMealsReachingTheEnd = { viewModel.getRandomMeals() },
+        onNavigateToAllRecipesScreen = onNavigateToAllRecipesScreen
+
+    )
+
 
 }
 
@@ -132,13 +119,12 @@ fun HomeScreenContent(
     isFocusedChanged: (Boolean) -> Unit,
     focusRequester: FocusRequester,
     isMealsReachingTheEnd: () -> Unit,
+    onNavigateToAllRecipesScreen: (List<RandomMeal>, String) -> Unit
 ) {
 
     LazyColumn(
         modifier = modifier
             .fillMaxWidth()
-            .navigationBarsPadding()
-            .statusBarsPadding()
             .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -161,7 +147,7 @@ fun HomeScreenContent(
         item {
             MealsSection(
                 title = "Random recipes",
-                onSeeAllClicked = { },
+                onSeeAllClicked = { onNavigateToAllRecipesScreen(uiState.meals, "Random recipes") },
                 meals = uiState.meals,
                 isLoading = uiState.meals.isEmpty(),
                 isMealsReachingTheEnd = isMealsReachingTheEnd,
@@ -406,7 +392,7 @@ fun MealsSectionBody(
         ) {
             items(meals.size) { index: Int ->
                 Log.d(TAG, "MealsSectionBody: Index$index")
-                val num = Random.nextInt(0, 5)
+                val num = index % listOfColors.size
                 SingleMealCard(
                     meal = meals[index],
                     backgroundColor = listOfColors[num]

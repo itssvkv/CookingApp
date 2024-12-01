@@ -15,13 +15,19 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -55,18 +61,41 @@ fun SingleMealCard(
     mealDescription: TextStyle =
         if (width > 200.dp) MaterialTheme.typography.bodySmall else
             MaterialTheme.typography.titleSmall,
-    backgroundColor: Color
+    backgroundColor: Color,
+    favIcon: Painter? = null,
+    onFacIconClicked: (Boolean) -> Unit = {}
 ) {
+    var isFavIconClicked by remember {
+        mutableStateOf(false)
+    }
+    val isLarge = if (width > 200.dp) 16.dp else 0.dp
+    val isSmall = if (width <= 200.dp) 16.dp else 0.dp
     Column(
         modifier = modifier
             .width(width)
             .height(height)
-            .padding(end = 16.dp)
+            .padding(end = isSmall)
+            .padding(bottom = isLarge)
             .clip(RoundedCornerShape(16.dp))
             .background(backgroundColor)
             .padding(paddingValue),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        if (favIcon != null) {
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopEnd) {
+                IconButton(onClick = {
+                    isFavIconClicked = !isFavIconClicked
+                    onFacIconClicked(isFavIconClicked)
+                }) {
+                    Icon(
+                        painter = favIcon,
+                        contentDescription = "love",
+                        tint = if (isFavIconClicked) Color.Red else Color.Black
+                    )
+                }
+            }
+        }
+
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
                 .data(meal.strMealThumb)

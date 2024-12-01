@@ -12,7 +12,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.cookingapp.R
-import com.example.cookingapp.navigation.Screen
+import com.example.cookingapp.navigation.MainScreens
+import com.example.cookingapp.utils.Constants.BOTTOM_BAR_GRAPH_ROUTE
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import primaryContainerLight
@@ -40,13 +41,13 @@ fun SplashScreen(
         splashViewModel.splashScreenState.collectLatest { state ->
             if (state.navigateToHomeScreen) {
                 navHostController.popBackStack()
-                navHostController.navigate(Screen.HomeScreen)
+                navHostController.navigate(route = BOTTOM_BAR_GRAPH_ROUTE)
             } else if (state.navigateToLoginScreen) {
                 navHostController.popBackStack()
-                navHostController.navigate(Screen.LoginScreen)
+                navHostController.navigate(MainScreens.LoginScreen.route)
             } else {
                 navHostController.popBackStack()
-                navHostController.navigate(Screen.OnBoardingScreen)
+                navHostController.navigate(MainScreens.OnBoardingScreen.route)
                 splashViewModel.saveFirstOpenStateToDataStore()
             }
 

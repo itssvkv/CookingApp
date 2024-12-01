@@ -5,23 +5,26 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.core.splashscreen.SplashScreen
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.compose.ui.graphics.Color
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.cookingapp.navigation.SetupNavGraph
+import com.example.cookingapp.navigation.HomeScreens
+import com.example.cookingapp.navigation.RootNavGraph
+import com.example.cookingapp.presentation.components.BottomNavigationBar
+import com.example.cookingapp.presentation.screen.home.HomeScreen
+import com.example.cookingapp.utils.Constants
+import com.example.cookingapp.utils.Constants.BOTTOM_BAR_GRAPH_ROUTE
+import com.example.cookingapp.utils.Constants.MAIN_GRAPH_ROUTE
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -31,13 +34,69 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AppTheme {
-                val navHostController = rememberNavController()
-                SetupNavGraph(
-                    navHostController = navHostController
-                )
+                val navController = rememberNavController()
+//                SetupNavGraph(
+//                    navHostController = navHostController
+//                )
+//                RootNavGraph(
+//                    navController = navHostController,
+//                    startGraph = if (Constants.isLoggedIn) BOTTOM_BAR_GRAPH_ROUTE else MAIN_GRAPH_ROUTE
+//                )
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentRoute = navBackStackEntry?.destination?.route
+
+                val scope = rememberCoroutineScope()
+                val snackbarHostState = remember { SnackbarHostState() }
+
+                val bottomBarState = remember { (mutableStateOf(true)) }
+                val topBarState = remember { (mutableStateOf(true)) }
+
+                // Control TopBar and BottomBar
+                when (navBackStackEntry?.destination?.route) {
+                    HomeScreens.HomeScreen.route -> {
+                        bottomBarState.value = true
+                        topBarState.value = true
+                    }
+
+                    HomeScreens.LibraryScreen.route -> {
+                        bottomBarState.value = true
+                        topBarState.value = true
+                    }
+
+                    HomeScreens.AllRecipesScreen.route -> {
+                        bottomBarState.value = true
+                        topBarState.value = true
+                    }
+
+                    else -> {
+                        bottomBarState.value = false
+                        topBarState.value = false
+                    }
+                }
+                Scaffold(
+                    snackbarHost = {
+                        SnackbarHost(hostState = snackbarHostState)
+                    },
+                    bottomBar = {
+                        if (bottomBarState.value) {
+                            BottomNavigationBar(navController = navController)
+                        }
+                    },
+                    containerColor = Color.White
+                ) { paddingValues ->
+                    Box(
+                        modifier = Modifier.padding(paddingValues)
+                    ) {
+                        RootNavGraph(
+                            navController = navController,
+                            startGraph = if (Constants.isLoggedIn) BOTTOM_BAR_GRAPH_ROUTE else MAIN_GRAPH_ROUTE
+                        )
+                    }
+                }
 
             }
         }
     }
 }
+
 

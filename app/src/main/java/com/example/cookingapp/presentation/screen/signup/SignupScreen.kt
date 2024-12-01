@@ -127,7 +127,8 @@ fun SignupScreenContent(
 
 @Composable
 fun HeaderSection(
-    modifier: Modifier = Modifier, onBackClicked: () -> Unit
+    modifier: Modifier = Modifier,
+    onBackClicked: () -> Unit
 ) {
 
     Column(

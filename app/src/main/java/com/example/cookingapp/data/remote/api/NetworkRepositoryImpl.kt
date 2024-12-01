@@ -37,7 +37,7 @@ class NetworkRepositoryImpl @Inject constructor(
         return flow {
             emit(Resource.Loading())
             try {
-                for (i in 0..10) {
+                for (i in 0..9) {
                     val response = api.getRandomMeal()
                     list = list + response.toRandomMeal()
                 }
