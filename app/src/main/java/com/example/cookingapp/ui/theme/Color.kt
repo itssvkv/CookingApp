@@ -223,6 +223,7 @@ val randomColor = Color(0xFFFFDBD1)
 val randomColor1 = Color(0xFFDED2F9)
 val randomColor2 = Color(0xFFC9EAFD)
 val dots = Color(0xFF5E98AE)
+val timeColor = Color(0xFFEE7A08)
 
 
 

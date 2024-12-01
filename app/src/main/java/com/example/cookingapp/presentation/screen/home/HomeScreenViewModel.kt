@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cookingapp.data.remote.api.NetworkRepository
 import com.example.cookingapp.data.remote.api.dto.CategoriesDto
+import com.example.cookingapp.model.RandomMeal
 import com.example.cookingapp.utils.Constants.TAG
 import com.example.cookingapp.utils.onResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,6 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.random.Random
 
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
@@ -67,10 +69,31 @@ class HomeScreenViewModel @Inject constructor(
                     _uiState.update { it.copy(isLoadingMoreMeals = false) }
                 },
                 onSuccess = { meals ->
-                    _uiState.update {
-                        it.copy(meals = it.meals + (meals!!), isLoadingMoreMeals = false)
+                    val newMeals = meals!!.map {
+                        val prepTime = Random.nextInt(10, 40)
+                        val cookTime = Random.nextInt(10, 40)
+                        val totalTime = prepTime + cookTime
+                        RandomMeal(
+                            idMeal = it.idMeal,
+                            strMeal = it.strMeal,
+                            strDrinkAlternate = it.strDrinkAlternate,
+                            strCategory = it.strCategory,
+                            strArea = it.strArea,
+                            strInstructions = it.strInstructions,
+                            strMealThumb = it.strMealThumb,
+                            strTags = it.strTags,
+                            strYoutube = it.strYoutube,
+                            ingredient = it.ingredient,
+                            measure = it.measure,
+                            prepTime = prepTime,
+                            cookTime = cookTime,
+                            totalTime = totalTime
+                        )
                     }
-                    Log.d(TAG, "getRandomMeals: ${meals?.get(0)}")
+                    _uiState.update {
+                        it.copy(meals = it.meals + (newMeals), isLoadingMoreMeals = false)
+                    }
+                    Log.d(TAG, "getRandomMeals: ${newMeals[0]}")
                 }
             )
         }

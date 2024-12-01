@@ -13,6 +13,9 @@ data class RandomMeal(
     var strTags: String? = null,
     var strYoutube: String? = null,
     val ingredient: List<String?> = emptyList(),
-    val measure: List<String?> = emptyList()
+    val measure: List<String?> = emptyList(),
+    val prepTime: Int = 0,
+    val cookTime: Int = 0,
+    val totalTime: Int = 0
 
 )

@@ -63,7 +63,8 @@ fun AllRecipesScreen(
     modifier: Modifier = Modifier,
     viewModel: AllRecipesViewModel = hiltViewModel(),
     meals: List<RandomMeal>,
-    title: String
+    title: String,
+    onBackIconClicked: () -> Unit = {}
 ) {
 //    viewModel.onReceiveMeals(meals = meals)
     val uiState by viewModel.uiState.collectAsState()
@@ -73,7 +74,8 @@ fun AllRecipesScreen(
         onSearchQueryChanged = viewModel::onSearchQueryChanged,
         isMealsReachingTheEnd = { viewModel.getRandomMeals() },
         meals = meals,
-        title = title
+        title = title,
+        onBackIconClicked = onBackIconClicked
     )
 }
 
@@ -84,7 +86,8 @@ fun ScreenContent(
     onSearchQueryChanged: (String) -> Unit,
     isMealsReachingTheEnd: () -> Unit = {},
     meals:List<RandomMeal>,
-    title: String
+    title: String,
+    onBackIconClicked: () -> Unit = {}
 ) {
     LazyColumn(
         modifier = modifier
@@ -92,7 +95,7 @@ fun ScreenContent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         item {
-            HeaderSection(title = title)
+            HeaderSection(title = title, onBackIconClicked = onBackIconClicked)
         }
         item {
             AllRecipesScreenSearchBar(

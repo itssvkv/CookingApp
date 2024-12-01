@@ -2,6 +2,7 @@ package com.example.cookingapp.presentation.components
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -63,7 +64,8 @@ fun SingleMealCard(
             MaterialTheme.typography.titleSmall,
     backgroundColor: Color,
     favIcon: Painter? = null,
-    onFacIconClicked: (Boolean) -> Unit = {}
+    onFacIconClicked: (Boolean) -> Unit = {},
+    onItemClicked: () -> Unit = {}
 ) {
     var isFavIconClicked by remember {
         mutableStateOf(false)
@@ -72,6 +74,9 @@ fun SingleMealCard(
     val isSmall = if (width <= 200.dp) 16.dp else 0.dp
     Column(
         modifier = modifier
+            .clickable {
+                onItemClicked()
+            }
             .width(width)
             .height(height)
             .padding(end = isSmall)

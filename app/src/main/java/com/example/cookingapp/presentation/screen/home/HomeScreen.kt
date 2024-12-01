@@ -90,7 +90,8 @@ import kotlin.random.Random
 fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeScreenViewModel = hiltViewModel(),
-    onNavigateToAllRecipesScreen: (List<RandomMeal>, String) -> Unit
+    onNavigateToAllRecipesScreen: (List<RandomMeal>, String) -> Unit,
+    onNavigateToSingleRecipeScreen: (RandomMeal, Color) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val focusRequester = remember {
@@ -104,7 +105,8 @@ fun HomeScreen(
         isFocusedChanged = viewModel::isFocusedChanged,
         focusRequester = focusRequester,
         isMealsReachingTheEnd = { viewModel.getRandomMeals() },
-        onNavigateToAllRecipesScreen = onNavigateToAllRecipesScreen
+        onNavigateToAllRecipesScreen = onNavigateToAllRecipesScreen,
+        onItemClicked = onNavigateToSingleRecipeScreen
 
     )
 
@@ -119,7 +121,8 @@ fun HomeScreenContent(
     isFocusedChanged: (Boolean) -> Unit,
     focusRequester: FocusRequester,
     isMealsReachingTheEnd: () -> Unit,
-    onNavigateToAllRecipesScreen: (List<RandomMeal>, String) -> Unit
+    onNavigateToAllRecipesScreen: (List<RandomMeal>, String) -> Unit,
+    onItemClicked: (RandomMeal, Color) -> Unit
 ) {
 
     LazyColumn(
@@ -151,7 +154,8 @@ fun HomeScreenContent(
                 meals = uiState.meals,
                 isLoading = uiState.meals.isEmpty(),
                 isMealsReachingTheEnd = isMealsReachingTheEnd,
-                isLoadingMoreMeals = uiState.isLoadingMoreMeals
+                isLoadingMoreMeals = uiState.isLoadingMoreMeals,
+                onItemClicked = onItemClicked
             )
 
 
@@ -167,7 +171,8 @@ fun HomeScreenContent(
                 meals = uiState.meals,
                 isLoading = uiState.meals.isEmpty(),
                 isMealsReachingTheEnd = isMealsReachingTheEnd,
-                isLoadingMoreMeals = uiState.isLoadingMoreMeals
+                isLoadingMoreMeals = uiState.isLoadingMoreMeals,
+                onItemClicked = onItemClicked
             )
         }
 
@@ -315,7 +320,8 @@ fun MealsSection(
     meals: List<RandomMeal> = emptyList(),
     isLoading: Boolean,
     isMealsReachingTheEnd: () -> Unit,
-    isLoadingMoreMeals: Boolean
+    isLoadingMoreMeals: Boolean,
+    onItemClicked: (RandomMeal, Color) -> Unit
 ) {
 
     Column(
@@ -350,7 +356,8 @@ fun MealsSection(
             meals = meals,
             isLoading = isLoading,
             isMealsReachingTheEnd = isMealsReachingTheEnd,
-            isLoadingMoreMeals = isLoadingMoreMeals
+            isLoadingMoreMeals = isLoadingMoreMeals,
+            onItemClicked = onItemClicked
         )
 
     }
@@ -369,7 +376,8 @@ fun MealsSectionBody(
     meals: List<RandomMeal> = emptyList(),
     isLoading: Boolean,
     isMealsReachingTheEnd: () -> Unit,
-    isLoadingMoreMeals: Boolean
+    isLoadingMoreMeals: Boolean,
+    onItemClicked: (RandomMeal, Color) -> Unit
 ) {
     val loadingContentAlpha = animateFloatAsState(
         targetValue = if (isLoading) 1f else 0f,
@@ -395,7 +403,8 @@ fun MealsSectionBody(
                 val num = index % listOfColors.size
                 SingleMealCard(
                     meal = meals[index],
-                    backgroundColor = listOfColors[num]
+                    backgroundColor = listOfColors[num],
+                    onItemClicked = { onItemClicked(meals[index], listOfColors[num]) }
                 )
                 LaunchedEffect(key1 = meals.size) {
                     if (index == meals.size - 1) {

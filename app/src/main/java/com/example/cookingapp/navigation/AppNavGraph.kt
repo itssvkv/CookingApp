@@ -12,12 +12,14 @@ import androidx.navigation.navigation
 import com.example.cookingapp.presentation.screen.allrecipes.AllRecipesScreen
 import com.example.cookingapp.presentation.screen.home.HomeScreen
 import com.example.cookingapp.presentation.screen.library.LibraryScreen
+import com.example.cookingapp.presentation.screen.singlerecipe.SingleRecipeScreen
 import com.example.cookingapp.utils.Constants.BOTTOM_BAR_GRAPH_ROUTE
 
 fun NavGraphBuilder.appNavGraph(
     navController: NavHostController,
     sharedViewModelNavigationGraph: SharedViewModelNavigationGraph
 ) {
+
     navigation(
         route = BOTTOM_BAR_GRAPH_ROUTE,
         startDestination = HomeScreens.HomeScreen.route
@@ -27,6 +29,10 @@ fun NavGraphBuilder.appNavGraph(
                 onNavigateToAllRecipesScreen = { meals, title ->
                     sharedViewModelNavigationGraph.updateUiState(meals = meals, title = title)
                     navController.navigate(HomeScreens.AllRecipesScreen.route)
+                },
+                onNavigateToSingleRecipeScreen = { singleMeal, color ->
+                    sharedViewModelNavigationGraph.updateSingleMealState(meal = singleMeal, color)
+                    navController.navigate(HomeScreens.SingleRecipeScreen.route)
                 }
             )
         }
@@ -40,7 +46,23 @@ fun NavGraphBuilder.appNavGraph(
 
             ) {
             val uiState by sharedViewModelNavigationGraph.uiState.collectAsState()
-            AllRecipesScreen(meals = uiState.meals, title = uiState.title)
+            AllRecipesScreen(meals = uiState.meals, title = uiState.title, onBackIconClicked = {
+                navController.popBackStack()
+            })
+        }
+        composable(route = HomeScreens.SingleRecipeScreen.route) {
+            val uiState by sharedViewModelNavigationGraph.uiState.collectAsState()
+            uiState.singleMealColor?.let { color ->
+                uiState.singleMeal?.let { meal ->
+                    SingleRecipeScreen(
+                        mealColor = color,
+                        mealInfo = meal,
+                        onBackIconClicked = {
+                            navController.popBackStack()
+                        },
+                    )
+                }
+            }
         }
     }
 }
