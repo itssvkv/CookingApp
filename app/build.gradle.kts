@@ -120,4 +120,9 @@ dependencies {
     // Add the dependency for the Firebase Authentication library
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation("com.google.firebase:firebase-auth")
+
+    //Accompanist
+//    implementation (libs.accompanist.permissions)
+//    implementation (libs.accompanist.webview)
+//    implementation ("com.google.accompanist:accompanist-webview:0.36.0")
 }

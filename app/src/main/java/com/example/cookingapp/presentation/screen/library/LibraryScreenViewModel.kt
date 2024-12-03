@@ -1,13 +1,16 @@
 package com.example.cookingapp.presentation.screen.library
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cookingapp.data.local.room.repository.RoomRepository
+import com.example.cookingapp.utils.Constants.TAG
 import com.example.cookingapp.utils.onResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -30,16 +33,16 @@ class LibraryScreenViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             roomRepository.getAllMeals().onResponse(
                 onLoading = {
-                    _uiState.value = _uiState.value.copy(isLoading = true)
+                    Log.d(TAG, "getAllMealsFormRoom: loading")
+                    _uiState.update { it.copy(isLoading = true) }
                 },
-                onSuccess = {
-                    _uiState.value = _uiState.value.copy(
-                        meals = it,
-                        isLoading = false
-                    )
+                onSuccess = {meals->
+                    Log.d(TAG, "getAllMealsFormRoom: success")
+                    _uiState.update { it.copy(meals = meals, isLoading = false) }
                 },
-                onFailure = {
-                    _uiState.value = _uiState.value.copy(isLoading = false)
+                onFailure = {e->
+                    Log.d(TAG, "getAllMealsFormRoom: failure $e")
+                    _uiState.update { it.copy(isLoading = false) }
                 }
             )
         }

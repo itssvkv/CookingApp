@@ -163,7 +163,7 @@ val onErrorContainerDarkMediumContrast = Color(0xFF000000)
 val backgroundDarkMediumContrast = Color(0xFF18120C)
 val onBackgroundDarkMediumContrast = Color(0xFFEEE0D5)
 val surfaceDarkMediumContrast = Color(0xFF111418)
-val onSurfaceDarkMediumContrast = Color(0xFFFAFAFF)
+val onSurfaceDarkMediumContrast = Color(0xFFFAFAFA)
 val surfaceVariantDarkMediumContrast = Color(0xFF42493F)
 val onSurfaceVariantDarkMediumContrast = Color(0xFFC7CDC0)
 val outlineDarkMediumContrast = Color(0xFF9FA599)
@@ -226,6 +226,7 @@ val dots = Color(0xFF5E98AE)
 val timeColor = Color(0xFFEE7A08)
 val veryLightWhite = Color(0xFFF1F9F9)
 val linkColor = Color(0xFF0000EE)
+val whiteMba3bas = Color(0xFFE0E0E0)
 
 
 

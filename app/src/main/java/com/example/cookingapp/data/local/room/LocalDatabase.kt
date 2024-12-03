@@ -7,7 +7,7 @@ import com.example.cookingapp.data.local.room.dao.MyRecipesDao
 import com.example.cookingapp.model.SingleMealLocal
 import com.example.cookingapp.utils.Converters
 
-@Database(entities = [SingleMealLocal::class], version = 1, exportSchema = false)
+@Database(entities = [SingleMealLocal::class], version = 2, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class LocalDatabase : RoomDatabase(){
     abstract fun recipeDao(): MyRecipesDao

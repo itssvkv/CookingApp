@@ -156,7 +156,7 @@ fun ScreenBody(
             .padding(horizontal = 16.dp)
     ) {
         ImageBox(
-            mealImageLink = mealInfo.strMealThumb,
+            mealImageLink = mealInfo.recipeImageFormDevice.ifEmpty { mealInfo.strMealThumb },
             mealColor = mealColor
         )
         Spacer(modifier = Modifier.height(16.dp))
@@ -178,7 +178,7 @@ fun ScreenBody(
                 cookTime = mealInfo.cookTime,
                 totalTime = mealInfo.totalTime
             )
-            Spacer(modifier = Modifier.height(8.dp))
+
             ImageLinkAndSomeInfo(
                 mealImageLink = mealInfo.strMealThumb,
                 mealTags = mealInfo.strTags,
@@ -187,10 +187,11 @@ fun ScreenBody(
             Spacer(modifier = Modifier.height(8.dp))
             IngredientsSection(
                 ingredients = mealInfo.ingredient,
-                measure = mealInfo.measure
+                measure = mealInfo.measure,
+                ingredientsImagesFromDevice = mealInfo.ingredientsImagesFromDevice
             )
-            Spacer(modifier = Modifier.height(8.dp))
             mealInfo.strYoutube?.let {
+                Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     modifier = Modifier.clickable { onYoutubeLinkClicked(it) },
                     text = it,
@@ -199,8 +200,8 @@ fun ScreenBody(
                 )
 
             }
-            Spacer(modifier = Modifier.height(8.dp))
             mealInfo.strSource?.let {
+                Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     modifier = Modifier.clickable { onSourceLinkClicked(it) },
                     text = it,
@@ -347,6 +348,7 @@ fun ImageLinkAndSomeInfo(
     onTheMealImageLinkClicked: (String) -> Unit
 ) {
     mealImageLink?.let {
+        Spacer(modifier = Modifier.height(8.dp))
         Text(
             modifier = Modifier.clickable { onTheMealImageLinkClicked(it) },
             text = it,
@@ -355,8 +357,8 @@ fun ImageLinkAndSomeInfo(
         )
 
     }
-    Spacer(modifier = Modifier.height(8.dp))
     mealTags?.let {
+        Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = it,
             style = MaterialTheme.typography.bodySmall,
@@ -370,8 +372,10 @@ fun ImageLinkAndSomeInfo(
 fun IngredientsSection(
     modifier: Modifier = Modifier,
     ingredients: List<String?>,
-    measure: List<String?>
+    measure: List<String?>,
+    ingredientsImagesFromDevice: List<String?>
 ) {
+
     LazyRow(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
@@ -379,29 +383,43 @@ fun IngredientsSection(
         items(ingredients.size) {
             val lastIndex = ingredients.size - 1
             val isLastIndex = lastIndex == it
+
             if (ingredients[it] != null && measure[it]
                 != null && ingredients[it]!!.isNotEmpty()
                 && measure[it]!!.isNotEmpty()
             ) {
+                val image = if (it < ingredientsImagesFromDevice.size && !ingredientsImagesFromDevice[it].isNullOrEmpty()) {
+                    ingredientsImagesFromDevice[it]
+                } else {
+                    "" // Default empty string if no valid image is found
+                }
                 SingleIngredientSection(
                     ingredient = ingredients[it],
                     measure = measure[it],
-                    isLastIndex = isLastIndex
+                    isLastIndex = isLastIndex,
+                    ingredientsImagesFromDevice = image!!
                 )
+
+
             }
 
         }
+
     }
+
 }
 
 @Composable
 fun SingleIngredientSection(
     modifier: Modifier = Modifier,
     ingredient: String?,
+    ingredientsImagesFromDevice: String,
     measure: String?,
     isLastIndex: Boolean
 ) {
+
     val paddingValue = if (isLastIndex) 0.dp else 8.dp
+    val dataLike = ingredientsImagesFromDevice.ifEmpty { "$INGREDIENT$ingredient.png" }
     Column(
         modifier = modifier
             .padding(end = paddingValue),
@@ -410,7 +428,7 @@ fun SingleIngredientSection(
         Log.d(TAG, "IngredientsSection: \"$INGREDIENT$ingredient.png\"")
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data("$INGREDIENT$ingredient.png")
+                .data(dataLike)
                 .crossfade(true)
                 .build(),
             placeholder = painterResource(id = R.drawable.cr7),

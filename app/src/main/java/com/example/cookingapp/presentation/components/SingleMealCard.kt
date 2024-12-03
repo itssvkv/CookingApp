@@ -103,7 +103,7 @@ fun SingleMealCard(
 
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(meal.strMealThumb)
+                .data(meal.recipeImageFormDevice.ifEmpty { meal.strMealThumb })
                 .crossfade(true)
                 .build(),
             placeholder = painterResource(id = R.drawable.cr7),
@@ -121,7 +121,7 @@ fun SingleMealCard(
         )
         Spacer(modifier = Modifier.height(20.dp))
         Text(
-            text = meal.strMeal!!,
+            text = meal.strMeal?:"",
             style = mealNameTextStyle,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
@@ -150,7 +150,7 @@ fun SingleMealCard(
                     .background(Color.White)
             )
             Text(
-                text = meal.strArea!!,
+                text = meal.strArea?:"",
                 style = mealAreaTextStyle,
                 fontWeight = FontWeight.SemiBold,
                 textAlign = TextAlign.Center
@@ -158,7 +158,7 @@ fun SingleMealCard(
         }
         Spacer(modifier = Modifier.height(20.dp))
         Text(
-            text = meal.strInstructions!!,
+            text = meal.strInstructions?:"",
             style = mealDescription,
             textAlign = TextAlign.Center,
             maxLines = 2,

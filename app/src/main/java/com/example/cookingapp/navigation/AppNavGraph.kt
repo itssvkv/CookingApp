@@ -12,6 +12,7 @@ import androidx.navigation.navigation
 import com.example.cookingapp.presentation.screen.allrecipes.AllRecipesScreen
 import com.example.cookingapp.presentation.screen.home.HomeScreen
 import com.example.cookingapp.presentation.screen.library.LibraryScreen
+import com.example.cookingapp.presentation.screen.newrecipe.NewRecipeScreen
 import com.example.cookingapp.presentation.screen.singlerecipe.SingleRecipeScreen
 import com.example.cookingapp.utils.Constants.BOTTOM_BAR_GRAPH_ROUTE
 
@@ -42,7 +43,8 @@ fun NavGraphBuilder.appNavGraph(
                 onItemClicked = { singleMeal, color ->
                     sharedViewModelNavigationGraph.updateSingleMealState(meal = singleMeal, color)
                     navController.navigate(HomeScreens.SingleRecipeScreen.route)
-                }
+                },
+                onNavigateToNewRecipeScreen = {navController.navigate(HomeScreens.NewRecipeScreen.route)}
             )
         }
         composable(
@@ -78,6 +80,11 @@ fun NavGraphBuilder.appNavGraph(
                     )
                 }
             }
+        }
+        composable(route = HomeScreens.NewRecipeScreen.route) {
+            NewRecipeScreen(
+                onBackIconClicked = { navController.popBackStack() }
+            )
         }
     }
 }

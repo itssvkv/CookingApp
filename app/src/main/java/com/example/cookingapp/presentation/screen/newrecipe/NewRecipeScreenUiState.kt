@@ -1,13 +1,9 @@
-package com.example.cookingapp.model
+package com.example.cookingapp.presentation.screen.newrecipe
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
 import kotlinx.serialization.Serializable
 
 @Serializable
-@Entity(tableName = "my_recipes")
-data class SingleMealLocal(
-    @PrimaryKey(autoGenerate = true)
+data class NewRecipeScreenUiState(
     var idMeal: Int? = null,
     var strMeal: String? = null,
     var strDrinkAlternate: String? = null,

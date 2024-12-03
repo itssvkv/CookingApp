@@ -4,6 +4,7 @@ import com.example.cookingapp.utils.Constants.ALL_RECIPES_SCREEN
 import com.example.cookingapp.utils.Constants.HOME_SCREEN_ROUTE
 import com.example.cookingapp.utils.Constants.LIBRARY_SCREEN_ROUTE
 import com.example.cookingapp.utils.Constants.LOGIN_SCREEN_ROUTE
+import com.example.cookingapp.utils.Constants.NEW_RECIPE_SCREEN
 import com.example.cookingapp.utils.Constants.ONBOARDING_SCREEN_ROUTE
 import com.example.cookingapp.utils.Constants.SIGNUP_SCREEN_ROUTE
 import com.example.cookingapp.utils.Constants.SINGLE_RECIPE_SCREEN
@@ -38,4 +39,6 @@ sealed class HomeScreens(val route: String) {
     data object AllRecipesScreen: HomeScreens(ALL_RECIPES_SCREEN)
     @Serializable
     data object SingleRecipeScreen: HomeScreens(SINGLE_RECIPE_SCREEN)
+    @Serializable
+    data object NewRecipeScreen: HomeScreens(NEW_RECIPE_SCREEN)
 }
