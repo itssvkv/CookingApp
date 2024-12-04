@@ -70,6 +70,13 @@ class MainActivity : ComponentActivity() {
                         topBarState.value = true
                     }
 
+                    HomeScreens.FavoriteScreen.route -> {
+                        bottomBarState.value = true
+                        topBarState.value = true
+                        selectedItem = 3
+                    }
+
+
                     else -> {
                         bottomBarState.value = false
                         topBarState.value = false

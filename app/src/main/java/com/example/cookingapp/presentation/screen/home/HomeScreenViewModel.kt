@@ -101,11 +101,17 @@ class HomeScreenViewModel @Inject constructor(
         }
     }
 
-    fun addTooRoom(recipe: SingleMealLocal) {
-        viewModelScope.launch {
-            roomRepository.insertRecipe(recipe)
+    fun onFavIconClicked(isFavIconClicked: Boolean, index: Int) {
+        _uiState.update {
+            it.copy(meals = it.meals.mapIndexed { i, meal ->
+                if (i == index) {
+                    meal.copy(isFavorite = !isFavIconClicked)
+                } else {
+                    meal
+                }
+            })
         }
-
     }
+
 
 }

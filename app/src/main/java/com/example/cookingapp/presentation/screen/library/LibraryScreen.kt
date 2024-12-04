@@ -77,7 +77,8 @@ fun ScreenContent(
                 meals = it,
                 isMealsReachingTheEnd = isMealsReachingTheEnd,
                 isLoading = uiState.isLoading,
-                onItemClicked = onItemClicked
+                onItemClicked = onItemClicked,
+                onFavIconClicked = { isFavorite, index -> }
             )
         }
     }

@@ -1,12 +1,10 @@
 package com.example.cookingapp.presentation.screen.newrecipe
 
-import android.net.Uri
+import android.app.Activity
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -24,7 +22,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -32,13 +29,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -54,12 +47,12 @@ import com.example.cookingapp.presentation.components.CommonHeaderSection
 import com.example.cookingapp.presentation.components.MainButton
 import com.example.cookingapp.presentation.components.NewTextField
 import com.example.cookingapp.utils.Common.fromListToString
-import com.example.cookingapp.utils.Common.fromStringToList
+import com.example.cookingapp.utils.Common.openGalleryForMultipleImages
+import com.example.cookingapp.utils.Common.permissionChecker
 import com.example.cookingapp.utils.Constants.TAG
+import com.example.cookingapp.utils.RealPathUtil.getRealPathFromURI
 import onPrimary
-import onSurfaceDarkMediumContrast
 import randomColor1
-import whiteMba3bas
 
 @Composable
 fun NewRecipeScreen(
@@ -69,16 +62,48 @@ fun NewRecipeScreen(
 
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val oneImageLauncher =
-        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri ->
-            Log.d(TAG, "NewRecipeScreen: $")
-            viewModel.onRecipeImageChanged(uri)
+    val context = LocalContext.current
+
+
+    val multiImageLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val clipData = result.data?.clipData
+            val realPaths = mutableListOf<String>()
+
+            if (clipData != null) {
+                for (i in 0 until clipData.itemCount) {
+                    val uri = clipData.getItemAt(i).uri
+                    val realPath = getRealPathFromURI(context, uri)
+                    realPath?.let { realPaths.add(it) }
+                }
+            } else {
+                result.data?.data?.let { uri ->
+                    val realPath = getRealPathFromURI(context, uri)
+                    realPath?.let { realPaths.add(it) }
+                }
+            }
+
+            if (realPaths.size > 1) {
+                viewModel.onRecipeIngredientsImagesChanged(realPaths)
+            } else {
+                viewModel.onRecipeImageChanged(realPaths[0])
+            }
         }
-    val multiImageLauncher =
-        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetMultipleContents()) { uriList ->
-            Log.d(TAG, "NewRecipeScreen: ${uriList[0]}")
-            viewModel.onRecipeIngredientsImagesChanged(uriList.map { it.toString() })
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            openGalleryForMultipleImages(context, multiImageLauncher)
+        } else {
+            Toast.makeText(context, "Permission denied", Toast.LENGTH_SHORT).show()
         }
+    }
+
+
     ScreenContent(
         modifier = modifier,
         uiState = uiState,
@@ -101,10 +126,10 @@ fun NewRecipeScreen(
         onRecipeMeasuresChanged = viewModel::onRecipeMeasuresChanged,
         onRecipeInstructionsChanged = viewModel::onRecipeInstructionsChanged,
         onImageClicked = {
-            oneImageLauncher.launch("image/*")
+            permissionChecker(context, permissionLauncher, multiImageLauncher)
         },
         onRecipeIngredientsImagesClicked = {
-            multiImageLauncher.launch("image/*")
+            permissionChecker(context, permissionLauncher, multiImageLauncher)
         }
     )
 }

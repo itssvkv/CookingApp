@@ -5,8 +5,8 @@ import androidx.room.PrimaryKey
 import kotlinx.serialization.Serializable
 
 @Serializable
-@Entity(tableName = "my_recipes")
-data class SingleMealLocal(
+@Entity(tableName = "favorite_recipes")
+data class FavoriteMealLocal(
     @PrimaryKey(autoGenerate = true)
     var idMeal: Int? = null,
     var strMeal: String? = null,

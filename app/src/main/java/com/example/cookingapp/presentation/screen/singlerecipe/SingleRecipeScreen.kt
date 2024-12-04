@@ -26,6 +26,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,6 +38,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
@@ -49,15 +53,26 @@ import veryLightWhite
 @Composable
 fun SingleRecipeScreen(
     modifier: Modifier = Modifier,
+    viewModel: SingleRecipeScreenViewModel = hiltViewModel(),
     mealInfo: SingleMealLocal,
     onBackIconClicked: () -> Unit,
-    mealColor: Color
+    mealColor: Color,
+    onFavIconClicked: (Boolean) -> Unit
 ) {
+    LaunchedEffect(key1 = true) {
+        viewModel.onReceiveMealInfo(mealInfo = mealInfo)
+    }
+    val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
-    ScreenContent(
-        mealInfo = mealInfo,
+
+    uiState.mealInfo?.let {meal->
+        ScreenContent(
+        mealInfo = meal,
         onBackIconClicked = onBackIconClicked,
-        onFavIconClicked = { },
+        onFavIconClicked = { isFavorite ->
+            viewModel.onFavIconClicked(isFavorite)
+            onFavIconClicked(isFavorite)
+        },
         mealColor = mealColor,
         onTheMealImageLinkClicked = {
             CustomTabsIntent.Builder().build().launchUrl(context, Uri.parse(it))
@@ -69,6 +84,7 @@ fun SingleRecipeScreen(
             CustomTabsIntent.Builder().build().launchUrl(context, Uri.parse(it))
         }
     )
+    }
 }
 
 
@@ -77,7 +93,7 @@ fun ScreenContent(
     modifier: Modifier = Modifier,
     mealInfo: SingleMealLocal,
     onBackIconClicked: () -> Unit,
-    onFavIconClicked: () -> Unit,
+    onFavIconClicked: (Boolean) -> Unit,
     mealColor: Color,
     onTheMealImageLinkClicked: (String) -> Unit = {},
     onYoutubeLinkClicked: (String) -> Unit = {},
@@ -90,6 +106,7 @@ fun ScreenContent(
     ) {
         item {
             ScreenHeader(
+                isFavorite = mealInfo.isFavorite,
                 onBackIconClicked = onBackIconClicked,
                 onFavIconClicked = onFavIconClicked
             )
@@ -110,7 +127,8 @@ fun ScreenContent(
 fun ScreenHeader(
     modifier: Modifier = Modifier,
     onBackIconClicked: () -> Unit = {},
-    onFavIconClicked: () -> Unit = {}
+    onFavIconClicked: (Boolean) -> Unit = {},
+    isFavorite: Boolean = false
 ) {
     Row(
         modifier = modifier
@@ -133,8 +151,14 @@ fun ScreenHeader(
             )
         }
         Box(modifier = Modifier.size(24.dp), contentAlignment = Alignment.Center) {
-            IconButton(onClick = onFavIconClicked) {
-                Icon(painter = painterResource(id = R.drawable.fav), contentDescription = "love")
+            IconButton(onClick = {
+                onFavIconClicked(isFavorite)
+            }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.fav),
+                    contentDescription = "love",
+                    tint = if (isFavorite) Color.Red else Color.Black
+                )
             }
         }
 
@@ -155,6 +179,10 @@ fun ScreenBody(
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
     ) {
+        Log.d(
+            TAG,
+            "ScreenBody: ${mealInfo.recipeImageFormDevice.ifEmpty { mealInfo.strMealThumb }}"
+        )
         ImageBox(
             mealImageLink = mealInfo.recipeImageFormDevice.ifEmpty { mealInfo.strMealThumb },
             mealColor = mealColor
@@ -388,11 +416,12 @@ fun IngredientsSection(
                 != null && ingredients[it]!!.isNotEmpty()
                 && measure[it]!!.isNotEmpty()
             ) {
-                val image = if (it < ingredientsImagesFromDevice.size && !ingredientsImagesFromDevice[it].isNullOrEmpty()) {
-                    ingredientsImagesFromDevice[it]
-                } else {
-                    "" // Default empty string if no valid image is found
-                }
+                val image =
+                    if (it < ingredientsImagesFromDevice.size && !ingredientsImagesFromDevice[it].isNullOrEmpty()) {
+                        ingredientsImagesFromDevice[it]
+                    } else {
+                        "" // Default empty string if no valid image is found
+                    }
                 SingleIngredientSection(
                     ingredient = ingredients[it],
                     measure = measure[it],

@@ -89,18 +89,17 @@ fun SingleMealCard(
         if (favIcon != null) {
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopEnd) {
                 IconButton(onClick = {
-                    isFavIconClicked = !isFavIconClicked
-                    onFacIconClicked(isFavIconClicked)
+                    onFacIconClicked(meal.isFavorite)
                 }) {
                     Icon(
                         painter = favIcon,
                         contentDescription = "love",
-                        tint = if (isFavIconClicked) Color.Red else Color.Black
+                        tint = if (meal.isFavorite) Color.Red else Color.Black
                     )
                 }
             }
         }
-
+        Log.d(TAG, "SingleMealCard: ${meal.recipeImageFormDevice.ifEmpty { meal.strMealThumb }}")
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
                 .data(meal.recipeImageFormDevice.ifEmpty { meal.strMealThumb })
@@ -121,7 +120,7 @@ fun SingleMealCard(
         )
         Spacer(modifier = Modifier.height(20.dp))
         Text(
-            text = meal.strMeal?:"",
+            text = meal.strMeal ?: "",
             style = mealNameTextStyle,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
@@ -150,7 +149,7 @@ fun SingleMealCard(
                     .background(Color.White)
             )
             Text(
-                text = meal.strArea?:"",
+                text = meal.strArea ?: "",
                 style = mealAreaTextStyle,
                 fontWeight = FontWeight.SemiBold,
                 textAlign = TextAlign.Center
@@ -158,7 +157,7 @@ fun SingleMealCard(
         }
         Spacer(modifier = Modifier.height(20.dp))
         Text(
-            text = meal.strInstructions?:"",
+            text = meal.strInstructions ?: "",
             style = mealDescription,
             textAlign = TextAlign.Center,
             maxLines = 2,

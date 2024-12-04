@@ -76,6 +76,13 @@ fun BottomNavigationBar(
                             )
                         }
                     }
+                    3->{
+                        if (currentRoute != HomeScreens.FavoriteScreen.route) {
+                            navController.navigate(
+                                HomeScreens.FavoriteScreen.route
+                            )
+                        }
+                    }
                 }
             }) {
                 Icon(

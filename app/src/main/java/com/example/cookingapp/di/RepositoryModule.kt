@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import com.example.cookingapp.data.local.datastore.DataStoreRepository
 import com.example.cookingapp.data.local.datastore.DataStoreRepositoryImpl
 import com.example.cookingapp.data.local.room.LocalDatabase
+import com.example.cookingapp.data.local.room.dao.FavoriteDao
 import com.example.cookingapp.data.local.room.dao.MyRecipesDao
 import com.example.cookingapp.data.local.room.repository.RoomRepository
 import com.example.cookingapp.data.local.room.repository.RoomRepositoryImpl
@@ -45,8 +46,12 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideDatabaseRepository(myRecipes: MyRecipesDao, db: LocalDatabase): RoomRepository {
-        return RoomRepositoryImpl(dao = myRecipes, db = db)
+    fun provideDatabaseRepository(
+        myRecipes: MyRecipesDao,
+        favoriteDao: FavoriteDao,
+        db: LocalDatabase
+    ): RoomRepository {
+        return RoomRepositoryImpl(dao = myRecipes, favoriteDao = favoriteDao, db = db)
     }
 
 }

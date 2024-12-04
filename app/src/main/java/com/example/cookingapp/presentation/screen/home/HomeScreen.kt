@@ -81,11 +81,17 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeScreenViewModel = hiltViewModel(),
     onNavigateToAllRecipesScreen: (List<SingleMealLocal>, String) -> Unit,
-    onNavigateToSingleRecipeScreen: (SingleMealLocal, Color) -> Unit
+    onNavigateToSingleRecipeScreen: (SingleMealLocal, Color, Int) -> Unit,
+    isFavorite: Boolean = false,
+    index: Int = 0
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val focusRequester = remember {
         FocusRequester()
+    }
+
+    LaunchedEffect(key1 = isFavorite) {
+        viewModel.onFavIconClicked(isFavIconClicked =isFavorite, index=index)
     }
 
     HomeScreenContent(
@@ -97,7 +103,7 @@ fun HomeScreen(
         isMealsReachingTheEnd = { viewModel.getRandomMeals() },
         onNavigateToAllRecipesScreen = onNavigateToAllRecipesScreen,
         onItemClicked = onNavigateToSingleRecipeScreen,
-        onButtonClicked = { viewModel.addTooRoom(uiState.meals[0]) }
+        onButtonClicked = {  },
 
     )
 
@@ -113,7 +119,7 @@ fun HomeScreenContent(
     focusRequester: FocusRequester,
     isMealsReachingTheEnd: () -> Unit,
     onNavigateToAllRecipesScreen: (List<SingleMealLocal>, String) -> Unit,
-    onItemClicked: (SingleMealLocal, Color) -> Unit,
+    onItemClicked: (SingleMealLocal, Color, Int) -> Unit,
     onButtonClicked: () -> Unit = {},
 ) {
 
@@ -320,7 +326,7 @@ fun MealsSection(
     isLoading: Boolean,
     isMealsReachingTheEnd: () -> Unit,
     isLoadingMoreMeals: Boolean,
-    onItemClicked: (SingleMealLocal, Color) -> Unit
+    onItemClicked: (SingleMealLocal, Color, Int) -> Unit
 ) {
 
     Column(
@@ -376,7 +382,7 @@ fun MealsSectionBody(
     isLoading: Boolean,
     isMealsReachingTheEnd: () -> Unit,
     isLoadingMoreMeals: Boolean,
-    onItemClicked: (SingleMealLocal, Color) -> Unit
+    onItemClicked: (SingleMealLocal, Color, Int) -> Unit
 ) {
     val loadingContentAlpha = animateFloatAsState(
         targetValue = if (isLoading) 1f else 0f,
@@ -403,7 +409,7 @@ fun MealsSectionBody(
                 SingleMealCard(
                     meal = meals[index],
                     backgroundColor = listOfColors[num],
-                    onItemClicked = { onItemClicked(meals[index], listOfColors[num]) }
+                    onItemClicked = { onItemClicked(meals[index], listOfColors[num], index) }
                 )
                 LaunchedEffect(key1 = meals.size) {
                     if (index == meals.size - 1) {

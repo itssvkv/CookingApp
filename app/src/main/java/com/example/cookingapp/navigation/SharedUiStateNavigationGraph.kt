@@ -7,5 +7,8 @@ data class SharedUiStateNavigationGraph(
     val meals: List<SingleMealLocal> = emptyList(),
     val title: String = "",
     val singleMeal: SingleMealLocal? = null,
-    val singleMealColor: Color? = null
+    val singleMealColor: Color? = null,
+    val singleMealIndex: Int =0,
+    val isFavorite: Boolean = false,
+    val index: Int = 0
 )

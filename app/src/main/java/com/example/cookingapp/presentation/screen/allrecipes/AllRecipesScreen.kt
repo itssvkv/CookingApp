@@ -50,19 +50,27 @@ fun AllRecipesScreen(
     meals: List<SingleMealLocal>,
     title: String,
     onBackIconClicked: () -> Unit = {},
-    onNavigateToSingleRecipeScreen: (SingleMealLocal, Color) -> Unit
+    onNavigateToSingleRecipeScreen: (SingleMealLocal, Color) -> Unit,
+    onFavIconClicked: (Boolean, index: Int) -> Unit={_,_->}
 ) {
-//    viewModel.onReceiveMeals(meals = meals)
+    LaunchedEffect(key1 = true) {
+        viewModel.onReceiveMeals(meals = meals)
+    }
+
     val uiState by viewModel.uiState.collectAsState()
 
     ScreenContent(
         uiState = uiState,
         onSearchQueryChanged = viewModel::onSearchQueryChanged,
         isMealsReachingTheEnd = { viewModel.getRandomMeals() },
-        meals = meals,
+        meals = uiState.meals,
         title = title,
         onBackIconClicked = onBackIconClicked,
-        onItemClicked = onNavigateToSingleRecipeScreen
+        onItemClicked = onNavigateToSingleRecipeScreen,
+        onFavIconClicked = { isFavorite, index ->
+            viewModel.onFavIconClicked(isFavorite, index)
+            onFavIconClicked(isFavorite, index)
+        }
     )
 }
 
@@ -75,7 +83,8 @@ fun ScreenContent(
     meals: List<SingleMealLocal>,
     title: String,
     onBackIconClicked: () -> Unit = {},
-    onItemClicked: (SingleMealLocal, Color) -> Unit
+    onItemClicked: (SingleMealLocal, Color) -> Unit,
+    onFavIconClicked: (Boolean, index: Int) -> Unit,
 ) {
     LazyColumn(
         modifier = modifier
@@ -94,15 +103,15 @@ fun ScreenContent(
         item { Spacer(modifier = Modifier.height(10.dp)) }
 
         mealsSectionBody(
-            meals = meals + uiState.meals,
+            meals = uiState.meals,
             isMealsReachingTheEnd = isMealsReachingTheEnd,
             isLoading = uiState.isLoading,
-            onItemClicked = onItemClicked
+            onItemClicked = onItemClicked,
+            onFavIconClicked = onFavIconClicked
         )
 
     }
 }
-
 
 
 @Composable
@@ -131,7 +140,7 @@ fun LazyListScope.mealsSectionBody(
     meals: List<SingleMealLocal> = emptyList(),
     isLoading: Boolean = false,
     isMealsReachingTheEnd: () -> Unit = {},
-    onFavIconClicked: (Boolean) -> Unit = {},
+    onFavIconClicked: (Boolean, index: Int) -> Unit,
     onItemClicked: (SingleMealLocal, Color) -> Unit
 ) {
     items(meals.size) { index: Int ->
@@ -144,7 +153,9 @@ fun LazyListScope.mealsSectionBody(
             width = 345.dp,
             height = 405.dp,
             favIcon = painterResource(id = R.drawable.fav),
-            onFacIconClicked = onFavIconClicked,
+            onFacIconClicked = { isFavorite ->
+                onFavIconClicked(isFavorite, index)
+            },
             onItemClicked = { onItemClicked(meals[index], listOfColors[num]) }
         )
         LaunchedEffect(key1 = meals.size) {

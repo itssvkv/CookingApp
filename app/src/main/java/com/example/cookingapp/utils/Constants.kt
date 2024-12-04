@@ -37,6 +37,7 @@ object Constants {
     const val ALL_RECIPES_SCREEN = "all_recipes_screen}"
     const val SINGLE_RECIPE_SCREEN = "single_recipe_screen"
     const val NEW_RECIPE_SCREEN = "new_recipe_screen"
+    const val FAVORITE_SCREEN = "favorite_screen_route"
     const val SEARCH_SCREEN_ROUTE = "search_screen_route"
     const val CREATE_TASK_SCREEN_ROUTE = "create_task_screen_route/{task_id}"
     const val ANALYTICS_SCREEN_ROUTE = "analytics_screen_route"

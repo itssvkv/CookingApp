@@ -1,6 +1,9 @@
 package com.example.cookingapp.presentation.screen.newrecipe
 
+import android.graphics.ImageDecoder
 import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -24,15 +27,18 @@ class NewRecipeScreenViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(NewRecipeScreenUiState())
     val uiState = _uiState.asStateFlow()
 
-//    init {
+    //    init {
 //        _uiState.update { it.copy(singleRecipe = SingleMealLocal(
 //            prepTime = 0,
 //            cookTime = 0
 //        )) }
 //    }
+    private fun changeTotalTime() {
+        _uiState.update { it.copy(totalTime = uiState.value.prepTime + uiState.value.cookTime) }
+    }
 
     fun onRecipeNameChanged(name: String) {
-        _uiState.update { it.copy(strMeal = name, strInstructions = "ffffff") }
+        _uiState.update { it.copy(strMeal = name) }
     }
 
     fun onRecipeAreaChanged(area: String) {
@@ -62,14 +68,12 @@ class NewRecipeScreenViewModel @Inject constructor(
         changeTotalTime()
     }
 
-    private fun changeTotalTime() {
-        _uiState.update { it.copy(totalTime = uiState.value.prepTime + uiState.value.cookTime) }
-    }
 
     fun onPrepTimePlusCounter() {
         _uiState.update {
             it.copy(prepTime = uiState.value.prepTime + 1)
         }
+        changeTotalTime()
     }
 
     fun onPrepTimeMinusCounter() {
@@ -80,12 +84,14 @@ class NewRecipeScreenViewModel @Inject constructor(
         } else {
             _uiState.update { it.copy(prepTime = 0) }
         }
+        changeTotalTime()
     }
 
     fun onCookTimePlusCounter() {
         _uiState.update {
             it.copy(cookTime = uiState.value.cookTime + 1)
         }
+        changeTotalTime()
     }
 
     fun onCookTimeMinusCounter() {
@@ -96,6 +102,7 @@ class NewRecipeScreenViewModel @Inject constructor(
         } else {
             _uiState.update { it.copy(cookTime = 0) }
         }
+        changeTotalTime()
 
     }
 
@@ -108,9 +115,7 @@ class NewRecipeScreenViewModel @Inject constructor(
     }
 
     fun onRecipeLinksChanged(links: String) {
-        val linksList = links.split(" ").filterList {
-            this.isNotEmpty()
-        }
+        val linksList = links.split(" ").map { it.trim() }
         linksList.forEach { link ->
             if (link.contains(".jpg")) {
                 _uiState.update { it.copy(strMealThumb = link.trim()) }
@@ -123,13 +128,14 @@ class NewRecipeScreenViewModel @Inject constructor(
     }
 
     fun onRecipeIngredientsChanged(ingredients: String) {
-        val ingredientsList = ingredients.split(" ").filterList { this.isNotEmpty() }
+        val ingredientsList =
+            ingredients.split(" ").map { it.trim() }.filterList { this.isNotEmpty() }
         _uiState.update { it.copy(ingredient = ingredientsList) }
 
     }
 
     fun onRecipeMeasuresChanged(measures: String) {
-        val measuresList = measures.split(" ").filterList { this.isNotEmpty() }
+        val measuresList = measures.split(" ").map { it.trim() }.filterList { this.isNotEmpty() }
         Log.d(TAG, "onRecipeMeasuresChanged: $measuresList")
 
         _uiState.update { it.copy(measure = measuresList) }
@@ -139,10 +145,10 @@ class NewRecipeScreenViewModel @Inject constructor(
         _uiState.update { it.copy(strInstructions = instructions) }
     }
 
-    fun onRecipeImageChanged(uri: Uri?) {
-        val image = uri.toString()
-        _uiState.update { it.copy(recipeImageFormDevice = image) }
+    fun onRecipeImageChanged(uri: String) {
+        _uiState.update { it.copy(recipeImageFormDevice = uri) }
         Log.d(TAG, "onRecipeImageChanged: ${_uiState.value.recipeImageFormDevice}")
+
     }
 
     fun onRecipeIngredientsImagesChanged(uris: List<String?>) {
