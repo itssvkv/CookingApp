@@ -16,6 +16,10 @@ import kotlin.reflect.KClass
 
 object Common {
 
+    fun <T, R> mapRecipe(input: T, mapper: (T) -> R): R {
+        return mapper(input)
+    }
+
     fun toSingleMealLocal(localRecipe: NewRecipeScreenUiState): SingleMealLocal {
         return SingleMealLocal(
             strMeal = localRecipe.strMeal,
@@ -37,6 +41,8 @@ object Common {
             isFavorite = localRecipe.isFavorite
         )
     }
+
+
 
     fun toFavoriteMealLocal(localRecipe: SingleMealLocal): FavoriteMealLocal {
         return FavoriteMealLocal(
@@ -61,8 +67,10 @@ object Common {
 
         )
     }
+
     fun fromFavToSingle(favMeal: FavoriteMealLocal): SingleMealLocal {
         return SingleMealLocal(
+            idMeal = favMeal.idMeal,
             strMeal = favMeal.strMeal,
             strDrinkAlternate = favMeal.strDrinkAlternate,
             strCategory = favMeal.strCategory,

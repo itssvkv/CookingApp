@@ -152,7 +152,7 @@ fun ScreenHeader(
         }
         Box(modifier = Modifier.size(24.dp), contentAlignment = Alignment.Center) {
             IconButton(onClick = {
-                onFavIconClicked(isFavorite)
+                onFavIconClicked(!isFavorite)
             }) {
                 Icon(
                     painter = painterResource(id = R.drawable.fav),

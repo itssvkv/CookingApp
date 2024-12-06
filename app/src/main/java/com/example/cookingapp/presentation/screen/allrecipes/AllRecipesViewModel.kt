@@ -63,7 +63,7 @@ class AllRecipesViewModel @Inject constructor(
                 Log.d("Fav", "second: ${it.meals[index].isFavorite}")
                 if (i == index) {
                     Log.d("Fav", "third: ${it.meals[index].isFavorite}")
-                    meal.copy(isFavorite = !isFavIconClicked)
+                    meal.copy(isFavorite = isFavIconClicked)
                 } else {
                     Log.d("Fav", "last: ${it.meals[index].isFavorite}")
                     meal

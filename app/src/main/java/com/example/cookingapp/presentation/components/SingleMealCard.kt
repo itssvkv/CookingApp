@@ -89,7 +89,7 @@ fun SingleMealCard(
         if (favIcon != null) {
             Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopEnd) {
                 IconButton(onClick = {
-                    onFacIconClicked(meal.isFavorite)
+                    onFacIconClicked(!meal.isFavorite)
                 }) {
                     Icon(
                         painter = favIcon,

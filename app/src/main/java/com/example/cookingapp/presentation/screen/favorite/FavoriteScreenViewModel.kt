@@ -25,6 +25,7 @@ class FavoriteScreenViewModel @Inject constructor(
 
     init {
         getAllFromFavorite()
+
     }
 
     fun onSearchQueryChanged(searchQuery: String) {
@@ -41,7 +42,7 @@ class FavoriteScreenViewModel @Inject constructor(
                     _uiState.value = _uiState.value.copy(isLoading = false, error = it)
                 },
                 onSuccess = { favMeals ->
-                     val new = favMeals?.map { meal ->
+                    val new = favMeals?.map { meal ->
                         fromFavToSingle(meal)
                     }
                     new?.let {
@@ -50,6 +51,9 @@ class FavoriteScreenViewModel @Inject constructor(
 
                 }
             )
+            _uiState.value.meals.forEach {
+                Log.d("FavoriteScreen", "Test: ${it.strMeal}")
+            }
         }
     }
 
@@ -60,24 +64,26 @@ class FavoriteScreenViewModel @Inject constructor(
                 Log.d("Fav", "second: ${it.meals[index].isFavorite}")
                 if (i == index) {
                     Log.d("Fav", "third: ${it.meals[index].isFavorite}")
-                    meal.copy(isFavorite = !isFavIconClicked)
+                    meal.copy(isFavorite = isFavIconClicked)
                 } else {
                     Log.d("Fav", "last: ${it.meals[index].isFavorite}")
                     meal
                 }
             })
         }
-        if (_uiState.value.meals[index].isFavorite){
-            viewModelScope.launch(Dispatchers.IO) {
-                roomRepository.insertRecipeToFavorite(toFavoriteMealLocal(_uiState.value.meals[index]))
-            }
-
-        }else{
+        Log.d("FavoriteScreen", "onFavIconClicked: $isFavIconClicked")
+        Log.d(
+            "FavoriteScreen",
+            "onFavIconClicked: ${_uiState.value.meals[index].isFavorite} + $index"
+        )
+        if (!_uiState.value.meals[index].isFavorite) {
+            Log.d("FavoriteScreen", "onFavIconClicked: ${_uiState.value.meals[index].idMeal}")
             viewModelScope.launch(Dispatchers.IO) {
                 _uiState.value.meals[index].idMeal?.let { roomRepository.deleteRecipeFromFavorite(it) }
             }
+            getAllFromFavorite()
         }
-
     }
+
 
 }

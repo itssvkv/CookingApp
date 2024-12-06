@@ -45,6 +45,7 @@ fun NavGraphBuilder.appNavGraph(
                 isFavorite = uiState.isFavorite,
                 index = uiState.index
             )
+            Log.d("kosom", "appNavGraph: ${uiState.isFavorite} + ${uiState.index}")
         }
 
         composable(HomeScreens.LibraryScreen.route) {
@@ -77,6 +78,7 @@ fun NavGraphBuilder.appNavGraph(
                     sharedViewModelNavigationGraph.onFavIconClicked(isFavorite, index)
                 }
             )
+            Log.d("kosom", "appNavGraph: ${uiState.isFavorite} + ${uiState.index}")
         }
         composable(route = HomeScreens.SingleRecipeScreen.route) {
             val uiState by sharedViewModelNavigationGraph.uiState.collectAsState()

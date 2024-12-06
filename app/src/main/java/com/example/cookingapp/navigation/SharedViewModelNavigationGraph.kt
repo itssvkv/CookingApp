@@ -38,8 +38,8 @@ class SharedViewModelNavigationGraph @Inject constructor() : ViewModel() {
         _uiState.update {
             it.copy(meals = it.meals.mapIndexed { i, meal ->
                 if (i == index) {
-                    testFavIconClicked(isFavIconClicked = !isFavIconClicked, index = index)
-                    meal.copy(isFavorite = !isFavIconClicked)
+                    testFavIconClicked(isFavIconClicked = isFavIconClicked, index = index)
+                    meal.copy(isFavorite = isFavIconClicked)
                 } else {
                     meal
                 }
@@ -48,7 +48,7 @@ class SharedViewModelNavigationGraph @Inject constructor() : ViewModel() {
     }
 
     private fun testFavIconClicked(isFavIconClicked: Boolean, index: Int) {
-        _uiState.update { it.copy(isFavorite = !isFavIconClicked, index = index) }
+        _uiState.update { it.copy(isFavorite = isFavIconClicked, index = index) }
     }
 
 }

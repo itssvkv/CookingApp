@@ -90,8 +90,12 @@ fun HomeScreen(
         FocusRequester()
     }
 
-    LaunchedEffect(key1 = isFavorite) {
-        viewModel.onFavIconClicked(isFavIconClicked =isFavorite, index=index)
+    LaunchedEffect(key1 = true) {
+        if (isFavorite) {
+            viewModel.onFavIconClicked(isFavIconClicked = true, index = index)
+        } else {
+            viewModel.onFavIconClicked(isFavIconClicked = false, index = index)
+        }
     }
 
     HomeScreenContent(
@@ -100,12 +104,15 @@ fun HomeScreen(
         onSearchQueryChanged = viewModel::onSearchQueryChange,
         isFocusedChanged = viewModel::isFocusedChanged,
         focusRequester = focusRequester,
-        isMealsReachingTheEnd = { viewModel.getRandomMeals() },
+        isMealsReachingTheEnd = {
+            viewModel.getRandomMeals()
+            viewModel.getAllRandomMealsFromRoom()
+        },
         onNavigateToAllRecipesScreen = onNavigateToAllRecipesScreen,
         onItemClicked = onNavigateToSingleRecipeScreen,
-        onButtonClicked = {  },
+        onButtonClicked = { },
 
-    )
+        )
 
 
 }

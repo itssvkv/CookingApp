@@ -28,7 +28,7 @@ class SingleRecipeScreenViewModel @Inject constructor(
 
     fun onFavIconClicked(isFavIconClicked: Boolean) {
         _uiState.update {
-            it.copy(mealInfo = it.mealInfo?.copy(isFavorite = !isFavIconClicked))
+            it.copy(mealInfo = it.mealInfo?.copy(isFavorite = isFavIconClicked))
         }
         _uiState.value.mealInfo?.let {
             if (it.isFavorite) {

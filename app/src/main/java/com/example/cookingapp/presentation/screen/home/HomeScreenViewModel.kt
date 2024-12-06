@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.cookingapp.data.local.room.repository.RoomRepository
 import com.example.cookingapp.data.remote.api.NetworkRepository
 import com.example.cookingapp.model.SingleMealLocal
+import com.example.cookingapp.model.SingleMealRemote
+import com.example.cookingapp.utils.Common.mapRecipe
 import com.example.cookingapp.utils.Constants.TAG
 import com.example.cookingapp.utils.onResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -36,8 +38,10 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     init {
+        Log.d(TAG, "uiState: ${_uiState.value.meals}")
         getAllCategories()
         getRandomMeals()
+        getAllRandomMealsFromRoom()
     }
 
 
@@ -59,9 +63,69 @@ class HomeScreenViewModel @Inject constructor(
         }
     }
 
+//    fun getRandomMeals() {
+//        viewModelScope.launch(Dispatchers.IO) {
+//            networkRepository.getRandomMeal().onResponse(
+//                onLoading = {
+//                    _uiState.update { it.copy(isLoadingMoreMeals = true) }
+//                },
+//                onFailure = { error ->
+//                    Log.d(TAG, "getRandomMeals: $error")
+//                    _uiState.update { it.copy(isLoadingMoreMeals = false) }
+//                },
+//                onSuccess = { meals ->
+//                    val newMeals = meals!!.map {
+//                        val prepTime = Random.nextInt(10, 40)
+//                        val cookTime = Random.nextInt(10, 40)
+//                        val totalTime = prepTime + cookTime
+//                        SingleMealLocal(
+//                            idMeal = it.idMeal,
+//                            strMeal = it.strMeal,
+//                            strDrinkAlternate = it.strDrinkAlternate,
+//                            strCategory = it.strCategory,
+//                            strArea = it.strArea,
+//                            strInstructions = it.strInstructions,
+//                            strMealThumb = it.strMealThumb,
+//                            strTags = it.strTags,
+//                            strYoutube = it.strYoutube,
+//                            ingredient = it.ingredient,
+//                            strSource = it.strSource,
+//                            measure = it.measure,
+//                            prepTime = prepTime,
+//                            cookTime = cookTime,
+//                            totalTime = totalTime
+//                        )
+//                    }
+//                    _uiState.update {
+//                        it.copy(meals = it.meals + (newMeals), isLoadingMoreMeals = false)
+//                    }
+//                    Log.d(TAG, "getRandomMeals: ${newMeals[0]}")
+//                }
+//            )
+//        }
+//    }
+
+
     fun getRandomMeals() {
         viewModelScope.launch(Dispatchers.IO) {
-            networkRepository.getRandomMeal().onResponse(
+            roomRepository.insertRecipeToCache(onLoading = {
+                _uiState.update {
+                    it.copy(
+                        isLoadingMoreMeals = true
+                    )
+                }
+            }, onFailure = {
+                _uiState.update { it.copy(isLoadingMoreMeals = false) }
+            },
+                onSuccess = {
+                    _uiState.update { it.copy(isLoadingMoreMeals = false) }
+                })
+        }
+    }
+
+     fun getAllRandomMealsFromRoom(){
+        viewModelScope.launch(Dispatchers.IO) {
+            roomRepository.getAllMealsFromCache().onResponse(
                 onLoading = {
                     _uiState.update { it.copy(isLoadingMoreMeals = true) }
                 },
@@ -69,33 +133,42 @@ class HomeScreenViewModel @Inject constructor(
                     Log.d(TAG, "getRandomMeals: $error")
                     _uiState.update { it.copy(isLoadingMoreMeals = false) }
                 },
-                onSuccess = { meals ->
-                    val newMeals = meals!!.map {
-                        val prepTime = Random.nextInt(10, 40)
-                        val cookTime = Random.nextInt(10, 40)
-                        val totalTime = prepTime + cookTime
-                        SingleMealLocal(
-                            idMeal = it.idMeal,
-                            strMeal = it.strMeal,
-                            strDrinkAlternate = it.strDrinkAlternate,
-                            strCategory = it.strCategory,
-                            strArea = it.strArea,
-                            strInstructions = it.strInstructions,
-                            strMealThumb = it.strMealThumb,
-                            strTags = it.strTags,
-                            strYoutube = it.strYoutube,
-                            ingredient = it.ingredient,
-                            strSource = it.strSource,
-                            measure = it.measure,
-                            prepTime = prepTime,
-                            cookTime = cookTime,
-                            totalTime = totalTime
-                        )
+                onSuccess = {
+                    it?.let { meals ->
+                        val mealsList = meals.map { meal ->
+                            mapRecipe(meal) { oneMeal ->
+                                val prepTime = Random.nextInt(10, 40)
+                                val cookTime = Random.nextInt(10, 40)
+                                val totalTime = prepTime + cookTime
+                                SingleMealLocal(
+                                    idMeal = oneMeal.idMeal,
+                                    strMeal = oneMeal.strMeal,
+                                    strDrinkAlternate = oneMeal.strDrinkAlternate,
+                                    strCategory = oneMeal.strCategory,
+                                    strArea = oneMeal.strArea,
+                                    strInstructions = oneMeal.strInstructions,
+                                    strMealThumb = oneMeal.strMealThumb,
+                                    strTags = oneMeal.strTags,
+                                    strYoutube = oneMeal.strYoutube,
+                                    strSource = oneMeal.strSource,
+                                    ingredient = oneMeal.ingredient,
+                                    measure = oneMeal.measure,
+                                    prepTime = prepTime,
+                                    cookTime = cookTime,
+                                    totalTime = totalTime,
+                                    recipeImageFormDevice = oneMeal.recipeImageFormDevice,
+                                    ingredientsImagesFromDevice = oneMeal.ingredientsImagesFromDevice,
+                                    isFavorite = oneMeal.isFavorite
+                                )
+                            }
+                        }
+                        _uiState.update { state ->
+                            state.copy(
+                                meals = state.meals + (mealsList),
+                                isLoadingMoreMeals = false
+                            )
+                        }
                     }
-                    _uiState.update {
-                        it.copy(meals = it.meals + (newMeals), isLoadingMoreMeals = false)
-                    }
-                    Log.d(TAG, "getRandomMeals: ${newMeals[0]}")
                 }
             )
         }
@@ -105,13 +178,12 @@ class HomeScreenViewModel @Inject constructor(
         _uiState.update {
             it.copy(meals = it.meals.mapIndexed { i, meal ->
                 if (i == index) {
-                    meal.copy(isFavorite = !isFavIconClicked)
+                    meal.copy(isFavorite = isFavIconClicked)
                 } else {
                     meal
                 }
             })
         }
     }
-
 
 }
