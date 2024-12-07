@@ -43,7 +43,7 @@ fun NavGraphBuilder.appNavGraph(
                     navController.navigate(HomeScreens.SingleRecipeScreen.route)
                 },
                 isFavorite = uiState.isFavorite,
-                index = uiState.index
+                indexes = uiState.favIndexesList
             )
             Log.d("kosom", "appNavGraph: ${uiState.isFavorite} + ${uiState.index}")
         }
@@ -73,9 +73,14 @@ fun NavGraphBuilder.appNavGraph(
                     )
                     navController.navigate(HomeScreens.SingleRecipeScreen.route)
 
-                }, onFavIconClicked = { isFavorite, index ->
-                    Log.d("Fav", "appNavGraph: $isFavorite + $index")
-                    sharedViewModelNavigationGraph.onFavIconClicked(isFavorite, index)
+                }, onFavIconClicked = { isFavorite, index, indexesList ->
+                    sharedViewModelNavigationGraph.updateFavIndexesList(favIndexesList = indexesList)
+                    Log.d("FavList", "appNavGraph: $indexesList")
+                    sharedViewModelNavigationGraph.onFavIconClicked(
+                        isFavorite,
+                        index,
+                    )
+
                 }
             )
             Log.d("kosom", "appNavGraph: ${uiState.isFavorite} + ${uiState.index}")
@@ -91,9 +96,9 @@ fun NavGraphBuilder.appNavGraph(
                             navController.popBackStack()
                         },
                         onFavIconClicked = { isFavorite ->
-                            sharedViewModelNavigationGraph.onFavIconClicked(
+                            sharedViewModelNavigationGraph.onFavIconClickedInSingleRecipeScreen(
                                 isFavorite,
-                                uiState.singleMealIndex
+                                uiState.singleMealIndex,
                             )
                         }
 

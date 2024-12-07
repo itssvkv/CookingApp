@@ -34,21 +34,80 @@ class SharedViewModelNavigationGraph @Inject constructor() : ViewModel() {
         _uiState.update { it.copy(singleMeal = meal, singleMealColor = color) }
     }
 
-    fun onFavIconClicked(isFavIconClicked: Boolean, index: Int) {
+    fun onFavIconClicked(
+        isFavIconClicked: Boolean,
+        index: Int,
+    ) {
         _uiState.update {
             it.copy(meals = it.meals.mapIndexed { i, meal ->
                 if (i == index) {
-                    testFavIconClicked(isFavIconClicked = isFavIconClicked, index = index)
-                    meal.copy(isFavorite = isFavIconClicked)
+                    testFavIconClicked(
+                        isFavIconClicked = isFavIconClicked,
+                        index = index,
+                    )
+                    meal.copy(
+                        isFavorite = isFavIconClicked,
+                    )
                 } else {
                     meal
                 }
             })
         }
+        checkTheStateOfFavIconList(isFavIconClicked)
+
+        Log.d("FavList", "onFavIconClickedShare: ${_uiState.value.favIndexesList}")
     }
 
-    private fun testFavIconClicked(isFavIconClicked: Boolean, index: Int) {
-        _uiState.update { it.copy(isFavorite = isFavIconClicked, index = index) }
+    fun onFavIconClickedInSingleRecipeScreen(
+        isFavIconClicked: Boolean,
+        index: Int,
+    ) {
+        val favIndexesList = listOf(index)
+        _uiState.update {
+            it.copy(meals = it.meals.mapIndexed { i, meal ->
+                if (i == index) {
+                    testFavIconClicked(
+                        isFavIconClicked = isFavIconClicked,
+                        index = index,
+                    )
+                    meal.copy(
+                        isFavorite = isFavIconClicked,
+                    )
+                } else {
+                    meal
+                }
+            }, favIndexesListFromSingleRecipe = it.favIndexesListFromSingleRecipe + favIndexesList)
+        }
+        checkTheStateOfFavIconList(isFavIconClicked)
+        Log.d("FavList", "onFavIconClickedShare: ${_uiState.value.favIndexesList}")
+    }
+
+    private fun checkTheStateOfFavIconList(isClicked: Boolean) {
+        if (isClicked) {
+            _uiState.update { it.copy(favIndexesList = it.favIndexesList + it.favIndexesListFromSingleRecipe) }
+        } else {
+            val list = _uiState.value.favIndexesList + _uiState.value.favIndexesListFromSingleRecipe
+            list.toSet()
+            Log.d("FavList", "checkTheStateOfFavIconList: $list")
+            _uiState.update { it.copy(favIndexesList = list.toList()) }
+        }
+    }
+
+    fun updateFavIndexesList(favIndexesList: List<Int?>) {
+        _uiState.update { it.copy(favIndexesList = favIndexesList) }
+
+    }
+
+    private fun testFavIconClicked(
+        isFavIconClicked: Boolean,
+        index: Int,
+    ) {
+        _uiState.update {
+            it.copy(
+                isFavorite = isFavIconClicked,
+                index = index,
+            )
+        }
     }
 
 }

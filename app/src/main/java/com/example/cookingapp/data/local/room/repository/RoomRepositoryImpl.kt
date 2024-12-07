@@ -10,10 +10,15 @@ import com.example.cookingapp.model.FavoriteMealLocal
 import com.example.cookingapp.model.SingleMealLocal
 import com.example.cookingapp.model.SingleMealRemote
 import com.example.cookingapp.utils.Common.mapRecipe
+import com.example.cookingapp.utils.Constants.TAG
 import com.example.cookingapp.utils.Resource
 import com.example.cookingapp.utils.onResponse
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -75,13 +80,13 @@ class RoomRepositoryImpl @Inject constructor(
             onLoading = onLoading,
             onFailure = { onFailure() },
             onSuccess = {
-                onSuccess()
                 it?.let { meals ->
                     list = meals.map { meal ->
                         mapRecipe(meal) { oneMeal ->
                             val prepTime = Random.nextInt(10, 40)
                             val cookTime = Random.nextInt(10, 40)
                             val totalTime = prepTime + cookTime
+                            val currentTime = System.currentTimeMillis()
                             SingleMealRemote(
                                 idMeal = oneMeal.idMeal,
                                 strMeal = oneMeal.strMeal,
@@ -100,19 +105,27 @@ class RoomRepositoryImpl @Inject constructor(
                                 totalTime = totalTime,
                                 recipeImageFormDevice = oneMeal.recipeImageFormDevice,
                                 ingredientsImagesFromDevice = oneMeal.ingredientsImagesFromDevice,
-                                isFavorite = oneMeal.isFavorite
+                                isFavorite = oneMeal.isFavorite,
+                                lastUpdated = currentTime
                             )
                         }
                     }
+                    Log.d(TAG, "insertRecipeToCache: $list")
                 }
+                CoroutineScope(Dispatchers.IO).launch {
+                    list.forEach { meal ->
+                        allRecipesDao.insertRecipe(recipe = meal)
+                    }
+                    onSuccess()
+                }
+
             }
         )
-        list.forEach {
-            allRecipesDao.insertRecipe(recipe = it)
-        }
+
     }
 
     override suspend fun getAllMealsFromCache(): Flow<Resource<List<SingleMealRemote>>> {
+        Log.d(TAG, "getAllMealsFromCache: ffffffffffffffffff")
         return flow {
             emit(Resource.Loading())
             try {
@@ -122,6 +135,10 @@ class RoomRepositoryImpl @Inject constructor(
                 emit(Resource.Failure(msg = e.message.toString()))
             }
         }
+    }
+
+    override suspend fun updateRecipe(isFavorite: Boolean, idMeal: Int) {
+        allRecipesDao.updateRecipe(isFavorite = isFavorite, idMeal = idMeal)
     }
 
 

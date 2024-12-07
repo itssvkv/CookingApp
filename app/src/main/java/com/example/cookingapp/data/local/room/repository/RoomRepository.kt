@@ -23,4 +23,6 @@ interface RoomRepository {
     )
 
     suspend fun getAllMealsFromCache(): Flow<Resource<List<SingleMealRemote>>>
+
+    suspend fun updateRecipe(isFavorite: Boolean, idMeal: Int)
 }

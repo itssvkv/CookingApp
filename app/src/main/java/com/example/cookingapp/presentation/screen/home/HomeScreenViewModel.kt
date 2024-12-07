@@ -27,7 +27,6 @@ class HomeScreenViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(HomeScreenUiState())
     val uiState = _uiState.asStateFlow()
 
-
     fun onSearchQueryChange(searchQuery: String) {
         _uiState.update { it.copy(searchQuery = searchQuery) }
 
@@ -40,8 +39,6 @@ class HomeScreenViewModel @Inject constructor(
     init {
         Log.d(TAG, "uiState: ${_uiState.value.meals}")
         getAllCategories()
-        getRandomMeals()
-        getAllRandomMealsFromRoom()
     }
 
 
@@ -114,16 +111,20 @@ class HomeScreenViewModel @Inject constructor(
                         isLoadingMoreMeals = true
                     )
                 }
+                Log.d(TAG, "getRandomMeals: Loadinnnggg")
             }, onFailure = {
                 _uiState.update { it.copy(isLoadingMoreMeals = false) }
+                Log.d(TAG, "getRandomMeals: Failed")
             },
                 onSuccess = {
                     _uiState.update { it.copy(isLoadingMoreMeals = false) }
+                    Log.d(TAG, "getRandomMeals: Suuuuus")
+                    getAllRandomMealsFromRoom()
                 })
         }
     }
 
-     fun getAllRandomMealsFromRoom(){
+    fun getAllRandomMealsFromRoom() {
         viewModelScope.launch(Dispatchers.IO) {
             roomRepository.getAllMealsFromCache().onResponse(
                 onLoading = {
@@ -158,7 +159,8 @@ class HomeScreenViewModel @Inject constructor(
                                     totalTime = totalTime,
                                     recipeImageFormDevice = oneMeal.recipeImageFormDevice,
                                     ingredientsImagesFromDevice = oneMeal.ingredientsImagesFromDevice,
-                                    isFavorite = oneMeal.isFavorite
+                                    isFavorite = oneMeal.isFavorite,
+                                    lastUpdated = oneMeal.lastUpdated
                                 )
                             }
                         }

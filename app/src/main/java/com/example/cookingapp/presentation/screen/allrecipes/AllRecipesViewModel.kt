@@ -25,7 +25,9 @@ class AllRecipesViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(AllRecipesScreenUiState())
     val uiState = _uiState.asStateFlow()
 
+    var onFinishedClick: (List<Int?>) -> Unit = { favIndexesList ->
 
+    }
     fun onSearchQueryChanged(searchQuery: String) {
         _uiState.update { it.copy(searchQuery = searchQuery) }
     }
@@ -59,27 +61,37 @@ class AllRecipesViewModel @Inject constructor(
     fun onFavIconClicked(isFavIconClicked: Boolean, index: Int) {
         _uiState.update {
             Log.d("Fav", "first: ${it.meals[index].isFavorite}")
+            val favIndexesList = listOf(index)
             it.copy(meals = it.meals.mapIndexed { i, meal ->
                 Log.d("Fav", "second: ${it.meals[index].isFavorite}")
                 if (i == index) {
                     Log.d("Fav", "third: ${it.meals[index].isFavorite}")
-                    meal.copy(isFavorite = isFavIconClicked)
+                    meal.copy(
+                        isFavorite = isFavIconClicked,
+                        favIndexesList = it.meals[index].favIndexesList + favIndexesList
+                    )
+
                 } else {
                     Log.d("Fav", "last: ${it.meals[index].isFavorite}")
                     meal
                 }
-            })
+            }, favIndexesList = it.favIndexesList + favIndexesList)
+
         }
-        if (_uiState.value.meals[index].isFavorite){
+        Log.d("FavList", "onFavIconClickedAll: ${_uiState.value.favIndexesList}")
+        if (_uiState.value.meals[index].isFavorite) {
             viewModelScope.launch(Dispatchers.IO) {
                 roomRepository.insertRecipeToFavorite(toFavoriteMealLocal(_uiState.value.meals[index]))
             }
 
-        }else{
+        } else {
             viewModelScope.launch(Dispatchers.IO) {
                 _uiState.value.meals[index].idMeal?.let { roomRepository.deleteRecipeFromFavorite(it) }
             }
         }
 
+
+        Log.d("FavList", "Finished")
+        onFinishedClick.invoke(_uiState.value.favIndexesList)
     }
 }

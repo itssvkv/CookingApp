@@ -9,11 +9,12 @@ import com.example.cookingapp.data.local.room.dao.MyRecipesDao
 import com.example.cookingapp.model.FavoriteMealLocal
 import com.example.cookingapp.model.SingleMealLocal
 import com.example.cookingapp.model.SingleMealRemote
+import com.example.cookingapp.utils.Common
 import com.example.cookingapp.utils.Converters
 
 @Database(
     entities = [SingleMealLocal::class, FavoriteMealLocal::class, SingleMealRemote::class],
-    version = 5,
+    version = 7,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

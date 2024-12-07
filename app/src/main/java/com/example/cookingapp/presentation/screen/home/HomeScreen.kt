@@ -50,6 +50,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
@@ -64,6 +65,7 @@ import com.example.cookingapp.presentation.components.MainButton
 import com.example.cookingapp.presentation.components.MainTextField
 import com.example.cookingapp.presentation.components.SingleMealCard
 import com.example.cookingapp.presentation.components.shimmerBrush
+import com.example.cookingapp.utils.Common.isInternetAvailable
 import com.example.cookingapp.utils.Constants
 import com.example.cookingapp.utils.Constants.TAG
 import dots
@@ -83,18 +85,34 @@ fun HomeScreen(
     onNavigateToAllRecipesScreen: (List<SingleMealLocal>, String) -> Unit,
     onNavigateToSingleRecipeScreen: (SingleMealLocal, Color, Int) -> Unit,
     isFavorite: Boolean = false,
-    index: Int = 0
+    indexes: List<Int?> = emptyList(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val focusRequester = remember {
         FocusRequester()
     }
 
-    LaunchedEffect(key1 = true) {
-        if (isFavorite) {
-            viewModel.onFavIconClicked(isFavIconClicked = true, index = index)
+    val context = LocalContext.current
+    val isOnline = isInternetAvailable(context)
+
+    LaunchedEffect(isOnline) {
+        if (isOnline) {
+            viewModel.getRandomMeals()
         } else {
-            viewModel.onFavIconClicked(isFavIconClicked = false, index = index)
+            viewModel.getAllRandomMealsFromRoom()
+        }
+    }
+
+    LaunchedEffect(key1 = true) {
+        Log.d("FavList", "onFavIconClicked: $indexes + $isFavorite")
+        if (isFavorite) {
+            indexes.forEach { index ->
+                viewModel.onFavIconClicked(isFavIconClicked = true, index = index!!)
+            }
+        } else {
+            indexes.forEach { index ->
+                viewModel.onFavIconClicked(isFavIconClicked = false, index = index!!)
+            }
         }
     }
 
@@ -106,7 +124,6 @@ fun HomeScreen(
         focusRequester = focusRequester,
         isMealsReachingTheEnd = {
             viewModel.getRandomMeals()
-            viewModel.getAllRandomMealsFromRoom()
         },
         onNavigateToAllRecipesScreen = onNavigateToAllRecipesScreen,
         onItemClicked = onNavigateToSingleRecipeScreen,

@@ -51,14 +51,15 @@ fun AllRecipesScreen(
     title: String,
     onBackIconClicked: () -> Unit = {},
     onNavigateToSingleRecipeScreen: (SingleMealLocal, Color) -> Unit,
-    onFavIconClicked: (Boolean, index: Int) -> Unit={_,_->}
+    onFavIconClicked: (Boolean, index: Int, indexedList: List<Int?>) -> Unit = { _, _, _ -> }
 ) {
     LaunchedEffect(key1 = true) {
         viewModel.onReceiveMeals(meals = meals)
     }
 
     val uiState by viewModel.uiState.collectAsState()
-
+    Log.d("FavList", "AllRecipesScreenFirst: ${uiState.favIndexesList}")
+    val favIndexesList = uiState.favIndexesList
     ScreenContent(
         uiState = uiState,
         onSearchQueryChanged = viewModel::onSearchQueryChanged,
@@ -68,8 +69,12 @@ fun AllRecipesScreen(
         onBackIconClicked = onBackIconClicked,
         onItemClicked = onNavigateToSingleRecipeScreen,
         onFavIconClicked = { isFavorite, index ->
+            Log.d("FavList", "index: $index")
             viewModel.onFavIconClicked(isFavorite, index)
-            onFavIconClicked(isFavorite, index)
+            Log.d("FavList", "AllRecipesScreenSecond: ${uiState.favIndexesList}")
+            viewModel.onFinishedClick = { favIndexesList ->
+                onFavIconClicked(isFavorite, index, favIndexesList)
+            }
         }
     )
 }

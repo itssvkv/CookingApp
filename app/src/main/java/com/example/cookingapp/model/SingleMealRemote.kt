@@ -25,5 +25,7 @@ data class SingleMealRemote(
     val totalTime: Int = prepTime + cookTime,
     val recipeImageFormDevice: String = "",
     val ingredientsImagesFromDevice: List<String?> = emptyList(),
-    val isFavorite: Boolean = false
+    val isFavorite: Boolean = false,
+    val favIndexesList: List<Int?> = emptyList(),
+    val lastUpdated: Long = System.currentTimeMillis()
 )
