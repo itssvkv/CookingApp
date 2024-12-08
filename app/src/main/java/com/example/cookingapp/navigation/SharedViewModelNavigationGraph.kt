@@ -30,6 +30,11 @@ class SharedViewModelNavigationGraph @Inject constructor() : ViewModel() {
         }
     }
 
+
+
+
+
+
     fun updateSingleMealState(meal: SingleMealLocal, color: Color) {
         _uiState.update { it.copy(singleMeal = meal, singleMealColor = color) }
     }
