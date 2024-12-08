@@ -1,6 +1,7 @@
 package com.example.cookingapp.presentation.screen.allrecipes
 
 import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -49,12 +50,24 @@ fun AllRecipesScreen(
     viewModel: AllRecipesViewModel = hiltViewModel(),
     meals: List<SingleMealLocal>,
     title: String,
-    onBackIconClicked: () -> Unit = {},
+    onBackIconClicked: (List<Pair<Boolean, Int?>>) -> Unit = {},
     onNavigateToSingleRecipeScreen: (SingleMealLocal, Color) -> Unit,
-    onFavIconClicked: (Boolean, index: Int, indexedList: List<Int?>) -> Unit = { _, _, _ -> }
+    onFavIconClicked: (Boolean, index: Int, indexedList: List<Pair<Boolean, Int?>>) -> Unit = { _, _, _ -> },
+    favIndexesListAndValue: List<Pair<Boolean, Int?>>?
 ) {
     LaunchedEffect(key1 = true) {
         viewModel.onReceiveMeals(meals = meals)
+    }
+    LaunchedEffect(key1 = true) {
+        favIndexesListAndValue?.forEach {
+            val isFavIconClicked = it.first
+            val index = it.second
+            if (isFavIconClicked) {
+                viewModel.onFavIconClicked(isFavIconClicked = true, index = index!!)
+            } else {
+                viewModel.onFavIconClicked(isFavIconClicked = false, index = index!!)
+            }
+        }
     }
 
     val uiState by viewModel.uiState.collectAsState()
@@ -66,17 +79,20 @@ fun AllRecipesScreen(
         isMealsReachingTheEnd = { viewModel.getRandomMeals() },
         meals = uiState.meals,
         title = title,
-        onBackIconClicked = onBackIconClicked,
+        onBackIconClicked = { onBackIconClicked(uiState.favIndexesListAndValue) },
         onItemClicked = onNavigateToSingleRecipeScreen,
         onFavIconClicked = { isFavorite, index ->
             Log.d("FavList", "index: $index")
             viewModel.onFavIconClicked(isFavorite, index)
+            onFavIconClicked(isFavorite, index, uiState.favIndexesListAndValue)
             Log.d("FavList", "AllRecipesScreenSecond: ${uiState.favIndexesList}")
-            viewModel.onFinishedClick = { favIndexesList ->
-                onFavIconClicked(isFavorite, index, favIndexesList)
-            }
+
         }
     )
+    BackHandler {
+        Log.d("Ya rab", "AllRecipesScreenSecond: ${uiState.favIndexesListAndValue}")
+        onBackIconClicked(uiState.favIndexesListAndValue)
+    }
 }
 
 @Composable
@@ -186,9 +202,6 @@ private fun AllRecipesScreenPreview() {
             .fillMaxWidth()
             .background(Color.White)
     ) {
-        AllRecipesScreen(
-            meals = emptyList(),
-            title = "",
-            onNavigateToSingleRecipeScreen = { _, _ -> })
+
     }
 }

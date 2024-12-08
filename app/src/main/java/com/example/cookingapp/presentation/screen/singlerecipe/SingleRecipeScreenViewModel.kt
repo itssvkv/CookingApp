@@ -26,9 +26,20 @@ class SingleRecipeScreenViewModel @Inject constructor(
     }
 
 
-    fun onFavIconClicked(isFavIconClicked: Boolean) {
+    fun onFavIconClicked(isFavIconClicked: Boolean, index: Int) {
         _uiState.update {
-            it.copy(mealInfo = it.mealInfo?.copy(isFavorite = isFavIconClicked))
+            val favIndexesListAndValue = listOf(Pair(isFavIconClicked, index))
+            it.copy(
+                mealInfo = it.mealInfo?.copy(isFavorite = isFavIconClicked),
+                isFavClicked = isFavIconClicked,
+                favIndexesListAndValue = it.favIndexesListAndValue.mapIndexed { i, pair ->
+                    if (pair.second == index) {
+                        Pair(isFavIconClicked, index)
+                    } else {
+                        pair
+                    }
+                } + favIndexesListAndValue
+            )
         }
         _uiState.value.mealInfo?.let {
             if (it.isFavorite) {

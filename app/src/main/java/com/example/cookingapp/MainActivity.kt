@@ -6,9 +6,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -19,11 +22,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.cookingapp.navigation.HomeScreens
+import com.example.cookingapp.navigation.MainScreens
 import com.example.cookingapp.navigation.RootNavGraph
 import com.example.cookingapp.presentation.components.BottomNavigationBar
 import com.example.cookingapp.presentation.screen.home.HomeScreen
@@ -53,6 +58,10 @@ class MainActivity : ComponentActivity() {
                 }
                 // Control TopBar and BottomBar
                 when (navBackStackEntry?.destination?.route) {
+                    MainScreens.SplashScreen.route -> {
+                        bottomBarState.value = false
+                        topBarState.value = false
+                    }
                     HomeScreens.HomeScreen.route -> {
                         bottomBarState.value = true
                         topBarState.value = true
@@ -82,29 +91,61 @@ class MainActivity : ComponentActivity() {
                         topBarState.value = false
                     }
                 }
-                Scaffold(
-                    snackbarHost = {
-                        SnackbarHost(hostState = snackbarHostState)
-                    },
-                    bottomBar = {
-                        if (bottomBarState.value) {
-                            BottomNavigationBar(
-                                navController = navController,
-                                currentRoute = currentRoute,
-                                selectedItem = selectedItem
-                            )
-                        }
-                    },
-                    containerColor = Color.White
-                ) { paddingValues ->
+//                Scaffold(
+//                    snackbarHost = {
+//                        SnackbarHost(hostState = snackbarHostState)
+//                    },
+//                    bottomBar = {
+//                        if (bottomBarState.value) {
+//                            BottomNavigationBar(
+//                                navController = navController,
+//                                currentRoute = currentRoute,
+//                                selectedItem = selectedItem
+//                            )
+//                        }
+//                    },
+//                    containerColor = Color.White
+//                ) { paddingValues ->
+//                    Box(
+//                        modifier = Modifier.padding(paddingValues)
+//                    ) {
+//                        RootNavGraph(
+//                            navController = navController,
+//                            startGraph = if (Constants.isLoggedIn) BOTTOM_BAR_GRAPH_ROUTE else MAIN_GRAPH_ROUTE
+//                        )
+//                    }
+//                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
                     Box(
-                        modifier = Modifier.padding(paddingValues)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.TopCenter)
                     ) {
                         RootNavGraph(
                             navController = navController,
                             startGraph = if (Constants.isLoggedIn) BOTTOM_BAR_GRAPH_ROUTE else MAIN_GRAPH_ROUTE
                         )
                     }
+                    AnimatedVisibility(
+                        visible = bottomBarState.value,
+                        modifier = Modifier.align(Alignment.BottomCenter),
+                        enter = fadeIn(
+                            animationSpec = tween(durationMillis = 2000)
+                        ),
+                        exit = fadeOut(animationSpec = tween(durationMillis = 2000))
+                    ) {
+                        BottomNavigationBar(
+                            modifier = Modifier.align(Alignment.BottomCenter),
+                            navController = navController,
+                            currentRoute = currentRoute,
+                            selectedItem = selectedItem
+                        )
+
+                    }
+
                 }
 
             }

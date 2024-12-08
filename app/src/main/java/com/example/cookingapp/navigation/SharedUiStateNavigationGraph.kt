@@ -12,5 +12,6 @@ data class SharedUiStateNavigationGraph(
     val isFavorite: Boolean = false,
     val favIndexesList: List<Int?> = emptyList(),
     val favIndexesListFromSingleRecipe: List<Int?> = emptyList(),
-    val index: Int = 0
+    val index: Int = 0,
+    val favIndexesListAndValue: List<Pair<Boolean, Int?>> = emptyList(),
 )

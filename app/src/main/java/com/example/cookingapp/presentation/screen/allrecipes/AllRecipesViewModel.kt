@@ -28,6 +28,7 @@ class AllRecipesViewModel @Inject constructor(
     var onFinishedClick: (List<Int?>) -> Unit = { favIndexesList ->
 
     }
+
     fun onSearchQueryChanged(searchQuery: String) {
         _uiState.update { it.copy(searchQuery = searchQuery) }
     }
@@ -60,7 +61,7 @@ class AllRecipesViewModel @Inject constructor(
 
     fun onFavIconClicked(isFavIconClicked: Boolean, index: Int) {
         _uiState.update {
-            Log.d("Fav", "first: ${it.meals[index].isFavorite}")
+            val favIndexesListAndValue = listOf(Pair(isFavIconClicked, index))
             val favIndexesList = listOf(index)
             it.copy(meals = it.meals.mapIndexed { i, meal ->
                 Log.d("Fav", "second: ${it.meals[index].isFavorite}")
@@ -75,9 +76,17 @@ class AllRecipesViewModel @Inject constructor(
                     Log.d("Fav", "last: ${it.meals[index].isFavorite}")
                     meal
                 }
-            }, favIndexesList = it.favIndexesList + favIndexesList)
+            }, favIndexesListAndValue = it.favIndexesListAndValue.mapIndexed { i, pair ->
+                if (pair.second == index) {
+                    Pair(isFavIconClicked, index)
+                } else {
+                    pair
+                }
+            } + favIndexesListAndValue
+            )
 
         }
+        //it.favIndexesListAndValue + favIndexesListAndValue
         Log.d("FavList", "onFavIconClickedAll: ${_uiState.value.favIndexesList}")
         if (_uiState.value.meals[index].isFavorite) {
             viewModelScope.launch(Dispatchers.IO) {

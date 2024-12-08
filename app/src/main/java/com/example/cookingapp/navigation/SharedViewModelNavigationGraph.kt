@@ -34,6 +34,23 @@ class SharedViewModelNavigationGraph @Inject constructor() : ViewModel() {
         _uiState.update { it.copy(singleMeal = meal, singleMealColor = color) }
     }
 
+    fun updateFavIndexesListAndValue(favIndexesListAndValue: List<Pair<Boolean, Int?>>) {
+        _uiState.update {
+            it.copy(
+                favIndexesListAndValue = favIndexesListAndValue.toSet().toList()
+            )
+        }
+    }
+
+    fun updateFavIndexesListAndValueFromSingleRecipe(favIndexesListAndValue: List<Pair<Boolean, Int?>>) {
+        _uiState.update {
+            it.copy(
+                favIndexesListAndValue = it.favIndexesListAndValue + favIndexesListAndValue.toSet()
+                    .toList()
+            )
+        }
+    }
+
     fun onFavIconClicked(
         isFavIconClicked: Boolean,
         index: Int,

@@ -86,6 +86,7 @@ fun HomeScreen(
     onNavigateToSingleRecipeScreen: (SingleMealLocal, Color, Int) -> Unit,
     isFavorite: Boolean = false,
     indexes: List<Int?> = emptyList(),
+    favIndexesListAndValue: List<Pair<Boolean, Int?>>?
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val focusRequester = remember {
@@ -104,16 +105,24 @@ fun HomeScreen(
     }
 
     LaunchedEffect(key1 = true) {
-        Log.d("FavList", "onFavIconClicked: $indexes + $isFavorite")
-        if (isFavorite) {
-            indexes.forEach { index ->
+        favIndexesListAndValue?.forEach {
+            val isFavIconClicked = it.first
+            val index = it.second
+            if (isFavIconClicked) {
                 viewModel.onFavIconClicked(isFavIconClicked = true, index = index!!)
-            }
-        } else {
-            indexes.forEach { index ->
+            } else {
                 viewModel.onFavIconClicked(isFavIconClicked = false, index = index!!)
             }
         }
+//        if (isFavorite) {
+//            indexes.forEach { index ->
+//                viewModel.onFavIconClicked(isFavIconClicked = true, index = index!!)
+//            }
+//        } else {
+//            indexes.forEach { index ->
+//                viewModel.onFavIconClicked(isFavIconClicked = false, index = index!!)
+//            }
+//        }
     }
 
     HomeScreenContent(

@@ -12,6 +12,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.cookingapp.R
+import com.example.cookingapp.navigation.HomeScreens
 import com.example.cookingapp.navigation.MainScreens
 import com.example.cookingapp.utils.Constants.BOTTOM_BAR_GRAPH_ROUTE
 import kotlinx.coroutines.delay
@@ -41,7 +42,7 @@ fun SplashScreen(
         splashViewModel.splashScreenState.collectLatest { state ->
             if (state.navigateToHomeScreen) {
                 navHostController.popBackStack()
-                navHostController.navigate(route = BOTTOM_BAR_GRAPH_ROUTE)
+                navHostController.navigate(route = HomeScreens.HomeScreen.route)
             } else if (state.navigateToLoginScreen) {
                 navHostController.popBackStack()
                 navHostController.navigate(MainScreens.LoginScreen.route)

@@ -35,7 +35,7 @@ fun NavGraphBuilder.mainNavGraph(
                 onNavigateToRegister = { navController.navigate(MainScreens.SignupScreen.route) },
                 onNavigateToHome = {
                     navController.popBackStack()
-                    navController.navigate(route = BOTTOM_BAR_GRAPH_ROUTE)
+                    navController.navigate(route = HomeScreens.HomeScreen.route)
                 },
                 onNavigateToForgetPassword = {}
             )
@@ -44,7 +44,7 @@ fun NavGraphBuilder.mainNavGraph(
             SignupScreen(
                 onNavigateToHome = {
                     navController.popBackStack()
-                    navController.navigate(route = BOTTOM_BAR_GRAPH_ROUTE)
+                    navController.navigate(route = HomeScreens.HomeScreen.route)
                 },
                 onNavigateToLogin = { navController.navigate(MainScreens.LoginScreen.route) },
                 onBackClicked = { navController.popBackStack() }

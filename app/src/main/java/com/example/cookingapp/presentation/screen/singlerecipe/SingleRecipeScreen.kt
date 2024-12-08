@@ -2,6 +2,7 @@ package com.example.cookingapp.presentation.screen.singlerecipe
 
 import android.net.Uri
 import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -44,6 +45,7 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.example.cookingapp.R
 import com.example.cookingapp.model.SingleMealLocal
+import com.example.cookingapp.presentation.screen.newrecipe.ScreenContent
 import com.example.cookingapp.utils.Constants.INGREDIENT
 import com.example.cookingapp.utils.Constants.TAG
 import linkColor
@@ -55,9 +57,11 @@ fun SingleRecipeScreen(
     modifier: Modifier = Modifier,
     viewModel: SingleRecipeScreenViewModel = hiltViewModel(),
     mealInfo: SingleMealLocal,
-    onBackIconClicked: () -> Unit,
+    onBackIconClicked: (List<Pair<Boolean, Int?>>) -> Unit = {},
     mealColor: Color,
-    onFavIconClicked: (Boolean) -> Unit
+    index: Int,
+    onFavIconClicked: (Boolean) -> Unit,
+    favIndexesListAndValue: Pair<Boolean, Int?>?
 ) {
     LaunchedEffect(key1 = true) {
         viewModel.onReceiveMealInfo(mealInfo = mealInfo)
@@ -65,25 +69,35 @@ fun SingleRecipeScreen(
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
 
-    uiState.mealInfo?.let {meal->
+    uiState.mealInfo?.let { meal ->
         ScreenContent(
-        mealInfo = meal,
-        onBackIconClicked = onBackIconClicked,
-        onFavIconClicked = { isFavorite ->
-            viewModel.onFavIconClicked(isFavorite)
-            onFavIconClicked(isFavorite)
-        },
-        mealColor = mealColor,
-        onTheMealImageLinkClicked = {
-            CustomTabsIntent.Builder().build().launchUrl(context, Uri.parse(it))
-        },
-        onYoutubeLinkClicked = {
-            CustomTabsIntent.Builder().build().launchUrl(context, Uri.parse(it))
-        },
-        onSourceLinkClicked = {
-            CustomTabsIntent.Builder().build().launchUrl(context, Uri.parse(it))
+            mealInfo = meal,
+            onBackIconClicked = { onBackIconClicked(uiState.favIndexesListAndValue) },
+            onFavIconClicked = { isFavorite ->
+                viewModel.onFavIconClicked(isFavorite, index = index)
+                onFavIconClicked(isFavorite)
+            },
+            mealColor = mealColor,
+            onTheMealImageLinkClicked = {
+                CustomTabsIntent.Builder().build().launchUrl(context, Uri.parse(it))
+            },
+            onYoutubeLinkClicked = {
+                CustomTabsIntent.Builder().build().launchUrl(context, Uri.parse(it))
+            },
+            onSourceLinkClicked = {
+                CustomTabsIntent.Builder().build().launchUrl(context, Uri.parse(it))
+            }
+        )
+    }
+    LaunchedEffect(key1 = true) {
+        if (favIndexesListAndValue?.first == true) {
+            viewModel.onFavIconClicked(isFavIconClicked = true, index = index)
+        } else {
+            viewModel.onFavIconClicked(isFavIconClicked = false, index = index)
         }
-    )
+    }
+    BackHandler {
+        onBackIconClicked(uiState.favIndexesListAndValue)
     }
 }
 
