@@ -76,7 +76,16 @@ fun BottomNavigationBar(
                             )
                         }
                     }
-                    3->{
+
+                    2 -> {
+                        if (currentRoute != HomeScreens.GenerateRecipesScreen.route) {
+                            navController.navigate(
+                                HomeScreens.GenerateRecipesScreen.route
+                            )
+                        }
+                    }
+
+                    3 -> {
                         if (currentRoute != HomeScreens.FavoriteScreen.route) {
                             navController.navigate(
                                 HomeScreens.FavoriteScreen.route

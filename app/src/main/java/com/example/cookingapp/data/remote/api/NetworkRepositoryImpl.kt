@@ -1,6 +1,7 @@
 package com.example.cookingapp.data.remote.api
 
 import com.example.cookingapp.model.HomeCategoriesResponse
+import com.example.cookingapp.model.Meal
 import com.example.cookingapp.model.SingleMealLocal
 import com.example.cookingapp.utils.Resource
 import kotlinx.coroutines.flow.Flow
@@ -52,7 +53,58 @@ class NetworkRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getAllMealsWithMainIngredient(ingredient: String): Flow<Resource<List<Meal>>> {
+        return flow {
+            emit(Resource.Loading())
+            try {
+                val response = api.getAllMealsWithMainIngredient(ingredient = ingredient)
+                emit(Resource.Success(data = response.meals))
 
+            } catch (e: HttpException) {
+                emit(Resource.Failure(msg = e.message!!))
+            } catch (e: IOException) {
+                emit(Resource.Failure(msg = "Can't reach server, check your internet connection"))
+            } catch (e: Exception) {
+                emit(Resource.Failure(msg = "Unknown error happened, try again later"))
+            }
+        }
+    }
+
+    override suspend fun getAllMealsWithMainCategory(category: String): Flow<Resource<List<Meal>>> {
+        return flow {
+            emit(Resource.Loading())
+            try {
+                val response = api.getAllMealsWithCategory(category = category)
+                emit(Resource.Success(data = response.meals))
+
+            } catch (e: HttpException) {
+                emit(Resource.Failure(msg = e.message!!))
+            } catch (e: IOException) {
+                emit(Resource.Failure(msg = "Can't reach server, check your internet connection"))
+            } catch (e: Exception) {
+                emit(Resource.Failure(msg = "Unknown error happened, try again later"))
+            }
+        }
+    }
+
+    override suspend fun getAllMealsWithMainArea(area: String): Flow<Resource<List<Meal>>> {
+        return flow {
+            emit(Resource.Loading())
+            try {
+                val response = api.getAllMealsWithArea(area = area)
+                emit(Resource.Success(data = response.meals))
+
+            } catch (e: HttpException) {
+                emit(Resource.Failure(msg = e.message!!))
+            } catch (e: IOException) {
+                emit(Resource.Failure(msg = "Can't reach server, check your internet connection"))
+            } catch (e: Exception) {
+                emit(Resource.Failure(msg = "Unknown error happened, try again later"))
+            }
+        }
+    }
 }
+
+
 
 

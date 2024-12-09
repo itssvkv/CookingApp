@@ -62,6 +62,7 @@ class MainActivity : ComponentActivity() {
                         bottomBarState.value = false
                         topBarState.value = false
                     }
+
                     HomeScreens.HomeScreen.route -> {
                         bottomBarState.value = true
                         topBarState.value = true
@@ -72,6 +73,12 @@ class MainActivity : ComponentActivity() {
                         bottomBarState.value = true
                         topBarState.value = true
                         selectedItem = 1
+                    }
+
+                    HomeScreens.GenerateRecipesScreen.route -> {
+                        bottomBarState.value = true
+                        topBarState.value = true
+                        selectedItem = 2
                     }
 
                     HomeScreens.AllRecipesScreen.route -> {

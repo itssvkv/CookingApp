@@ -12,6 +12,7 @@ import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.example.cookingapp.presentation.screen.allrecipes.AllRecipesScreen
 import com.example.cookingapp.presentation.screen.favorite.FavoriteScreen
+import com.example.cookingapp.presentation.screen.generaterecipes.GenerateRecipesScreen
 import com.example.cookingapp.presentation.screen.home.HomeScreen
 import com.example.cookingapp.presentation.screen.library.LibraryScreen
 import com.example.cookingapp.presentation.screen.newrecipe.NewRecipeScreen
@@ -150,7 +151,9 @@ fun NavGraphBuilder.appNavGraph(
                 onBackIconClicked = { navController.popBackStack() }
             )
         }
-
+        composable(route=HomeScreens.GenerateRecipesScreen.route) {
+            GenerateRecipesScreen()
+        }
         composable(route = HomeScreens.FavoriteScreen.route) {
             FavoriteScreen(
                 onNavigateToSingleRecipeScreen = { singleMeal, color ->

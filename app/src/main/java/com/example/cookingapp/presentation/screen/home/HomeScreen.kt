@@ -55,6 +55,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.cookingapp.R
@@ -532,12 +533,13 @@ fun GenerateRecipeSection(
     secondDescription: String = "",
     buttonText: String = "",
     onButtonClicked: () -> Unit = {},
+    parentHeight: Dp = 220.dp,
     painter: Painter = painterResource(id = R.drawable.gernerate_woman)
 ) {
     BoxWithConstraints(
         modifier = modifier
             .fillMaxWidth()
-            .height(220.dp)
+            .height(parentHeight)
             .padding(vertical = 16.dp),
         contentAlignment = Alignment.Center
     ) {
@@ -644,10 +646,8 @@ fun GenerateRecipeBody(
                         .padding(end = 16.dp),
                     text = buttonText,
                     onButtonClicked = onButtonClicked
-
                 )
             }
-
             Image(
                 painter = painter,
                 contentDescription = "woman",
