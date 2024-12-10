@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -61,7 +62,7 @@ fun SingleRecipeScreen(
     mealColor: Color,
     index: Int,
     onFavIconClicked: (Boolean) -> Unit,
-    favIndexesListAndValue: Pair<Boolean, Int?>?
+//    favIndexesListAndValue: Pair<Boolean, Int?>?
 ) {
     LaunchedEffect(key1 = true) {
         viewModel.onReceiveMealInfo(mealInfo = mealInfo)
@@ -89,13 +90,13 @@ fun SingleRecipeScreen(
             }
         )
     }
-    LaunchedEffect(key1 = true) {
-        if (favIndexesListAndValue?.first == true) {
-            viewModel.onFavIconClicked(isFavIconClicked = true, index = index)
-        } else {
-            viewModel.onFavIconClicked(isFavIconClicked = false, index = index)
-        }
-    }
+//    LaunchedEffect(key1 = true) {
+//        if (favIndexesListAndValue?.first == true) {
+//            viewModel.onFavIconClicked(isFavIconClicked = true, index = index)
+//        } else {
+//            viewModel.onFavIconClicked(isFavIconClicked = false, index = index)
+//        }
+//    }
     BackHandler {
         onBackIconClicked(uiState.favIndexesListAndValue)
     }
@@ -115,7 +116,8 @@ fun ScreenContent(
 ) {
     LazyColumn(
         modifier = modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .statusBarsPadding(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         item {

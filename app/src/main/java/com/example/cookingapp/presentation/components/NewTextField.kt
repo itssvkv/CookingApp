@@ -55,7 +55,7 @@ fun NewTextField(
     value: String = "",
     title: String = "",
     roundedShape: RoundedCornerShape = RoundedCornerShape(4.dp),
-    error: String? = null,
+    error: Boolean = false,
     singleLine: Boolean = true,
     height: Dp = if (singleLine) 60.dp else 110.dp,
     enabled: Boolean = true,
@@ -78,7 +78,7 @@ fun NewTextField(
             value = value,
             onValueChange = onValueChange,
             enabled = enabled,
-            isError = error != null,
+            isError = error,
             singleLine = singleLine,
             modifier = Modifier
                 .padding(0.dp)
@@ -97,9 +97,7 @@ fun NewTextField(
                 unfocusedBorderColor = onPrimary,
                 unfocusedTextColor = onPrimary,
                 unfocusedLabelColor = onPrimary,
-                errorContainerColor = errorLight,
                 errorLabelColor = errorLight,
-                errorTextColor = errorLight,
 
                 ),
             textStyle = MaterialTheme.typography.bodyLarge,

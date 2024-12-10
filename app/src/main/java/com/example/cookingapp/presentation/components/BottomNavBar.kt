@@ -92,6 +92,13 @@ fun BottomNavigationBar(
                             )
                         }
                     }
+                    4 -> {
+                        if (currentRoute != HomeScreens.ProfileScreen.route) {
+                            navController.navigate(
+                                HomeScreens.ProfileScreen.route
+                            )
+                        }
+                    }
                 }
             }) {
                 Icon(

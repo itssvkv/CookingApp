@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -87,7 +88,8 @@ fun HomeScreen(
     onNavigateToSingleRecipeScreen: (SingleMealLocal, Color, Int) -> Unit,
     isFavorite: Boolean = false,
     indexes: List<Int?> = emptyList(),
-    favIndexesListAndValue: List<Pair<Boolean, Int?>>?
+    favIndexesListAndValue: List<Pair<Boolean, Int?>>?,
+    onNavigateToGenerateRecipesScreen: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val focusRequester = remember {
@@ -137,9 +139,9 @@ fun HomeScreen(
         },
         onNavigateToAllRecipesScreen = onNavigateToAllRecipesScreen,
         onItemClicked = onNavigateToSingleRecipeScreen,
-        onButtonClicked = { },
+        onButtonClicked = onNavigateToGenerateRecipesScreen
 
-        )
+    )
 
 
 }
@@ -160,6 +162,7 @@ fun HomeScreenContent(
     LazyColumn(
         modifier = modifier
             .fillMaxWidth()
+            .statusBarsPadding()
             .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

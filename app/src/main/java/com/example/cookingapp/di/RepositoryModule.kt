@@ -8,6 +8,7 @@ import com.example.cookingapp.data.local.room.LocalDatabase
 import com.example.cookingapp.data.local.room.dao.AllRecipesDao
 import com.example.cookingapp.data.local.room.dao.FavoriteDao
 import com.example.cookingapp.data.local.room.dao.MyRecipesDao
+import com.example.cookingapp.data.local.room.dao.PreviousMealsDao
 import com.example.cookingapp.data.local.room.repository.RoomRepository
 import com.example.cookingapp.data.local.room.repository.RoomRepositoryImpl
 import com.example.cookingapp.data.remote.api.MealsAPI
@@ -51,6 +52,7 @@ object RepositoryModule {
         myRecipes: MyRecipesDao,
         favoriteDao: FavoriteDao,
         allRecipesDao: AllRecipesDao,
+        previousMealsDao: PreviousMealsDao,
         networkRepository: NetworkRepository,
         db: LocalDatabase
     ): RoomRepository {
@@ -59,6 +61,7 @@ object RepositoryModule {
             favoriteDao = favoriteDao,
             allRecipesDao = allRecipesDao,
             networkRepository = networkRepository,
+            previousMealsDao = previousMealsDao,
             db = db
         )
     }

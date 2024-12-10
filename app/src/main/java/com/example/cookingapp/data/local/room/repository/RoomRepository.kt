@@ -1,6 +1,7 @@
 package com.example.cookingapp.data.local.room.repository
 
 import com.example.cookingapp.model.FavoriteMealLocal
+import com.example.cookingapp.model.Meal
 import com.example.cookingapp.model.SingleMealLocal
 import com.example.cookingapp.model.SingleMealRemote
 import com.example.cookingapp.utils.Resource
@@ -23,6 +24,10 @@ interface RoomRepository {
     )
 
     suspend fun getAllMealsFromCache(): Flow<Resource<List<SingleMealRemote>>>
-
     suspend fun updateRecipe(isFavorite: Boolean, idMeal: Int)
+
+
+    suspend fun insertPreviousRecipe(recipe: Meal)
+    suspend fun getAllPreviousMeals(): Flow<Resource<List<Meal>>>
+
 }

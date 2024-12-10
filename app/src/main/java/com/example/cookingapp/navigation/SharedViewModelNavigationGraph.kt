@@ -3,6 +3,7 @@ package com.example.cookingapp.navigation
 import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
+import com.example.cookingapp.model.Meal
 import com.example.cookingapp.model.SingleMealLocal
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,10 +30,6 @@ class SharedViewModelNavigationGraph @Inject constructor() : ViewModel() {
             )
         }
     }
-
-
-
-
 
 
     fun updateSingleMealState(meal: SingleMealLocal, color: Color) {
@@ -130,6 +127,12 @@ class SharedViewModelNavigationGraph @Inject constructor() : ViewModel() {
                 index = index,
             )
         }
+    }
+
+    //generate and generate result
+    fun updateGenerateResultUiState(generatedMeals: List<Meal>) {
+        _uiState.update { it.copy(generatedMeals = generatedMeals) }
+
     }
 
 }

@@ -67,6 +67,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -87,6 +88,7 @@ fun MainBoxShape(
     boxWidth: Dp = 40.dp,
     borderStroke: BorderStroke = BorderStroke(width = 1.dp, color = Color.Black),
     shapeRadius: Dp = 4.5.dp,
+    shape: RoundedCornerShape = RoundedCornerShape(shapeRadius),
     blackColorRadius: Dp = 3.dp,
     content: @Composable () -> Unit
 
@@ -102,18 +104,17 @@ fun MainBoxShape(
             modifier = Modifier
                 .width(width = boxWidth)
                 .height(height = boxHeight)
-                .border(border = borderStroke, shape = RoundedCornerShape(shapeRadius))
-                .clip(shape = RoundedCornerShape(shapeRadius))
+                .border(border = borderStroke, shape = shape)
+                .clip(shape = shape)
                 .background(backgroundBottomBoxColor)
                 .align(Alignment.BottomStart),
-
-            )
+        )
         Box(
             modifier = Modifier
                 .width(width = boxWidth)
                 .height(height = boxHeight)
-                .border(border = borderStroke, shape = RoundedCornerShape(shapeRadius))
-                .clip(shape = RoundedCornerShape(shapeRadius))
+                .border(border = borderStroke, shape = shape)
+                .clip(shape = shape)
                 .background(backgroundTopBoxColor)
                 .align(Alignment.TopEnd),
             contentAlignment = Alignment.Center

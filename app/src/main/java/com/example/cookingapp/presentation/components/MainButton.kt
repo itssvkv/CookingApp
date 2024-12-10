@@ -59,7 +59,8 @@ fun MainButton(
             CircularProgressIndicator(
                 modifier
                     .padding(8.dp)
-                    .size(24.dp),
+                    .size(24.dp)
+                    .align(Alignment.CenterVertically),
                 color = Color.White,
                 strokeWidth = 2.dp,
                 strokeCap = StrokeCap.Round

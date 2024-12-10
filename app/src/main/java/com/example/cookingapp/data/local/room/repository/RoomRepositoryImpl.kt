@@ -5,8 +5,10 @@ import com.example.cookingapp.data.local.room.LocalDatabase
 import com.example.cookingapp.data.local.room.dao.AllRecipesDao
 import com.example.cookingapp.data.local.room.dao.FavoriteDao
 import com.example.cookingapp.data.local.room.dao.MyRecipesDao
+import com.example.cookingapp.data.local.room.dao.PreviousMealsDao
 import com.example.cookingapp.data.remote.api.NetworkRepository
 import com.example.cookingapp.model.FavoriteMealLocal
+import com.example.cookingapp.model.Meal
 import com.example.cookingapp.model.SingleMealLocal
 import com.example.cookingapp.model.SingleMealRemote
 import com.example.cookingapp.utils.Common.mapRecipe
@@ -26,6 +28,7 @@ class RoomRepositoryImpl @Inject constructor(
     private val dao: MyRecipesDao,
     private val favoriteDao: FavoriteDao,
     private val allRecipesDao: AllRecipesDao,
+    private val previousMealsDao: PreviousMealsDao,
     private val networkRepository: NetworkRepository,
     private val db: LocalDatabase
 ) : RoomRepository {
@@ -139,6 +142,22 @@ class RoomRepositoryImpl @Inject constructor(
 
     override suspend fun updateRecipe(isFavorite: Boolean, idMeal: Int) {
         allRecipesDao.updateRecipe(isFavorite = isFavorite, idMeal = idMeal)
+    }
+
+    override suspend fun insertPreviousRecipe(recipe: Meal) {
+        previousMealsDao.insertPreviousRecipe(recipe = recipe)
+    }
+
+    override suspend fun getAllPreviousMeals(): Flow<Resource<List<Meal>>> {
+        return flow {
+            emit(Resource.Loading())
+            try {
+                val response = previousMealsDao.getAllPreviousMeals()
+                emit(Resource.Success(data = response))
+            } catch (e: Exception) {
+                emit(Resource.Failure(msg = e.message.toString()))
+            }
+        }
     }
 
 

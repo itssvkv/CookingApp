@@ -3,6 +3,7 @@
 package com.example.cookingapp.presentation.screen.generaterecipes
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -31,8 +32,10 @@ import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -58,6 +61,10 @@ import com.example.cookingapp.presentation.components.NewTextField
 import com.example.cookingapp.presentation.components.SingleMealCard
 import com.example.cookingapp.utils.Constants.TAG
 import dots
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.launch
 import primaryDark
 import randomColor
 import randomColor2
@@ -67,10 +74,14 @@ import tertiaryDark
 @Composable
 fun GenerateRecipesScreen(
     modifier: Modifier = Modifier,
-    viewModel: GenerateRecipesScreenViewModel = hiltViewModel()
+    viewModel: GenerateRecipesScreenViewModel = hiltViewModel(),
+    onSheetButtonClicked: (List<Meal>) -> Unit = {},
+    onNavigateToSingleRecipeScreen: (SingleMealLocal?, Color) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val sheetState = rememberModalBottomSheetState()
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     GenerateRecipeScreenContent(
         modifier = modifier,
         onButtonClicked = {
@@ -79,7 +90,12 @@ fun GenerateRecipesScreen(
         title = "Previous generated recipes",
         onSeeAllClicked = {},
         uiState = uiState,
-        onItemClicked = { _, _, _ -> },
+        onItemClicked = { meal, color, index ->
+            scope.launch {
+                viewModel.onItemClicked(meal = meal)
+                onNavigateToSingleRecipeScreen(uiState.singleMealInfo, color)
+            }
+        },
         sheetState = sheetState,
         onDismissRequest = {
             viewModel.updateIsShowBottomSheet(value = false)
@@ -88,12 +104,31 @@ fun GenerateRecipesScreen(
         onCategoryValueChange = viewModel::onCategoryValueChange,
         onAreaValueChange = viewModel::onAreaValueChange,
         onSheetButtonClicked = {
-            viewModel.getAllMealsWithMainIngredient(ingredient = uiState.ingredient)
-            viewModel.getAllMealsWithMainCategory(category = uiState.category)
-            viewModel.getAllMealsWithMainArea(area = uiState.area)
-
+            scope.launch {
+                // Ensure each ViewModel function is complete before proceeding
+                viewModel.getAllMealsWithMainIngredient(ingredient = uiState.ingredient)
+                viewModel.getAllMealsWithMainCategory(category = uiState.category)
+                viewModel.getAllMealsWithMainArea(area = uiState.area)
+                if (!(uiState.isIngredientError || uiState.isCategoryError || uiState.isAreaError)) {
+                    val meals: List<Meal> =
+                        uiState.ingredientMeals!! + uiState.categoryMeals!! + uiState.areaMeals!!
+                    sheetState.hide() // Assuming it's a suspending function
+                    if (!sheetState.isVisible) {
+                        viewModel.updateIsShowBottomSheet(value = false)
+                    }
+                    onSheetButtonClicked(meals)
+                } else {
+                    Log.d("generate", "GenerateRecipesScreenLast: ")
+                    Toast.makeText(context, "Not found", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
+
     )
+    LaunchedEffect(key1 = uiState.resultMeals) {
+        viewModel.getALLPreviousMeals()
+    }
+
 }
 
 @Composable
@@ -124,15 +159,16 @@ fun GenerateRecipeScreenContent(
             )
         }
         item {
-            uiState.meals?.let {
-                PreviousMealsSection(
-                    title = title,
-                    onSeeAllClicked = onSeeAllClicked,
-                    meals = it,
-                    isLoading = uiState.isIngredientLoading || uiState.isCategoryLoading || uiState.isAreaLoading,
-                    onItemClicked = onItemClicked
-                )
-            }
+
+            PreviousMealsSection(
+                title = title,
+                onSeeAllClicked = onSeeAllClicked,
+                meals = uiState.previousMeals,
+                isLoading = uiState.isIngredientLoading || uiState.isCategoryLoading || uiState.isAreaLoading,
+                onItemClicked = onItemClicked
+            )
+
+
         }
         item {
             GenerateRecipesBottomSheet(
@@ -146,7 +182,10 @@ fun GenerateRecipeScreenContent(
                 areaValue = uiState.area,
                 onAreaValueChange = onAreaValueChange,
                 onSheetButtonClicked = onSheetButtonClicked,
-                isLoading = uiState.isIngredientLoading || uiState.isCategoryLoading || uiState.isAreaLoading
+                isLoading = uiState.isIngredientLoading || uiState.isCategoryLoading || uiState.isAreaLoading,
+                isIngredientError = uiState.isIngredientError,
+                isCategoryError = uiState.isCategoryError,
+                isAreaError = uiState.isAreaError
             )
 
         }
@@ -334,7 +373,13 @@ fun PreviousMealsSectionBody(
                     PreviousSingleCard(
                         meal = meals[index],
                         backgroundColor = listOfColors[num],
-                        onItemClicked = { onItemClicked(meals[index], listOfColors[num], index) }
+                        onItemClicked = {
+                            onItemClicked(
+                                meals[index],
+                                listOfColors[num],
+                                index
+                            )
+                        }
                     )
                 }
 
@@ -412,7 +457,10 @@ fun GenerateRecipesBottomSheet(
     areaValue: String = "",
     onAreaValueChange: (String) -> Unit = {},
     onSheetButtonClicked: () -> Unit = {},
-    isLoading: Boolean
+    isLoading: Boolean,
+    isIngredientError: Boolean = false,
+    isCategoryError: Boolean = false,
+    isAreaError: Boolean = false,
 ) {
     if (isShowBottomSheet) {
         ModalBottomSheet(
@@ -432,6 +480,7 @@ fun GenerateRecipesBottomSheet(
                     title = "Main ingredient",
                     onValueChange = onIngredientValueChange,
                     value = ingredientValue,
+                    error = isIngredientError
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 NewTextField(
@@ -439,7 +488,8 @@ fun GenerateRecipesBottomSheet(
                         .fillMaxWidth(),
                     title = "Category",
                     onValueChange = onCategoryValueChange,
-                    value = categoryValue
+                    value = categoryValue,
+                    error = isCategoryError
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 NewTextField(
@@ -447,16 +497,17 @@ fun GenerateRecipesBottomSheet(
                         .fillMaxWidth(),
                     title = "Area",
                     onValueChange = onAreaValueChange,
-                    value = areaValue
+                    value = areaValue,
+                    error = isAreaError
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 MainButton(
                     modifier = Modifier
-                        .fillMaxWidth()
                         .height(60.dp),
                     text = "Generate",
                     onButtonClicked = onSheetButtonClicked,
-                    isLoading = isLoading
+                    isLoading = isLoading,
+                    isEnabled = ingredientValue.isNotEmpty() || categoryValue.isNotEmpty() || areaValue.isNotEmpty()
                 )
             }
 

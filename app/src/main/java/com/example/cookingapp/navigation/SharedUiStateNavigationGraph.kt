@@ -1,6 +1,7 @@
 package com.example.cookingapp.navigation
 
 import androidx.compose.ui.graphics.Color
+import com.example.cookingapp.model.Meal
 import com.example.cookingapp.model.SingleMealLocal
 
 data class SharedUiStateNavigationGraph(
@@ -14,4 +15,9 @@ data class SharedUiStateNavigationGraph(
     val favIndexesListFromSingleRecipe: List<Int?> = emptyList(),
     val index: Int = 0,
     val favIndexesListAndValue: List<Pair<Boolean, Int?>> = emptyList(),
+
+
+
+    //generate and generate result
+    val generatedMeals: List<Meal> = emptyList(),
 )

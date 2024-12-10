@@ -105,4 +105,8 @@ object MainModule {
     @Singleton
     fun providesAllRecipesDao(database: LocalDatabase) = database.allRecipesDao()
 
+    @Provides
+    @Singleton
+    fun providesPreviousMealsDao(database: LocalDatabase) = database.previousMealsDao()
+
 }

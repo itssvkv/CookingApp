@@ -13,9 +13,11 @@ import androidx.navigation.navigation
 import com.example.cookingapp.presentation.screen.allrecipes.AllRecipesScreen
 import com.example.cookingapp.presentation.screen.favorite.FavoriteScreen
 import com.example.cookingapp.presentation.screen.generaterecipes.GenerateRecipesScreen
+import com.example.cookingapp.presentation.screen.generateresult.GenerateResultScreen
 import com.example.cookingapp.presentation.screen.home.HomeScreen
 import com.example.cookingapp.presentation.screen.library.LibraryScreen
 import com.example.cookingapp.presentation.screen.newrecipe.NewRecipeScreen
+import com.example.cookingapp.presentation.screen.profile.ProfileScreen
 import com.example.cookingapp.presentation.screen.singlerecipe.SingleRecipeScreen
 import com.example.cookingapp.presentation.screen.splash.SplashScreen
 import com.example.cookingapp.utils.Constants.BOTTOM_BAR_GRAPH_ROUTE
@@ -29,6 +31,7 @@ fun NavGraphBuilder.appNavGraph(
         route = BOTTOM_BAR_GRAPH_ROUTE,
         startDestination = MainScreens.SplashScreen.route
     ) {
+
         composable(route = MainScreens.SplashScreen.route) {
             SplashScreen(
                 navHostController = navController
@@ -51,7 +54,10 @@ fun NavGraphBuilder.appNavGraph(
                 },
                 isFavorite = uiState.isFavorite,
                 indexes = uiState.favIndexesList,
-                favIndexesListAndValue = uiState.favIndexesListAndValue
+                favIndexesListAndValue = uiState.favIndexesListAndValue,
+                onNavigateToGenerateRecipesScreen = {
+                    navController.navigate(HomeScreens.GenerateRecipesScreen.route)
+                }
             )
             Log.d("kosom", "appNavGraph: ${uiState.isFavorite} + ${uiState.index}")
         }
@@ -72,9 +78,9 @@ fun NavGraphBuilder.appNavGraph(
             AllRecipesScreen(
                 meals = uiState.meals, title = uiState.title,
                 onBackIconClicked = {
-                    sharedViewModelNavigationGraph.updateFavIndexesListAndValue(
-                        favIndexesListAndValue = it
-                    )
+//                    sharedViewModelNavigationGraph.updateFavIndexesListAndValue(
+//                        favIndexesListAndValue = it
+//                    )
                     navController.popBackStack()
                 },
                 onNavigateToSingleRecipeScreen = { singleMeal, color ->
@@ -88,10 +94,10 @@ fun NavGraphBuilder.appNavGraph(
 //                    sharedViewModelNavigationGraph.updateFavIndexesList(favIndexesList = indexesList)
 
                     Log.d("FavList", "appNavGraph: $indexesList")
-                    sharedViewModelNavigationGraph.onFavIconClicked(
-                        isFavorite,
-                        index,
-                    )
+//                    sharedViewModelNavigationGraph.onFavIconClicked(
+//                        isFavorite,
+//                        index,
+//                    )
                 },
                 favIndexesListAndValue = uiState.favIndexesListAndValue
             )
@@ -113,33 +119,33 @@ fun NavGraphBuilder.appNavGraph(
                             )
                             navController.popBackStack()
                         },
-                        favIndexesListAndValue = if (uiState.favIndexesListAndValue.isNotEmpty())
-                            uiState.favIndexesListAndValue[uiState.singleMealIndex] else Pair(
-                            false,
-                            null
-                        ),
+//                        favIndexesListAndValue = if (uiState.favIndexesListAndValue.isNotEmpty())
+//                            uiState.favIndexesListAndValue[uiState.singleMealIndex] else Pair(
+//                            false,
+//                            null
+//                        ),
                         index = uiState.singleMealIndex,
                         onFavIconClicked = { isFavorite ->
-                            favIndexesList.forEach {
-                                if (it.second == uiState.singleMealIndex) {
-                                    val pair = Pair(isFavorite, uiState.singleMealIndex)
-                                    favIndexesList = favIndexesList.map { oldPair ->
-                                        if (oldPair.second == uiState.singleMealIndex) {
-                                            pair
-                                        } else {
-                                            oldPair
-                                        }
-                                    }
-                                }
-                                Log.d("Ya rab", "appNavGraphSecond: $favIndexesList")
-                                sharedViewModelNavigationGraph.updateFavIndexesListAndValue(
-                                    favIndexesList
-                                )
-                            }
-                            sharedViewModelNavigationGraph.onFavIconClickedInSingleRecipeScreen(
-                                isFavorite,
-                                uiState.singleMealIndex,
-                            )
+//                            favIndexesList.forEach {
+//                                if (it.second == uiState.singleMealIndex) {
+//                                    val pair = Pair(isFavorite, uiState.singleMealIndex)
+//                                    favIndexesList = favIndexesList.map { oldPair ->
+//                                        if (oldPair.second == uiState.singleMealIndex) {
+//                                            pair
+//                                        } else {
+//                                            oldPair
+//                                        }
+//                                    }
+//                                }
+//                                Log.d("Ya rab", "appNavGraphSecond: $favIndexesList")
+//                                sharedViewModelNavigationGraph.updateFavIndexesListAndValue(
+//                                    favIndexesList
+//                                )
+//                            }
+//                            sharedViewModelNavigationGraph.onFavIconClickedInSingleRecipeScreen(
+//                                isFavorite,
+//                                uiState.singleMealIndex,
+//                            )
                         }
 
                     )
@@ -151,8 +157,40 @@ fun NavGraphBuilder.appNavGraph(
                 onBackIconClicked = { navController.popBackStack() }
             )
         }
-        composable(route=HomeScreens.GenerateRecipesScreen.route) {
-            GenerateRecipesScreen()
+        composable(route = HomeScreens.GenerateRecipesScreen.route) {
+
+            GenerateRecipesScreen(
+                onSheetButtonClicked = { generatedMeals ->
+                    sharedViewModelNavigationGraph.updateGenerateResultUiState(generatedMeals = generatedMeals)
+                    navController.navigate(HomeScreens.GenerateResultScreen.route)
+                },
+                onNavigateToSingleRecipeScreen = { meal, color ->
+                    meal?.let {
+                        sharedViewModelNavigationGraph.updateSingleMealState(
+                            meal = meal,
+                            color = color
+                        )
+                        navController.navigate(HomeScreens.SingleRecipeScreen.route)
+                    }
+
+                }
+            )
+        }
+        composable(route = HomeScreens.GenerateResultScreen.route) {
+            val uiState by sharedViewModelNavigationGraph.uiState.collectAsState()
+            GenerateResultScreen(
+                onBackIconClicked = { navController.popBackStack() },
+                onButtonClicked = { meal, color ->
+                    meal?.let {
+                        sharedViewModelNavigationGraph.updateSingleMealState(
+                            meal = meal,
+                            color = color
+                        )
+                        navController.navigate(HomeScreens.SingleRecipeScreen.route)
+                    }
+                },
+                meals = uiState.generatedMeals
+            )
         }
         composable(route = HomeScreens.FavoriteScreen.route) {
             FavoriteScreen(
@@ -162,10 +200,22 @@ fun NavGraphBuilder.appNavGraph(
                         color = color
                     )
                     navController.navigate(HomeScreens.SingleRecipeScreen.route)
-                }, onFavIconClicked = { isFavorite, index ->
-                    Log.d("Fav", "appNavGraph: $isFavorite + $index")
-                    sharedViewModelNavigationGraph.onFavIconClicked(isFavorite, index)
-                })
+                },
+//                onFavIconClicked = { isFavorite, index ->
+//                    Log.d("Fav", "appNavGraph: $isFavorite + $index")
+//                    sharedViewModelNavigationGraph.onFavIconClicked(isFavorite, index)
+//                }
+            )
+        }
+        composable(
+            route = HomeScreens.ProfileScreen.route
+        ) {
+            ProfileScreen(
+                onNavigateToProfileSettings = {},
+                onNavigateToYourRecipes = {},
+                onNavigateToAbout = {},
+                onNavigateToLogOut = {}
+            )
         }
     }
 }

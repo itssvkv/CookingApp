@@ -3,11 +3,13 @@ package com.example.cookingapp.navigation
 import com.example.cookingapp.utils.Constants.ALL_RECIPES_SCREEN
 import com.example.cookingapp.utils.Constants.FAVORITE_SCREEN
 import com.example.cookingapp.utils.Constants.GENERATE_RECIPES_SCREEN
+import com.example.cookingapp.utils.Constants.GENERATE_RESULT_SCREEN
 import com.example.cookingapp.utils.Constants.HOME_SCREEN_ROUTE
 import com.example.cookingapp.utils.Constants.LIBRARY_SCREEN_ROUTE
 import com.example.cookingapp.utils.Constants.LOGIN_SCREEN_ROUTE
 import com.example.cookingapp.utils.Constants.NEW_RECIPE_SCREEN
 import com.example.cookingapp.utils.Constants.ONBOARDING_SCREEN_ROUTE
+import com.example.cookingapp.utils.Constants.PROFILE_SCREEN_ROUTE
 import com.example.cookingapp.utils.Constants.SIGNUP_SCREEN_ROUTE
 import com.example.cookingapp.utils.Constants.SINGLE_RECIPE_SCREEN
 import com.example.cookingapp.utils.Constants.SPLASH_SCREEN_ROUTE
@@ -37,15 +39,26 @@ sealed class HomeScreens(val route: String) {
 
     @Serializable
     data object LibraryScreen : HomeScreens(LIBRARY_SCREEN_ROUTE)
+
     @Serializable
-    data object AllRecipesScreen: HomeScreens(ALL_RECIPES_SCREEN)
+    data object AllRecipesScreen : HomeScreens(ALL_RECIPES_SCREEN)
+
     @Serializable
-    data object SingleRecipeScreen: HomeScreens(SINGLE_RECIPE_SCREEN)
+    data object SingleRecipeScreen : HomeScreens(SINGLE_RECIPE_SCREEN)
+
     @Serializable
-    data object NewRecipeScreen: HomeScreens(NEW_RECIPE_SCREEN)
+    data object NewRecipeScreen : HomeScreens(NEW_RECIPE_SCREEN)
+
     @Serializable
     data object FavoriteScreen : HomeScreens(FAVORITE_SCREEN)
+
     @Serializable
     data object GenerateRecipesScreen : HomeScreens(GENERATE_RECIPES_SCREEN)
+
+    @Serializable
+    data object GenerateResultScreen : HomeScreens(GENERATE_RESULT_SCREEN)
+
+    @Serializable
+    data object ProfileScreen : HomeScreens(PROFILE_SCREEN_ROUTE)
 
 }

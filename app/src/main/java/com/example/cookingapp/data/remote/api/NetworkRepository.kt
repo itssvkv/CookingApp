@@ -15,5 +15,6 @@ interface NetworkRepository {
     suspend fun getAllMealsWithMainIngredient(ingredient: String): Flow<Resource<List<Meal>>>
     suspend fun getAllMealsWithMainCategory(category: String): Flow<Resource<List<Meal>>>
     suspend fun getAllMealsWithMainArea(area: String): Flow<Resource<List<Meal>>>
+    suspend fun getMealInfoById(id: String): Flow<Resource<SingleMealLocal>>
 
 }

@@ -1,12 +1,16 @@
 package com.example.cookingapp.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Meal (
-    @SerializedName("strMeal"      ) var strMeal      : String? = null,
-    @SerializedName("strMealThumb" ) var strMealThumb : String? = null,
-    @SerializedName("idMeal"       ) var idMeal       : String? = null
+@Entity(tableName = "previous_meals")
+data class Meal(
+    var strMeal: String? = null,
+    var strMealThumb: String? = null,
+    @PrimaryKey(autoGenerate = true)
+    var idMeal: Int? = null
 
 )

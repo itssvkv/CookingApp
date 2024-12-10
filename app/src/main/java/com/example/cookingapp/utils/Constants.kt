@@ -18,6 +18,7 @@ object Constants {
     const val ALL_CATEGORIES = COMMON_URL + "categories.php"
     const val RANDOM_MEAL = COMMON_URL + "random.php"
     const val FILTER_INGREDIENT = COMMON_URL + "filter.php"
+    const val MEAL_BY_ID = COMMON_URL + "lookup.php"
     const val INGREDIENT = "https://www.themealdb.com/images/ingredients/"
 
     val theIngredient = ""
@@ -41,6 +42,8 @@ object Constants {
     const val NEW_RECIPE_SCREEN = "new_recipe_screen"
     const val FAVORITE_SCREEN = "favorite_screen_route"
     const val GENERATE_RECIPES_SCREEN = "generate_recipes_screen"
+    const val GENERATE_RESULT_SCREEN = "generate_result_screen"
+    const val PROFILE_SCREEN_ROUTE = "profile_screen_route"
     const val SEARCH_SCREEN_ROUTE = "search_screen_route"
     const val CREATE_TASK_SCREEN_ROUTE = "create_task_screen_route/{task_id}"
     const val ANALYTICS_SCREEN_ROUTE = "analytics_screen_route"
