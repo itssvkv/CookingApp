@@ -164,7 +164,8 @@ fun LazyListScope.mealsSectionBody(
     isLoading: Boolean = false,
     isMealsReachingTheEnd: () -> Unit = {},
     onFavIconClicked: (Boolean, index: Int) -> Unit,
-    onItemClicked: (SingleMealLocal, Color) -> Unit
+    onItemClicked: (SingleMealLocal, Color) -> Unit,
+    icon: Int = R.drawable.fav
 ) {
     items(meals.size) { index: Int ->
         Log.d(TAG, "MealsSectionBody: Index$index")
@@ -175,7 +176,7 @@ fun LazyListScope.mealsSectionBody(
             backgroundColor = listOfColors[num],
             width = 345.dp,
             height = 405.dp,
-            favIcon = painterResource(id = R.drawable.fav),
+            favIcon = painterResource(id = icon),
             onFacIconClicked = { isFavorite ->
                 onFavIconClicked(isFavorite, index)
             },

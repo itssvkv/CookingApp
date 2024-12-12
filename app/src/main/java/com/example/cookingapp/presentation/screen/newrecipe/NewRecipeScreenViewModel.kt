@@ -33,6 +33,22 @@ class NewRecipeScreenViewModel @Inject constructor(
 //            cookTime = 0
 //        )) }
 //    }
+    fun isSaveButtonEnabled(): Boolean {
+        if (_uiState.value.strMeal != null &&
+            _uiState.value.strMeal!!.isNotEmpty()
+            && _uiState.value.strArea != null
+            && _uiState.value.strArea!!.isNotEmpty()
+            && _uiState.value.strCategory != null
+            && _uiState.value.strCategory!!.isNotEmpty()
+            && _uiState.value.strInstructions != null
+            && _uiState.value.strInstructions!!.isNotEmpty()
+        ) {
+            return true
+        } else {
+            return false
+        }
+    }
+
     private fun changeTotalTime() {
         _uiState.update { it.copy(totalTime = uiState.value.prepTime + uiState.value.cookTime) }
     }

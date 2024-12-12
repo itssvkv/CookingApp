@@ -91,7 +91,7 @@ fun SignupScreenContent(
             .fillMaxSize()
             .navigationBarsPadding()
             .statusBarsPadding()
-            .padding(horizontal = 16.dp), horizontalAlignment = Alignment.CenterHorizontally
+            , horizontalAlignment = Alignment.CenterHorizontally
     ) {
         item {
             HeaderSection(
@@ -143,7 +143,11 @@ fun HeaderSection(
             IconButton(
                 onClick = onBackClicked
             ) {
-                Icon(imageVector = Icons.Default.ArrowBackIosNew, contentDescription = "Back Arrow")
+                Icon(
+                    modifier = Modifier.size(16.dp),
+                    imageVector = Icons.Default.ArrowBackIosNew,
+                    contentDescription = "Back Arrow"
+                )
             }
 
             Text(
@@ -194,7 +198,7 @@ fun SignupScreenDataSection(
     isFocused: Boolean = false
 ) {
 
-    Column(modifier = modifier.fillMaxWidth()) {
+    Column(modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
         MainTextField(
             value = email,
             onValueChange = onEmailChanged,
@@ -228,7 +232,10 @@ fun SignupScreenDataSection(
         if (isError) {
             Text(text = errorType!!, style = MaterialTheme.typography.bodySmall, color = Color.Red)
         }
+        Spacer(modifier = Modifier.height(20.dp))
         MainButton(
+            modifier = modifier
+                .height(60.dp),
             text = "Sign up",
             isLoading = isButtonLoading,
             isEnabled = !isButtonLoading && email.isNotEmpty() && password.isNotEmpty() && confirmPassword.isNotEmpty(),

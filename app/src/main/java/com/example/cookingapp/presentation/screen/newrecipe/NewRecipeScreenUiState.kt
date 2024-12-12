@@ -21,6 +21,7 @@ data class NewRecipeScreenUiState(
     val totalTime: Int = prepTime + cookTime,
     val recipeImageFormDevice: String = "",
     val ingredientsImagesFromDevice: List<String?> = emptyList(),
-    val isFavorite: Boolean = false
+    val isFavorite: Boolean = false,
+    val isSaveButtonEnabled: Boolean = false,
 
-)
+    )

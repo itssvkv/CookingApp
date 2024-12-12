@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.example.cookingapp.presentation.screen.allrecipes.AllRecipesScreen
+import com.example.cookingapp.presentation.screen.editprofile.EditProfileScreen
 import com.example.cookingapp.presentation.screen.favorite.FavoriteScreen
 import com.example.cookingapp.presentation.screen.generaterecipes.GenerateRecipesScreen
 import com.example.cookingapp.presentation.screen.generateresult.GenerateResultScreen
@@ -20,6 +21,7 @@ import com.example.cookingapp.presentation.screen.newrecipe.NewRecipeScreen
 import com.example.cookingapp.presentation.screen.profile.ProfileScreen
 import com.example.cookingapp.presentation.screen.singlerecipe.SingleRecipeScreen
 import com.example.cookingapp.presentation.screen.splash.SplashScreen
+import com.example.cookingapp.presentation.screen.yourrecipes.YourRecipesScreen
 import com.example.cookingapp.utils.Constants.BOTTOM_BAR_GRAPH_ROUTE
 
 fun NavGraphBuilder.appNavGraph(
@@ -154,7 +156,12 @@ fun NavGraphBuilder.appNavGraph(
         }
         composable(route = HomeScreens.NewRecipeScreen.route) {
             NewRecipeScreen(
-                onBackIconClicked = { navController.popBackStack() }
+                onBackIconClicked = { navController.popBackStack() },
+                onNavigateToLibraryScreen = {
+                    navController.popBackStack()
+                    navController.popBackStack()
+                    navController.navigate(HomeScreens.LibraryScreen.route)
+                }
             )
         }
         composable(route = HomeScreens.GenerateRecipesScreen.route) {
@@ -211,10 +218,46 @@ fun NavGraphBuilder.appNavGraph(
             route = HomeScreens.ProfileScreen.route
         ) {
             ProfileScreen(
-                onNavigateToProfileSettings = {},
-                onNavigateToYourRecipes = {},
+                onNavigateToProfileSettings = { userId, userPhoto, userName, userEmail ->
+                    sharedViewModelNavigationGraph.updateEditProfileScreenUiState(
+                        userId = userId,
+                        userPhoto = userPhoto,
+                        userName = userName,
+                        userEmail = userEmail
+                    )
+                    navController.navigate(HomeScreens.EditProfileScreen.route)
+                },
+                onNavigateToYourRecipes = {
+                    navController.navigate(HomeScreens.YourRecipesScreen.route)
+                },
                 onNavigateToAbout = {},
                 onNavigateToLogOut = {}
+            )
+        }
+        composable(route = HomeScreens.EditProfileScreen.route) {
+            val uiState by sharedViewModelNavigationGraph.uiState.collectAsState()
+
+            EditProfileScreen(
+                userId = uiState.userId,
+                userPhoto = uiState.userPhoto,
+                userName = uiState.userName,
+                userEmail = uiState.userEmail,
+                onBackIconClicked = { navController.popBackStack() },
+                onUpdateUserInfoSuccess = {
+                    navController.popBackStack()
+                    navController.popBackStack()
+                    navController.navigate(HomeScreens.ProfileScreen.route)
+                },
+                onUpdatedEmailSuccess = {
+                    navController.navigate(MainScreens.LoginScreen.route) {
+                        popUpTo(navController.graph.id) { inclusive = true }
+                    }
+                }
+            )
+        }
+        composable(route = HomeScreens.YourRecipesScreen.route) {
+            YourRecipesScreen(
+                onBackIconClicked = { navController.popBackStack() }
             )
         }
     }

@@ -59,7 +59,8 @@ import randomColor1
 fun NewRecipeScreen(
     modifier: Modifier = Modifier,
     viewModel: NewRecipeScreenViewModel = hiltViewModel(),
-    onBackIconClicked: () -> Unit = {}
+    onBackIconClicked: () -> Unit = {},
+    onNavigateToLibraryScreen: () -> Unit = {}
 
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -120,7 +121,8 @@ fun NewRecipeScreen(
         onCookTimeMinusCounter = viewModel::onCookTimeMinusCounter,
         onButtonClicked = {
             viewModel.saveToDatabase()
-            Log.d(TAG, "NewRecipeScreen: $uiState")
+            onNavigateToLibraryScreen()
+
         },
         onRecipeLinksChanged = viewModel::onRecipeLinksChanged,
         onRecipeIngredientsChanged = viewModel::onRecipeIngredientsChanged,
@@ -131,7 +133,8 @@ fun NewRecipeScreen(
         },
         onRecipeIngredientsImagesClicked = {
             permissionChecker(context, permissionLauncher, multiImageLauncher)
-        }
+        },
+        isSaveButtonEnabled = viewModel.isSaveButtonEnabled()
     )
 }
 
@@ -156,10 +159,14 @@ fun ScreenContent(
     onRecipeInstructionsChanged: (String) -> Unit = {},
     onImageClicked: () -> Unit = {},
     onRecipeIngredientsImagesClicked: () -> Unit = {},
+    isSaveButtonEnabled: Boolean = false
 
-    ) {
+) {
     LazyColumn(
-        modifier = modifier.fillMaxWidth().statusBarsPadding(), horizontalAlignment = Alignment.CenterHorizontally
+        modifier = modifier
+            .fillMaxWidth()
+            .statusBarsPadding(),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
         item {
@@ -191,10 +198,17 @@ fun ScreenContent(
             )
         }
         item {
+
             MainButton(
+                modifier = modifier
+                    .padding(16.dp)
+                    .fillMaxWidth()
+                    .height(60.dp),
                 text = "Save",
-                onButtonClicked = onButtonClicked
+                onButtonClicked = onButtonClicked,
+                isEnabled = isSaveButtonEnabled
             )
+
         }
     }
 }
@@ -271,7 +285,7 @@ fun ScreenBody(
             .padding(horizontal = 16.dp)
     ) {
         NewTextField(
-            title = "Recipe Name",
+            title = "Recipe Name * ",
             value = uiState.strMeal ?: "",
             onValueChange = onRecipeNameChanged,
         )
@@ -283,14 +297,14 @@ fun ScreenBody(
         ) {
             NewTextField(
                 modifier = Modifier.weight(5f),
-                title = "Recipe Area",
+                title = "Recipe Area * ",
                 value = uiState.strArea ?: "",
                 onValueChange = onRecipeAreaChanged
             )
             Spacer(modifier = Modifier.width(4.dp))
             NewTextField(
                 modifier = Modifier.weight(5f),
-                title = "Recipe Category",
+                title = "Recipe Category * ",
                 value = uiState.strCategory ?: "",
                 onValueChange = onRecipeCategoryChanged
             )
@@ -366,7 +380,7 @@ fun ScreenBody(
         )
         Spacer(modifier = Modifier.height(8.dp))
         NewTextField(
-            title = "Instructions",
+            title = "Instructions * ",
             value = uiState.strInstructions ?: "",
             onValueChange = onRecipeInstructionsChanged,
             singleLine = false,

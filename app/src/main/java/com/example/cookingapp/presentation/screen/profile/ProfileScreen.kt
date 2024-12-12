@@ -1,6 +1,8 @@
 package com.example.cookingapp.presentation.screen.profile
 
+import android.net.Uri
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -29,6 +31,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,6 +43,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
@@ -50,20 +55,37 @@ import whiteMba3bas
 @Composable
 fun ProfileScreen(
     modifier: Modifier = Modifier,
-    onNavigateToProfileSettings: () -> Unit = {},
+    viewModel: ProfileScreenViewModel = hiltViewModel(),
+    onNavigateToProfileSettings: (userId: String?, userPhoto: Uri?, userName: String?, userEmail: String?) -> Unit,
     onNavigateToYourRecipes: () -> Unit = {},
     onNavigateToAbout: () -> Unit = {},
     onNavigateToLogOut: () -> Unit = {}
 ) {
+    val uiState by viewModel.uiState.collectAsState()
     ProfileScreenContent(
         modifier = modifier,
+        uiState = uiState,
         onItemClicked = { index ->
             when (index) {
-                0 -> onNavigateToProfileSettings()
+                0 -> onNavigateToProfileSettings(
+                    uiState.userId,
+                    uiState.userPhoto,
+                    uiState.userName,
+                    uiState.userEmail
+                )
+
                 1 -> onNavigateToYourRecipes()
                 2 -> onNavigateToAbout()
                 3 -> onNavigateToLogOut()
             }
+        },
+        onEditIconClicked = {
+            onNavigateToProfileSettings(
+                uiState.userId,
+                uiState.userPhoto,
+                uiState.userName,
+                uiState.userEmail
+            )
         }
     )
 }
@@ -71,7 +93,9 @@ fun ProfileScreen(
 @Composable
 fun ProfileScreenContent(
     modifier: Modifier = Modifier,
-    onItemClicked: (Int) -> Unit = {}
+    uiState: ProfileScreenUiState,
+    onItemClicked: (Int) -> Unit = {},
+    onEditIconClicked: () -> Unit = {}
 ) {
     Column(
         modifier = modifier
@@ -81,7 +105,12 @@ fun ProfileScreenContent(
     ) {
         ProfileScreenHeader()
         Spacer(modifier = Modifier.height(16.dp))
-        ProfileScreenUserInfo()
+        ProfileScreenUserInfo(
+            userPhoto = uiState.userPhoto,
+            userName = uiState.userName ?: "",
+            userEmail = uiState.userEmail ?: "",
+            onEditIconClicked = onEditIconClicked
+        )
         Spacer(modifier = Modifier.height(16.dp))
         ProfileScreenBody(
             profileItemsMenu = listOf(
@@ -116,7 +145,7 @@ fun ProfileScreenHeader(
 @Composable
 fun ProfileScreenUserInfo(
     modifier: Modifier = Modifier,
-    userPhoto: String = "",
+    userPhoto: Uri? = null,
     userName: String = "",
     userEmail: String = "",
     onEditIconClicked: () -> Unit = {},
@@ -171,7 +200,7 @@ fun ProfileImageBox(
     modifier: Modifier = Modifier,
     showTheImageCover: Boolean = false,
     onCoverClicked: () -> Unit = {},
-    userPhoto: String = "",
+    userPhoto: Any? = null,
 ) {
     BoxWithConstraints(
         modifier = modifier
@@ -190,24 +219,35 @@ fun ProfileImageBox(
             backgroundTopBoxColor = Color.White,
             shape = CircleShape
         ) {
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(userPhoto)
-                    .crossfade(true)
-                    .build(),
-                placeholder = painterResource(id = R.drawable.profile_place_holder),
-                onSuccess = {
-                    Log.d(TAG, "SingleMealCard: Success")
-                },
-                onError = {
-                    Log.d(TAG, "SingleMealCard: ${it.result.throwable.message}")
-                },
-                contentDescription = userPhoto,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(90.dp)
-                    .clip(CircleShape),
-            )
+            if (userPhoto != null) {
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(userPhoto)
+                        .crossfade(true)
+                        .build(),
+                    placeholder = painterResource(id = R.drawable.profile_place_holder),
+                    onSuccess = {
+                        Log.d(TAG, "SingleMealCard: Success")
+                    },
+                    onError = {
+                        Log.d(TAG, "SingleMealCard: ${it.result.throwable.message}")
+                    },
+                    contentDescription = userPhoto.toString(),
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(90.dp)
+                        .clip(CircleShape),
+                )
+            } else {
+                Image(
+                    modifier = Modifier
+                        .size(90.dp)
+                        .clip(CircleShape),
+                    painter = painterResource(id = R.drawable.profile_place_holder),
+                    contentDescription = "Profile",
+                    contentScale = ContentScale.Crop
+                )
+            }
             if (showTheImageCover) {
                 Box(
                     modifier = Modifier
@@ -305,7 +345,7 @@ private fun ProfileScreenPreview() {
             .statusBarsPadding()
             .background(Color.White)
     ) {
-        ProfileScreen()
+        ProfileScreen(onNavigateToProfileSettings = { _, _, _, _ -> })
     }
 }
 

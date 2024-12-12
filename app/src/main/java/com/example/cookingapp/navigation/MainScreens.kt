@@ -1,6 +1,7 @@
 package com.example.cookingapp.navigation
 
 import com.example.cookingapp.utils.Constants.ALL_RECIPES_SCREEN
+import com.example.cookingapp.utils.Constants.EDIT_PROFILE_SCREEN_ROUTE
 import com.example.cookingapp.utils.Constants.FAVORITE_SCREEN
 import com.example.cookingapp.utils.Constants.GENERATE_RECIPES_SCREEN
 import com.example.cookingapp.utils.Constants.GENERATE_RESULT_SCREEN
@@ -13,6 +14,7 @@ import com.example.cookingapp.utils.Constants.PROFILE_SCREEN_ROUTE
 import com.example.cookingapp.utils.Constants.SIGNUP_SCREEN_ROUTE
 import com.example.cookingapp.utils.Constants.SINGLE_RECIPE_SCREEN
 import com.example.cookingapp.utils.Constants.SPLASH_SCREEN_ROUTE
+import com.example.cookingapp.utils.Constants.YOUR_RECIPES_SCREEN_ROUTE
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -60,5 +62,9 @@ sealed class HomeScreens(val route: String) {
 
     @Serializable
     data object ProfileScreen : HomeScreens(PROFILE_SCREEN_ROUTE)
+    @Serializable
+    data object EditProfileScreen : HomeScreens(EDIT_PROFILE_SCREEN_ROUTE)
+    @Serializable
+    data object YourRecipesScreen:HomeScreens(YOUR_RECIPES_SCREEN_ROUTE)
 
 }

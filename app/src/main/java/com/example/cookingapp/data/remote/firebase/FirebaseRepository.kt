@@ -1,5 +1,6 @@
 package com.example.cookingapp.data.remote.firebase
 
+import android.net.Uri
 import com.example.cookingapp.utils.Resource
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
@@ -19,4 +20,12 @@ interface FirebaseRepository {
         password: String
     ): Flow<Resource<FirebaseUser?>>
 
+    suspend fun getTheUserInfo(): Flow<Resource<FirebaseUser?>>
+
+    suspend fun updateUserInfo(
+        photo: Uri?,
+        name: String,
+    ): Flow<Resource<FirebaseUser?>>
+
+    suspend fun updateUserEmail(email: String, password: String): Flow<Resource<FirebaseUser?>>
 }

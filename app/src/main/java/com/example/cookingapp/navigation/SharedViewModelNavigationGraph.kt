@@ -1,5 +1,6 @@
 package com.example.cookingapp.navigation
 
+import android.net.Uri
 import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
@@ -133,6 +134,22 @@ class SharedViewModelNavigationGraph @Inject constructor() : ViewModel() {
     fun updateGenerateResultUiState(generatedMeals: List<Meal>) {
         _uiState.update { it.copy(generatedMeals = generatedMeals) }
 
+    }
+
+    fun updateEditProfileScreenUiState(
+        userId: String?,
+        userPhoto: Uri?,
+        userName: String?,
+        userEmail: String?
+    ) {
+        _uiState.update {
+            it.copy(
+                userId = userId,
+                userPhoto = userPhoto,
+                userName = userName,
+                userEmail = userEmail
+            )
+        }
     }
 
 }

@@ -129,15 +129,15 @@ fun MainTextField(
             }
         },
         visualTransformation = visualTransformation,
-        leadingIcon = {
-            if (leadingIcon != null) {
+        leadingIcon = if (leadingIcon != null) {
+            {
                 Icon(
                     imageVector = leadingIcon,
                     contentDescription = "",
                     tint = if (isFocused) primary else onPrimary
                 )
             }
-        }
+        } else null
     )
 
 

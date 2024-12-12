@@ -158,13 +158,13 @@ fun ScreenHeader(
             modifier = Modifier.weight(3.5f)
         ) {
             IconButton(onClick = onBackIconClicked) {
-                Icon(imageVector = Icons.Filled.ArrowBackIosNew, contentDescription = "back")
+                Icon(
+                    modifier = Modifier.size(16.dp),
+                    imageVector = Icons.Filled.ArrowBackIosNew,
+                    contentDescription = "back"
+                )
             }
-            Text(
-                text = "Back", style = MaterialTheme.typography.bodyLarge,
-                color = Color.Black,
-                fontWeight = FontWeight.Bold
-            )
+
         }
         Box(modifier = Modifier.size(24.dp), contentAlignment = Alignment.Center) {
             IconButton(onClick = {

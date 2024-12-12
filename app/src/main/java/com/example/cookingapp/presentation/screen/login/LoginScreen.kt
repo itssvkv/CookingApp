@@ -163,6 +163,8 @@ fun LoginDataSection(
         }
         ForgetPasswordSection(onForgetPasswordClicked = onForgetPasswordClicked)
         MainButton(
+            modifier = modifier
+                .height(60.dp),
             text = "Log In",
             isLoading = isButtonLoading,
             isEnabled = !isButtonLoading && email.isNotEmpty() && password.isNotEmpty(),

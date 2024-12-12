@@ -27,7 +27,8 @@ object Constants {
     enum class CustomTextFieldLabel {
         EMAIL,
         PASSWORD,
-        SEARCH
+        SEARCH,
+        NAME
     }
 
     //Screens Routes
@@ -44,6 +45,8 @@ object Constants {
     const val GENERATE_RECIPES_SCREEN = "generate_recipes_screen"
     const val GENERATE_RESULT_SCREEN = "generate_result_screen"
     const val PROFILE_SCREEN_ROUTE = "profile_screen_route"
+    const val EDIT_PROFILE_SCREEN_ROUTE = "edit_profile_screen_route"
+    const val YOUR_RECIPES_SCREEN_ROUTE = "your_recipes_screen_route"
     const val SEARCH_SCREEN_ROUTE = "search_screen_route"
     const val CREATE_TASK_SCREEN_ROUTE = "create_task_screen_route/{task_id}"
     const val ANALYTICS_SCREEN_ROUTE = "analytics_screen_route"

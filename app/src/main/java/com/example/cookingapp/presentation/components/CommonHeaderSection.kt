@@ -33,10 +33,14 @@ fun CommonHeaderSection(
         Box(modifier = Modifier.fillMaxWidth()) {
             IconButton(
                 onClick = onBackIconClicked,
-                modifier = Modifier.size(16.dp)
+                modifier = Modifier
                     .align(Alignment.TopStart)
             ) {
-                Icon(imageVector = Icons.Filled.ArrowBackIosNew, contentDescription = "back")
+                Icon(
+                    modifier = Modifier.size(16.dp),
+                    imageVector = Icons.Filled.ArrowBackIosNew,
+                    contentDescription = "back"
+                )
             }
             Text(
                 modifier = Modifier.align(Alignment.Center),
