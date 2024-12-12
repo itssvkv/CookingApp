@@ -7,5 +7,7 @@ data class FavoriteScreenUiState(
     val isLoading: Boolean = false,
     val error: String? = null,
     val meals: List<SingleMealLocal> = emptyList(),
-    val searchQuery: String = ""
+    val searchQuery: String = "",
+    val isSearchLoading: Boolean = false,
+    val searchResult:  List<SingleMealLocal>? = null
 )

@@ -25,7 +25,7 @@ class AllRecipesViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(AllRecipesScreenUiState())
     val uiState = _uiState.asStateFlow()
 
-    var onFinishedClick: (List<Int?>) -> Unit = { favIndexesList ->
+    private var onFinishedClick: (List<Int?>) -> Unit = { favIndexesList ->
 
     }
 
@@ -36,6 +36,27 @@ class AllRecipesViewModel @Inject constructor(
 
     fun onReceiveMeals(meals: List<SingleMealLocal>) {
         _uiState.update { it.copy(meals = meals) }
+    }
+
+    fun onSearchImeActionClicked() {
+        viewModelScope.launch(Dispatchers.IO) {
+            networkRepository.searchForMealByName(searchQuery = _uiState.value.searchQuery)
+                .onResponse(
+                    onLoading = {
+                        _uiState.update {
+                            it.copy(isSearchLoading = true)
+                        }
+                    },
+                    onSuccess = { meals ->
+                        _uiState.update { it.copy(searchResult = meals, isSearchLoading = false) }
+                    },
+                    onFailure = {
+                        _uiState.update {
+                            it.copy(isSearchLoading = false)
+                        }
+                    }
+                )
+        }
     }
 
     fun getRandomMeals() {

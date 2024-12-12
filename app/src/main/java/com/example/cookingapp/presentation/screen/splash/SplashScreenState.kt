@@ -1,4 +1,4 @@
-package com.example.cookingapp.model.uistate
+package com.example.cookingapp.presentation.screen.splash
 
 data class SplashScreenState(
     val navigateToOnBoardingScreen: Boolean = true,

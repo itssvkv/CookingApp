@@ -36,11 +36,11 @@ class LibraryScreenViewModel @Inject constructor(
                     Log.d(TAG, "getAllMealsFormRoom: loading")
                     _uiState.update { it.copy(isLoading = true) }
                 },
-                onSuccess = {meals->
+                onSuccess = { meals ->
                     Log.d(TAG, "getAllMealsFormRoom: success")
                     _uiState.update { it.copy(meals = meals, isLoading = false) }
                 },
-                onFailure = {e->
+                onFailure = { e ->
                     Log.d(TAG, "getAllMealsFormRoom: failure $e")
                     _uiState.update { it.copy(isLoading = false) }
                 }
@@ -48,8 +48,27 @@ class LibraryScreenViewModel @Inject constructor(
         }
     }
 
-
-
-
+    fun searchForMeal() {
+        viewModelScope.launch(Dispatchers.IO) {
+            roomRepository.searchForMeal(searchQuery = _uiState.value.searchQuery.trim()).onResponse(
+                onLoading = { _uiState.update { it.copy(isSearchLoading = true) } },
+                onFailure = { e ->
+                    _uiState.update {
+                        it.copy(isSearchLoading = false)
+                    }
+                    Log.d("library", "searchForMeal : $e")
+                },
+                onSuccess = {meals->
+                    Log.d("library", "searchForMeal sus:$meals ")
+                    _uiState.update {
+                        it.copy(
+                            searchResult = meals,
+                            isSearchLoading = false
+                        )
+                    }
+                }
+            )
+        }
+    }
 
 }

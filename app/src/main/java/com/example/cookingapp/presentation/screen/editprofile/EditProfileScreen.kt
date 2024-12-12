@@ -8,6 +8,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,8 +40,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -75,6 +78,11 @@ fun EditProfileScreen(
     onUpdateUserInfoSuccess: () -> Unit = {},
     onUpdatedEmailSuccess: () -> Unit = {}
 ) {
+    val focusRequester = remember {
+        FocusRequester()
+    }
+    val interactionSource = remember { MutableInteractionSource() }
+    val focusManager = LocalFocusManager.current
     LaunchedEffect(key1 = true) {
         viewModel.onReceiveUserData(
             userId = userId,
@@ -118,7 +126,10 @@ fun EditProfileScreen(
         }
     }
     EditProfileScreenContent(
-        modifier = modifier,
+        modifier = modifier.clickable(
+            interactionSource = interactionSource,
+            indication = null
+        ) { focusManager.clearFocus() },
         uiState = uiState,
         onBackIconClicked = onBackIconClicked,
         onButtonClicked = viewModel::onSaveButtonClicked,
@@ -128,7 +139,8 @@ fun EditProfileScreen(
         onNameChanged = viewModel::onNameChanged,
         onChangeClicked = viewModel::onChangeClicked,
         onEmailChanged = viewModel::onEmailChanged,
-        onPasswordChanged = viewModel::onPasswordChanged
+        onPasswordChanged = viewModel::onPasswordChanged,
+        focusRequester = focusRequester
     )
 
     LaunchedEffect(
@@ -162,7 +174,8 @@ fun EditProfileScreenContent(
     onNameChanged: (String) -> Unit = {},
     onChangeClicked: () -> Unit = {},
     onEmailChanged: (String) -> Unit,
-    onPasswordChanged: (String) -> Unit = {}
+    onPasswordChanged: (String) -> Unit = {},
+    focusRequester: FocusRequester
 ) {
     Column(
         modifier = modifier
@@ -188,7 +201,8 @@ fun EditProfileScreenContent(
             onEmailChanged = onEmailChanged,
             isChangeClicked = uiState.isChangeClicked,
             password = uiState.password,
-            onPasswordChanged = onPasswordChanged
+            onPasswordChanged = onPasswordChanged,
+            focusRequester = focusRequester
         )
     }
 }
@@ -237,7 +251,8 @@ fun EditProfileScreenBody(
     onPasswordChanged: (String) -> Unit = {},
     onChangeClicked: () -> Unit = {},
     isChangeClicked: Boolean = false,
-    onEmailChanged: (String) -> Unit = {}
+    onEmailChanged: (String) -> Unit = {},
+    focusRequester : FocusRequester
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         ProfileImageBox(
@@ -250,7 +265,8 @@ fun EditProfileScreenBody(
             value = name,
             onValueChange = onNameChanged,
             label = Constants.CustomTextFieldLabel.NAME,
-            leadingIcon = null
+            leadingIcon = null,
+            focusRequester = focusRequester
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(

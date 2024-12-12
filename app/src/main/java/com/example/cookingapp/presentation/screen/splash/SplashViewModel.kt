@@ -3,7 +3,6 @@ package com.example.cookingapp.presentation.screen.splash
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cookingapp.data.local.datastore.DataStoreRepository
-import com.example.cookingapp.model.uistate.SplashScreenState
 import com.example.cookingapp.utils.Constants.IS_FIRST_TIME
 import com.example.cookingapp.utils.Constants.isFirstTime
 import com.example.cookingapp.utils.Constants.isLoggedIn

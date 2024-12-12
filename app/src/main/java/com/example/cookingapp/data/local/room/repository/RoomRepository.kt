@@ -30,4 +30,7 @@ interface RoomRepository {
     suspend fun insertPreviousRecipe(recipe: Meal)
     suspend fun getAllPreviousMeals(): Flow<Resource<List<Meal>>>
 
+    suspend fun searchForMeal(searchQuery: String): Flow<Resource<List<SingleMealLocal>>>
+    suspend fun searchForMealInFavorite(searchQuery: String):  Flow<Resource<List<FavoriteMealLocal>>>
+
 }

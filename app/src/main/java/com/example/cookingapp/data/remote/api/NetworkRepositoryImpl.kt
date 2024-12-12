@@ -140,6 +140,22 @@ class NetworkRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun searchForMealByName(searchQuery: String): Flow<Resource<List<SingleMealLocal>>> {
+        return flow {
+            emit(Resource.Loading())
+            try {
+                val response = api.searchForMealByName(searchQuery = searchQuery)
+                emit(Resource.Success(response.toListOfRandomMeals()))
+            } catch (e: HttpException) {
+                emit(Resource.Failure(msg = e.message!!))
+            } catch (e: IOException) {
+                emit(Resource.Failure(msg = "Can't reach server, check your internet connection"))
+            } catch (e: Exception) {
+                emit(Resource.Failure(msg = "Unknown error happened, try again later"))
+            }
+        }
+    }
 }
 
 

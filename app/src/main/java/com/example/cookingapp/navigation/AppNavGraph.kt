@@ -31,14 +31,14 @@ fun NavGraphBuilder.appNavGraph(
 
     navigation(
         route = BOTTOM_BAR_GRAPH_ROUTE,
-        startDestination = MainScreens.SplashScreen.route
+        startDestination = HomeScreens.HomeScreen.route
     ) {
 
-        composable(route = MainScreens.SplashScreen.route) {
-            SplashScreen(
-                navHostController = navController
-            )
-        }
+//        composable(route = MainScreens.SplashScreen.route) {
+//            SplashScreen(
+//                navHostController = navController
+//            )
+//        }
         composable(route = HomeScreens.HomeScreen.route) {
             val uiState by sharedViewModelNavigationGraph.uiState.collectAsState()
             HomeScreen(
@@ -230,8 +230,11 @@ fun NavGraphBuilder.appNavGraph(
                 onNavigateToYourRecipes = {
                     navController.navigate(HomeScreens.YourRecipesScreen.route)
                 },
-                onNavigateToAbout = {},
-                onNavigateToLogOut = {}
+                onNavigateToLogOut = {
+                    navController.navigate(MainScreens.LoginScreen.route) {
+                        popUpTo(navController.graph.id) { inclusive = true }
+                    }
+                }
             )
         }
         composable(route = HomeScreens.EditProfileScreen.route) {

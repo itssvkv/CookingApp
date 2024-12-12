@@ -19,6 +19,7 @@ object Constants {
     const val RANDOM_MEAL = COMMON_URL + "random.php"
     const val FILTER_INGREDIENT = COMMON_URL + "filter.php"
     const val MEAL_BY_ID = COMMON_URL + "lookup.php"
+    const val SEARCH_MEAL_BY_NAME = COMMON_URL + "search.php"
     const val INGREDIENT = "https://www.themealdb.com/images/ingredients/"
 
     val theIngredient = ""

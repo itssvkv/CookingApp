@@ -13,7 +13,8 @@ interface MyRecipesDao {
 
     @Query("SELECT * FROM my_recipes")
     suspend fun getAllMeals(): List<SingleMealLocal>
-
+    @Query("SELECT * FROM my_recipes WHERE strMeal LIKE '%' || :searchQuery || '%' OR strArea LIKE '%' || :searchQuery || '%' OR strCategory LIKE '%' || :searchQuery || '%'" )
+    suspend fun searchForMeal(searchQuery: String):  List<SingleMealLocal>
 
 
 }

@@ -1,5 +1,8 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.example.cookingapp.presentation.screen.profile
 
+import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -19,17 +22,26 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -37,6 +49,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -48,6 +61,7 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.example.cookingapp.R
+import com.example.cookingapp.model.AboutItem
 import com.example.cookingapp.presentation.components.MainBoxShape
 import com.example.cookingapp.utils.Constants.TAG
 import whiteMba3bas
@@ -58,10 +72,11 @@ fun ProfileScreen(
     viewModel: ProfileScreenViewModel = hiltViewModel(),
     onNavigateToProfileSettings: (userId: String?, userPhoto: Uri?, userName: String?, userEmail: String?) -> Unit,
     onNavigateToYourRecipes: () -> Unit = {},
-    onNavigateToAbout: () -> Unit = {},
     onNavigateToLogOut: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val sheetState = rememberModalBottomSheetState()
+    val context = LocalContext.current
     ProfileScreenContent(
         modifier = modifier,
         uiState = uiState,
@@ -75,8 +90,13 @@ fun ProfileScreen(
                 )
 
                 1 -> onNavigateToYourRecipes()
-                2 -> onNavigateToAbout()
-                3 -> onNavigateToLogOut()
+                2 -> {
+                    viewModel.updateIsShowBottomSheet(value = true)
+                }
+
+                3 -> {
+                    viewModel.updateIsShowAlertDialog(value = true)
+                }
             }
         },
         onEditIconClicked = {
@@ -86,6 +106,50 @@ fun ProfileScreen(
                 uiState.userName,
                 uiState.userEmail
             )
+        },
+        sheetState = sheetState,
+        onDismissRequest = { viewModel.updateIsShowBottomSheet(value = false) },
+        onSheetItemClicked = { index ->
+            when (index) {
+                0 -> {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uiState.aboutItems[0].url))
+                    context.startActivity(intent)
+                }
+
+                1 -> {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uiState.aboutItems[1].url))
+                    context.startActivity(intent)
+                }
+
+                2 -> {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uiState.aboutItems[2].url))
+                    context.startActivity(intent)
+                }
+
+                3 -> {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uiState.aboutItems[3].url))
+                    context.startActivity(intent)
+                }
+
+                4 -> {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uiState.aboutItems[4].url))
+                    context.startActivity(intent)
+                }
+
+                5 -> {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uiState.aboutItems[5].url))
+                    context.startActivity(intent)
+                }
+
+                else -> {}
+
+            }
+        },
+        onDismissDialogRequest = { viewModel.updateIsShowAlertDialog(value = false) },
+        onConfirmation = {
+            viewModel.updateIsShowAlertDialog(value = false)
+            onNavigateToLogOut()
+            viewModel.isLogoutSuccessful()
         }
     )
 }
@@ -95,7 +159,12 @@ fun ProfileScreenContent(
     modifier: Modifier = Modifier,
     uiState: ProfileScreenUiState,
     onItemClicked: (Int) -> Unit = {},
-    onEditIconClicked: () -> Unit = {}
+    onEditIconClicked: () -> Unit = {},
+    onDismissRequest: () -> Unit = {},
+    sheetState: SheetState,
+    onSheetItemClicked: (Int) -> Unit,
+    onDismissDialogRequest: () -> Unit,
+    onConfirmation: () -> Unit,
 ) {
     Column(
         modifier = modifier
@@ -120,6 +189,21 @@ fun ProfileScreenContent(
                 "Log out"
             ),
             onItemClicked = onItemClicked
+        )
+        ProfileScreenAboutBottomSheet(
+            sheetState = sheetState,
+            isShowBottomSheet = uiState.isShowBottomSheet,
+            onDismissRequest = onDismissRequest,
+            aboutItems = uiState.aboutItems,
+            onSheetItemClicked = onSheetItemClicked
+        )
+        ProfileScreenLogoutAlertDialog(
+            onDismissRequest = onDismissDialogRequest,
+            onConfirmation = onConfirmation,
+            dialogTitle = "Log out",
+            dialogText = "Are you sure you want to log out?",
+            icon = Icons.AutoMirrored.Filled.Logout,
+            isShowAlertDialog = uiState.isOpenAlertDialog
         )
     }
 }
@@ -333,6 +417,94 @@ fun ProfileScreenSingleItem(
                     .background(whiteMba3bas)
             )
         }
+    }
+}
+
+@Composable
+fun ProfileScreenAboutBottomSheet(
+    modifier: Modifier = Modifier,
+    isShowBottomSheet: Boolean = false,
+    onDismissRequest: () -> Unit = {},
+    sheetState: SheetState,
+    aboutItems: List<AboutItem> = emptyList(),
+    onSheetItemClicked: (Int) -> Unit
+) {
+    if (isShowBottomSheet) {
+        ModalBottomSheet(
+            modifier = modifier,
+            onDismissRequest = onDismissRequest,
+            sheetState = sheetState,
+            containerColor = Color.White
+        ) {
+            LazyRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+            ) {
+                items(aboutItems.size) {
+                    Image(
+                        modifier = Modifier
+                            .size(50.dp)
+                            .clip(CircleShape)
+                            .clickable {
+                                onSheetItemClicked(it)
+                            },
+                        painter = painterResource(id = aboutItems[it].icon),
+                        contentDescription = aboutItems[it].url
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ProfileScreenLogoutAlertDialog(
+    onDismissRequest: () -> Unit,
+    onConfirmation: () -> Unit,
+    dialogTitle: String,
+    dialogText: String,
+    icon: ImageVector,
+    isShowAlertDialog: Boolean = false
+) {
+    if (isShowAlertDialog) {
+        AlertDialog(
+            icon = {
+                Icon(icon, contentDescription = "Example Icon")
+            },
+            title = {
+                Text(text = dialogTitle)
+            },
+            text = {
+                Text(text = dialogText)
+            },
+            onDismissRequest = {
+                onDismissRequest()
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onConfirmation()
+                    }
+                ) {
+                    Text(text = "Confirm", color = Color.Black)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        onDismissRequest()
+                    }
+                ) {
+                    Text(text = "Dismiss", color = Color.Black)
+                }
+            },
+            containerColor = Color.White,
+            textContentColor = Color.Black,
+            titleContentColor = Color.Black,
+            iconContentColor = Color.Black,
+        )
     }
 }
 

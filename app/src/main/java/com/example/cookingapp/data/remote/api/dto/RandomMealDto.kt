@@ -129,4 +129,66 @@ data class RandomMealDto(
         )
     }
 
+    fun toListOfRandomMeals(): List<SingleMealLocal> {
+        return List(meals.size) { index ->
+            SingleMealLocal(
+                idMeal = this.meals[index].idMeal?.toInt(),
+                strMeal = this.meals[index].strMeal,
+                strDrinkAlternate = this.meals[index].strDrinkAlternate,
+                strCategory = this.meals[index].strCategory,
+                strArea = this.meals[index].strArea,
+                strInstructions = this.meals[index].strInstructions,
+                strMealThumb = this.meals[index].strMealThumb,
+                strTags = this.meals[index].strTags,
+                strYoutube = this.meals[index].strYoutube,
+                strSource = this.meals[index].strSource,
+                ingredient = listOf(
+                    this.meals[index].strIngredient1,
+                    this.meals[index].strIngredient2,
+                    this.meals[index].strIngredient3,
+                    this.meals[index].strIngredient4,
+                    this.meals[index].strIngredient5,
+                    this.meals[index].strIngredient6,
+                    this.meals[index].strIngredient7,
+                    this.meals[index].strIngredient8,
+                    this.meals[index].strIngredient9,
+                    this.meals[index].strIngredient10,
+                    this.meals[index].strIngredient11,
+                    this.meals[index].strIngredient12,
+                    this.meals[index].strIngredient13,
+                    this.meals[index].strIngredient14,
+                    this.meals[index].strIngredient15,
+                    this.meals[index].strIngredient16,
+                    this.meals[index].strIngredient17,
+                    this.meals[index].strIngredient18,
+                    this.meals[index].strIngredient19,
+                    this.meals[index].strIngredient20,
+
+                    ),
+                measure = listOf(
+                    this.meals[index].strMeasure1,
+                    this.meals[index].strMeasure2,
+                    this.meals[index].strMeasure3,
+                    this.meals[index].strMeasure4,
+                    this.meals[index].strMeasure5,
+                    this.meals[index].strMeasure6,
+                    this.meals[index].strMeasure7,
+                    this.meals[index].strMeasure8,
+                    this.meals[index].strMeasure9,
+                    this.meals[index].strMeasure10,
+                    this.meals[index].strMeasure11,
+                    this.meals[index].strMeasure12,
+                    this.meals[index].strMeasure13,
+                    this.meals[index].strMeasure14,
+                    this.meals[index].strMeasure15,
+                    this.meals[index].strMeasure16,
+                    this.meals[index].strMeasure17,
+                    this.meals[index].strMeasure18,
+                    this.meals[index].strMeasure19,
+                    this.meals[index].strMeasure20,
+                )
+            )
+        }
+    }
+
 }

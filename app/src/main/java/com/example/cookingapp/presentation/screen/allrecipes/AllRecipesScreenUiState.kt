@@ -8,5 +8,7 @@ data class AllRecipesScreenUiState(
     val favIndexesList: List<Int?> = emptyList(),
     val favIndexesListAndValue: List<Pair<Boolean, Int?>> = emptyList(),
     val isLoading: Boolean = false,
-    val searchQuery: String = ""
+    val searchQuery: String = "",
+    val isSearchLoading: Boolean = false,
+    val searchResult:  List<SingleMealLocal>? = null
 )

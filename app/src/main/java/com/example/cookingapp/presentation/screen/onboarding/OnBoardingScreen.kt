@@ -23,14 +23,18 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.cookingapp.R
 import com.example.cookingapp.navigation.MainScreens
 import com.example.cookingapp.presentation.components.MainBoxShape
@@ -41,8 +45,12 @@ import primaryContainerLight
 @Composable
 fun OnBoardingScreen(
     modifier: Modifier = Modifier,
+    viewModel: OnBoardingViewModel = hiltViewModel(),
     navHostController: NavHostController
 ) {
+    LaunchedEffect(key1 = true) {
+        viewModel.isOnBoardingCompleted()
+    }
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -63,8 +71,15 @@ fun OnBoardingScreen(
                 modifier = Modifier
                     .width(40.dp)
                     .height(40.dp),
-            contentAlignment = Alignment.Center){
-                MainBoxShape {
+                contentAlignment = Alignment.Center
+            ) {
+                MainBoxShape(
+                    boxWidth = 38.dp,
+                    boxHeight = 38.dp,
+                    blackColorRadius = 2.dp,
+                    shapeRadius = 6.dp,
+                    backgroundTopBoxColor = primaryContainerLight
+                ) {
                     Icon(
                         painter = painterResource(id = R.drawable.logo),
                         contentDescription = "Logo"
@@ -169,6 +184,13 @@ fun OnBoardingScreen(
                 )
             }
         }
-
     }
+
+}
+
+@Preview
+@Composable
+private fun Test() {
+    val navController = rememberNavController()
+    OnBoardingScreen(navHostController = navController)
 }

@@ -16,4 +16,7 @@ interface FavoriteDao {
 
     @Query("DELETE FROM favorite_recipes WHERE idMeal=:idMeal")
     suspend fun deleteRecipe(idMeal: Int)
+
+    @Query("SELECT * FROM favorite_recipes WHERE strMeal LIKE '%' || :searchQuery || '%' OR strArea LIKE '%' || :searchQuery || '%' OR strCategory LIKE '%' || :searchQuery || '%'" )
+    suspend fun searchForMealInFavorite(searchQuery: String):  List<FavoriteMealLocal>
 }

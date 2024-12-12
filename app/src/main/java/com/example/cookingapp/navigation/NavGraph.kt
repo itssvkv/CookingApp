@@ -10,6 +10,7 @@ import com.example.cookingapp.presentation.screen.login.LoginScreen
 import com.example.cookingapp.presentation.screen.onboarding.OnBoardingScreen
 import com.example.cookingapp.presentation.screen.signup.SignupScreen
 import com.example.cookingapp.presentation.screen.splash.SplashScreen
+import com.example.cookingapp.utils.Constants
 import com.example.cookingapp.utils.Constants.BOTTOM_BAR_GRAPH_ROUTE
 import com.example.cookingapp.utils.Constants.MAIN_GRAPH_ROUTE
 
@@ -20,13 +21,13 @@ fun NavGraphBuilder.mainNavGraph(
 
     navigation(
         route = MAIN_GRAPH_ROUTE,
-        startDestination = MainScreens.SplashScreen.route
+        startDestination = if (Constants.isFirstTime) MainScreens.OnBoardingScreen.route else MainScreens.LoginScreen.route
     ) {
-        composable(route = MainScreens.SplashScreen.route) {
-            SplashScreen(
-                navHostController = navController
-            )
-        }
+//        composable(route = MainScreens.SplashScreen.route) {
+//            SplashScreen(
+//                navHostController = navController
+//            )
+//        }
         composable(route = MainScreens.OnBoardingScreen.route) {
             OnBoardingScreen(navHostController = navController)
         }

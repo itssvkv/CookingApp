@@ -10,6 +10,13 @@ data class HomeScreenUiState(
     val isFocused: Boolean = false,
     val meals: List<SingleMealLocal> = emptyList(),
     val isLoadingMoreMeals: Boolean = false,
-    val isMealsReachingTheEnd: Boolean = false
+    val isMealsReachingTheEnd: Boolean = false,
+    val isOneCategoryClick: Boolean = false,
+    val categoryIndex: Int? = null,
+    val isCategoryLoading: Boolean = false,
+    val categoryMeals: List<SingleMealLocal> = emptyList(),
+    val isSearchLoading: Boolean = false,
+    val searchResult:  List<SingleMealLocal>? = null
+
 )
 

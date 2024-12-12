@@ -68,6 +68,7 @@ fun YourRecipesScreenContent(
         item { Spacer(modifier = Modifier.height(10.dp)) }
 
         mealsSectionBody(
+            modifier = Modifier.padding(horizontal = 16.dp),
             meals = uiState.meals,
             isLoading = uiState.isLoading,
             onItemClicked = onItemClicked,

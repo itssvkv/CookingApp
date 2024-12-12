@@ -7,6 +7,7 @@ import com.example.cookingapp.utils.Constants.ALL_CATEGORIES
 import com.example.cookingapp.utils.Constants.FILTER_INGREDIENT
 import com.example.cookingapp.utils.Constants.MEAL_BY_ID
 import com.example.cookingapp.utils.Constants.RANDOM_MEAL
+import com.example.cookingapp.utils.Constants.SEARCH_MEAL_BY_NAME
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -34,6 +35,10 @@ interface MealsAPI {
         @Query("a")
         area: String
     ): FilteringDto
+
     @GET(MEAL_BY_ID)
     suspend fun getMealInfoById(@Query("i") id: String): RandomMealDto
+
+    @GET(SEARCH_MEAL_BY_NAME)
+    suspend fun searchForMealByName(@Query("s") searchQuery: String): RandomMealDto
 }

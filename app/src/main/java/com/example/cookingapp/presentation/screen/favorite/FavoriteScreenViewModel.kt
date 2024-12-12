@@ -57,6 +57,33 @@ class FavoriteScreenViewModel @Inject constructor(
         }
     }
 
+    fun searchForMeal() {
+        viewModelScope.launch(Dispatchers.IO) {
+            roomRepository.searchForMealInFavorite(searchQuery = _uiState.value.searchQuery.trim())
+                .onResponse(
+                    onLoading = { _uiState.update { it.copy(isSearchLoading = true) } },
+                    onFailure = { e ->
+                        _uiState.update {
+                            it.copy(isSearchLoading = false)
+                        }
+                        Log.d("library", "searchForMeal : $e")
+                    },
+                    onSuccess = { meals ->
+                        Log.d("library", "searchForMeal sus:$meals ")
+                        val new = meals?.map { meal ->
+                            fromFavToSingle(meal)
+                        }
+                        _uiState.update {
+                            it.copy(
+                                searchResult = new,
+                                isSearchLoading = false
+                            )
+                        }
+                    }
+                )
+        }
+    }
+
     fun onFavIconClicked(isFavIconClicked: Boolean, index: Int) {
         _uiState.update {
             Log.d("Fav", "first: ${it.meals[index].isFavorite}")

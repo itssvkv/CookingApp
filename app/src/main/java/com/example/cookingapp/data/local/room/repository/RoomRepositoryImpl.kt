@@ -160,5 +160,29 @@ class RoomRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun searchForMeal(searchQuery: String): Flow<Resource<List<SingleMealLocal>>> {
+        return flow {
+            emit(Resource.Loading())
+            try {
+                val response = dao.searchForMeal(searchQuery = searchQuery)
+                emit(Resource.Success(data = response))
+            } catch (e: Exception) {
+                emit(Resource.Failure(msg = e.message.toString()))
+            }
+        }
+    }
+
+    override suspend fun searchForMealInFavorite(searchQuery: String): Flow<Resource<List<FavoriteMealLocal>>> {
+        return flow {
+            emit(Resource.Loading())
+            try {
+                val response = favoriteDao.searchForMealInFavorite(searchQuery = searchQuery)
+                emit(Resource.Success(data = response))
+            } catch (e: Exception) {
+                emit(Resource.Failure(msg = e.message.toString()))
+            }
+        }
+    }
+
 
 }

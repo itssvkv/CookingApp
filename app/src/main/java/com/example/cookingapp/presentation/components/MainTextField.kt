@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActionScope
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -21,6 +23,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathSegment
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -52,7 +55,8 @@ fun MainTextField(
     leadingIcon: ImageVector? = null,
     isFocusedChanged: (Boolean) -> Unit = {},
     focusRequester: FocusRequester = FocusRequester(),
-    isFocused: Boolean = false
+    isFocused: Boolean = false,
+    onSearch: (KeyboardActionScope.() -> Unit)? = null,
 ) {
 
 //    var isFocused: Boolean by remember { mutableStateOf(false) }
@@ -73,10 +77,6 @@ fun MainTextField(
         modifier = modifier
             .fillMaxWidth()
             .clip(roundedShape)
-            .onFocusChanged {
-                Log.d(TAG, "MainTextField: $isFocused")
-                isFocusedChanged(it.isFocused)
-            }
             .focusRequester(focusRequester),
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = primary,
@@ -94,12 +94,16 @@ fun MainTextField(
         label = {
             Text(text = label.name)
         },
+        keyboardActions = KeyboardActions(
+            onSearch = onSearch
+        ),
         keyboardOptions = KeyboardOptions(
             keyboardType = when (label) {
                 Constants.CustomTextFieldLabel.EMAIL -> KeyboardType.Email
                 Constants.CustomTextFieldLabel.PASSWORD -> KeyboardType.Password
                 else -> KeyboardType.Text
-            }
+            },
+            imeAction = imeAction
         ),
         suffix = {
             if (trailingText != null || isPassword) {

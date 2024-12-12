@@ -2,13 +2,17 @@ package com.example.cookingapp.presentation.screen.home
 
 import android.annotation.SuppressLint
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -29,7 +33,9 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActionScope
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -43,22 +49,32 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.cookingapp.R
 import com.example.cookingapp.data.remote.api.dto.CategoriesDto
 import com.example.cookingapp.model.SingleMealLocal
@@ -67,10 +83,12 @@ import com.example.cookingapp.presentation.components.MainButton
 import com.example.cookingapp.presentation.components.MainTextField
 import com.example.cookingapp.presentation.components.SingleMealCard
 import com.example.cookingapp.presentation.components.shimmerBrush
+import com.example.cookingapp.presentation.screen.allrecipes.mealsSectionBody
 import com.example.cookingapp.utils.Common.isInternetAvailable
 import com.example.cookingapp.utils.Constants
 import com.example.cookingapp.utils.Constants.TAG
 import dots
+import kotlinx.coroutines.launch
 import primary
 import primaryContainerLight
 import primaryDark
@@ -95,7 +113,9 @@ fun HomeScreen(
     val focusRequester = remember {
         FocusRequester()
     }
-
+    val interactionSource = remember { MutableInteractionSource() }
+    val focusManager = LocalFocusManager.current
+    val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val isOnline = isInternetAvailable(context)
 
@@ -129,7 +149,10 @@ fun HomeScreen(
     }
 
     HomeScreenContent(
-        modifier = modifier,
+        modifier = modifier.clickable(
+            interactionSource = interactionSource,
+            indication = null
+        ) { focusManager.clearFocus() },
         uiState = uiState,
         onSearchQueryChanged = viewModel::onSearchQueryChange,
         isFocusedChanged = viewModel::isFocusedChanged,
@@ -139,10 +162,16 @@ fun HomeScreen(
         },
         onNavigateToAllRecipesScreen = onNavigateToAllRecipesScreen,
         onItemClicked = onNavigateToSingleRecipeScreen,
-        onButtonClicked = onNavigateToGenerateRecipesScreen
+        onButtonClicked = onNavigateToGenerateRecipesScreen,
+        onOneCategoryClicked = { category, index ->
+            category?.let { viewModel.onOneCategoryClicked(category = category, index = index) }
+            Log.d("home", "HomeScreen: ${uiState.categoryMeals}")
+        },
+        onSearch = {
+            viewModel.onSearchImeActionClicked()
+        }
 
     )
-
 
 }
 
@@ -157,6 +186,8 @@ fun HomeScreenContent(
     onNavigateToAllRecipesScreen: (List<SingleMealLocal>, String) -> Unit,
     onItemClicked: (SingleMealLocal, Color, Int) -> Unit,
     onButtonClicked: () -> Unit = {},
+    onOneCategoryClicked: (String?, Int) -> Unit = { _, _ -> },
+    onSearch: (KeyboardActionScope.() -> Unit)? = null
 ) {
 
     LazyColumn(
@@ -172,72 +203,89 @@ fun HomeScreenContent(
                 onSearchQueryChanged = onSearchQueryChanged,
                 isFocusedChanged = isFocusedChanged,
                 focusRequester = focusRequester,
-                isFocused = uiState.isFocused
+                isFocused = uiState.isFocused,
+                onSearch = onSearch
             )
         }
 
         item {
             HomeScreenCategoriesSection(
                 categories = uiState.categories?.categories ?: emptyList(),
-                isLoading = uiState.categories == null
+                isLoading = uiState.categories == null,
+                isOneCategoryClick = uiState.isOneCategoryClick,
+                onOneCategoryClicked = onOneCategoryClicked,
+                categoryIndex = uiState.categoryIndex
             )
         }
-        item {
-            MealsSection(
-                title = "Random recipes",
-                onSeeAllClicked = { onNavigateToAllRecipesScreen(uiState.meals, "Random recipes") },
-                meals = uiState.meals,
-                isLoading = uiState.meals.isEmpty(),
+
+        if (uiState.isCategoryLoading) {
+            item {
+                HomeScreenLoadingOneCategoryMeals()
+            }
+        } else if (uiState.categoryMeals.isNotEmpty() && uiState.isOneCategoryClick) {
+            mealsSectionBody(
+                meals = uiState.categoryMeals,
                 isMealsReachingTheEnd = isMealsReachingTheEnd,
-                isLoadingMoreMeals = uiState.isLoadingMoreMeals,
-                onItemClicked = onItemClicked
+                isLoading = uiState.isLoading,
+                onItemClicked = { meal, color ->
+                    onItemClicked(meal, color, 0)
+                },
+                onFavIconClicked = { isFavorite, index -> }
             )
 
-
-        }
-        item {
-            GenerateRecipeSection(
-                firstDescription = "Don't know what to eat?",
-                secondDescription = "*based on your preferences",
-                title = "Generate recipe",
-                buttonText = "Generate",
-                onButtonClicked = onButtonClicked
-            )
-        }
-
-        item {
-            MealsSection(
-                title = "Favourite recipes",
-                onSeeAllClicked = { },
-                meals = uiState.meals,
-                isLoading = uiState.meals.isEmpty(),
+        } else if (uiState.searchResult != null && !uiState.isSearchLoading && uiState.searchQuery.isNotEmpty()) {
+            mealsSectionBody(
+                meals = uiState.searchResult,
                 isMealsReachingTheEnd = isMealsReachingTheEnd,
-                isLoadingMoreMeals = uiState.isLoadingMoreMeals,
-                onItemClicked = onItemClicked
+                isLoading = uiState.isLoading,
+                onItemClicked = { meal, color ->
+                    onItemClicked(meal, color, 0)
+                },
+                onFavIconClicked = { isFavorite, index -> }
             )
+        } else {
+            item {
+                MealsSection(
+                    title = "Random recipes",
+                    onSeeAllClicked = {
+                        onNavigateToAllRecipesScreen(
+                            uiState.meals,
+                            "Random recipes"
+                        )
+                    },
+                    meals = uiState.meals,
+                    isLoading = uiState.meals.isEmpty(),
+                    isMealsReachingTheEnd = isMealsReachingTheEnd,
+                    isLoadingMoreMeals = uiState.isLoadingMoreMeals,
+                    onItemClicked = onItemClicked
+                )
+
+
+            }
+            item {
+                GenerateRecipeSection(
+                    firstDescription = "Don't know what to eat?",
+                    secondDescription = "*based on your preferences",
+                    title = "Generate recipe",
+                    buttonText = "Generate",
+                    onButtonClicked = onButtonClicked
+                )
+            }
+
+            item {
+                MealsSection(
+                    title = "Favourite recipes",
+                    onSeeAllClicked = { },
+                    meals = uiState.meals,
+                    isLoading = uiState.meals.isEmpty(),
+                    isMealsReachingTheEnd = isMealsReachingTheEnd,
+                    isLoadingMoreMeals = uiState.isLoadingMoreMeals,
+                    onItemClicked = onItemClicked
+                )
+            }
         }
 
     }
-//    HomeTabsFooter(
-//        tabViewIcons = listOf(
-//            painterResource(id = R.drawable.home),
-//            painterResource(id = R.drawable.liberary),
-//            painterResource(id = R.drawable.repeat),
-//            painterResource(id = R.drawable.fav),
-//            painterResource(id = R.drawable.profile),
-//        )
-//    ) {
-//        when (it) {
-//            0 -> isNavigateToHome()
-//            1 -> isNavigateToLibrary()
-//            2 -> isNavigateToGenerateRecipe()
-//            3 -> isNavigateToFavorite()
-//            4 -> isNavigateToProfile()
-//            else -> isNavigateToHome()
-//        }
-//    }
-
-
 }
 
 @Composable
@@ -246,7 +294,8 @@ fun HomeScreenSearchBar(
     onSearchQueryChanged: (String) -> Unit,
     isFocusedChanged: (Boolean) -> Unit,
     focusRequester: FocusRequester,
-    isFocused: Boolean = false
+    isFocused: Boolean = false,
+    onSearch: (KeyboardActionScope.() -> Unit)? = null
 ) {
     MainTextField(
         value = searchQuery,
@@ -255,7 +304,9 @@ fun HomeScreenSearchBar(
         leadingIcon = Icons.Default.Search,
         isFocusedChanged = isFocusedChanged,
         focusRequester = focusRequester,
-        isFocused = isFocused
+        isFocused = isFocused,
+        imeAction = ImeAction.Search,
+        onSearch = onSearch
     )
 }
 
@@ -264,7 +315,10 @@ fun HomeScreenCategoriesSection(
     modifier: Modifier = Modifier,
     categories: List<CategoriesDto.Categories>,
     onItemClicked: (Int) -> Unit = {},
-    isLoading: Boolean
+    isLoading: Boolean,
+    isOneCategoryClick: Boolean = false,
+    onOneCategoryClicked: (String?, Int) -> Unit = { _, _ -> },
+    categoryIndex: Int? = null
 ) {
 
     val loadingContentAlpha = animateFloatAsState(
@@ -288,7 +342,7 @@ fun HomeScreenCategoriesSection(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             items(categories.size) { index: Int ->
-                Box(
+                Row(
                     modifier = Modifier
                         .padding(end = 8.dp)
                         .border(
@@ -299,10 +353,21 @@ fun HomeScreenCategoriesSection(
                         .clip(RoundedCornerShape(20.dp))
                         .clickable {
                             onItemClicked(index)
+                            onOneCategoryClicked(categories[index].strCategory, index)
                         }
-                        .padding(vertical = 4.dp, horizontal = 12.dp)
-
+                        .padding(vertical = 4.dp, horizontal = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
+                    if (isOneCategoryClick && categoryIndex == index) {
+                        Icon(
+                            modifier = Modifier
+                                .size(24.dp)
+                                .padding(end = 8.dp),
+                            imageVector = Icons.Default.Check,
+                            contentDescription = "check",
+                            tint = Color.Black
+                        )
+                    }
                     Text(
                         text = categories[index].strCategory!!,
                         fontWeight = FontWeight.SemiBold,
@@ -724,6 +789,31 @@ fun Test(modifier: Modifier = Modifier) {
         }
     }
 
+}
+
+@Composable
+fun HomeScreenLoadingOneCategoryMeals(
+    modifier: Modifier = Modifier
+) {
+    val preloaderLottieComposition by rememberLottieComposition(
+        LottieCompositionSpec.RawRes(
+            R.raw.loading_pan
+        )
+    )
+
+    val preloaderProgress by animateLottieCompositionAsState(
+        preloaderLottieComposition,
+        iterations = LottieConstants.IterateForever,
+        isPlaying = true
+    )
+
+    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        LottieAnimation(
+            composition = preloaderLottieComposition,
+            progress = preloaderProgress,
+            modifier = Modifier.size(300.dp)
+        )
+    }
 }
 
 @Preview

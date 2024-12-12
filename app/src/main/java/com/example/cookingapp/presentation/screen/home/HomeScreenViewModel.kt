@@ -41,6 +41,26 @@ class HomeScreenViewModel @Inject constructor(
         getAllCategories()
     }
 
+    fun onSearchImeActionClicked() {
+        viewModelScope.launch(Dispatchers.IO) {
+            networkRepository.searchForMealByName(searchQuery = _uiState.value.searchQuery)
+                .onResponse(
+                    onLoading = {
+                        _uiState.update {
+                            it.copy(isSearchLoading = true)
+                        }
+                    },
+                    onSuccess = { meals ->
+                        _uiState.update { it.copy(searchResult = meals, isSearchLoading = false) }
+                    },
+                    onFailure = {
+                        _uiState.update {
+                            it.copy(isSearchLoading = false)
+                        }
+                    }
+                )
+        }
+    }
 
     private fun getAllCategories() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -60,48 +80,101 @@ class HomeScreenViewModel @Inject constructor(
         }
     }
 
-//    fun getRandomMeals() {
-//        viewModelScope.launch(Dispatchers.IO) {
-//            networkRepository.getRandomMeal().onResponse(
-//                onLoading = {
-//                    _uiState.update { it.copy(isLoadingMoreMeals = true) }
-//                },
-//                onFailure = { error ->
-//                    Log.d(TAG, "getRandomMeals: $error")
-//                    _uiState.update { it.copy(isLoadingMoreMeals = false) }
-//                },
-//                onSuccess = { meals ->
-//                    val newMeals = meals!!.map {
-//                        val prepTime = Random.nextInt(10, 40)
-//                        val cookTime = Random.nextInt(10, 40)
-//                        val totalTime = prepTime + cookTime
-//                        SingleMealLocal(
-//                            idMeal = it.idMeal,
-//                            strMeal = it.strMeal,
-//                            strDrinkAlternate = it.strDrinkAlternate,
-//                            strCategory = it.strCategory,
-//                            strArea = it.strArea,
-//                            strInstructions = it.strInstructions,
-//                            strMealThumb = it.strMealThumb,
-//                            strTags = it.strTags,
-//                            strYoutube = it.strYoutube,
-//                            ingredient = it.ingredient,
-//                            strSource = it.strSource,
-//                            measure = it.measure,
-//                            prepTime = prepTime,
-//                            cookTime = cookTime,
-//                            totalTime = totalTime
-//                        )
-//                    }
-//                    _uiState.update {
-//                        it.copy(meals = it.meals + (newMeals), isLoadingMoreMeals = false)
-//                    }
-//                    Log.d(TAG, "getRandomMeals: ${newMeals[0]}")
-//                }
-//            )
-//        }
-//    }
+    fun onOneCategoryClicked(category: String, index: Int) {
+        _uiState.update {
+            it.copy(
+                isOneCategoryClick = !uiState.value.isOneCategoryClick,
+                categoryIndex = index,
+                categoryMeals = emptyList()
+            )
+        }
+        viewModelScope.launch(Dispatchers.IO) {
+            getAllMealsWithMainCategory(category = category)
+        }
+    }
 
+    private suspend fun getAllMealsWithMainCategory(category: String) {
+        if (category.isNotEmpty() && _uiState.value.isOneCategoryClick) {
+            networkRepository.getAllMealsWithMainCategory(category = category.trim())
+                .onResponse(
+                    onLoading = {
+                        _uiState.update {
+                            it.copy(isCategoryLoading = true)
+                        }
+                    },
+                    onSuccess = { meals ->
+                        if (meals != null) {
+                            meals.forEach {
+                                viewModelScope.launch(Dispatchers.IO) {
+                                    networkRepository.getMealInfoById(id = it.idMeal.toString())
+                                        .onResponse(
+                                            onLoading = {
+                                                _uiState.update {
+                                                    it.copy(isCategoryLoading = true)
+                                                }
+                                            },
+                                            onSuccess = { oneMeal ->
+                                                oneMeal?.let {
+                                                    val prepTime = Random.nextInt(10, 40)
+                                                    val cookTime = Random.nextInt(10, 40)
+                                                    val totalTime = prepTime + cookTime
+                                                    val finalMeal = SingleMealLocal(
+                                                        idMeal = oneMeal.idMeal,
+                                                        strMeal = oneMeal.strMeal,
+                                                        strDrinkAlternate = oneMeal.strDrinkAlternate,
+                                                        strCategory = oneMeal.strCategory,
+                                                        strArea = oneMeal.strArea,
+                                                        strInstructions = oneMeal.strInstructions,
+                                                        strMealThumb = oneMeal.strMealThumb,
+                                                        strTags = oneMeal.strTags,
+                                                        strYoutube = oneMeal.strYoutube,
+                                                        strSource = oneMeal.strSource,
+                                                        ingredient = oneMeal.ingredient,
+                                                        measure = oneMeal.measure,
+                                                        prepTime = prepTime,
+                                                        cookTime = cookTime,
+                                                        totalTime = totalTime,
+                                                        recipeImageFormDevice = oneMeal.recipeImageFormDevice,
+                                                        ingredientsImagesFromDevice = oneMeal.ingredientsImagesFromDevice,
+                                                        isFavorite = oneMeal.isFavorite,
+                                                        lastUpdated = oneMeal.lastUpdated
+                                                    )
+                                                    _uiState.update {
+                                                        it.copy(
+                                                            categoryMeals = it.categoryMeals + finalMeal,
+                                                            isCategoryLoading = false
+                                                        )
+                                                    }
+                                                }
+                                            },
+                                            onFailure = {
+                                                _uiState.update {
+                                                    it.copy(isCategoryLoading = false)
+                                                }
+                                            }
+                                        )
+                                }
+                            }
+                            _uiState.update {
+                                it.copy(isCategoryLoading = false)
+                            }
+
+                        } else {
+                            _uiState.update {
+                                it.copy(
+                                    isCategoryLoading = false
+                                )
+                            }
+                        }
+                    },
+                    onFailure = {
+                        _uiState.update {
+                            it.copy(isCategoryLoading = false)
+                        }
+                    }
+                )
+        }
+    }
 
     fun getRandomMeals() {
         viewModelScope.launch(Dispatchers.IO) {
