@@ -2,6 +2,7 @@ package com.example.cookingapp.presentation.screen.home
 
 import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -78,6 +79,7 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.cookingapp.R
 import com.example.cookingapp.data.remote.api.dto.CategoriesDto
 import com.example.cookingapp.model.SingleMealLocal
+import com.example.cookingapp.navigation.LottieAnimationBox
 import com.example.cookingapp.presentation.components.MainBoxShape
 import com.example.cookingapp.presentation.components.MainButton
 import com.example.cookingapp.presentation.components.MainTextField
@@ -104,9 +106,6 @@ fun HomeScreen(
     viewModel: HomeScreenViewModel = hiltViewModel(),
     onNavigateToAllRecipesScreen: (List<SingleMealLocal>, String) -> Unit,
     onNavigateToSingleRecipeScreen: (SingleMealLocal, Color, Int) -> Unit,
-    isFavorite: Boolean = false,
-    indexes: List<Int?> = emptyList(),
-    favIndexesListAndValue: List<Pair<Boolean, Int?>>?,
     onNavigateToGenerateRecipesScreen: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -115,7 +114,6 @@ fun HomeScreen(
     }
     val interactionSource = remember { MutableInteractionSource() }
     val focusManager = LocalFocusManager.current
-    val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val isOnline = isInternetAvailable(context)
 
@@ -126,28 +124,6 @@ fun HomeScreen(
             viewModel.getAllRandomMealsFromRoom()
         }
     }
-
-    LaunchedEffect(key1 = true) {
-        favIndexesListAndValue?.forEach {
-            val isFavIconClicked = it.first
-            val index = it.second
-            if (isFavIconClicked) {
-                viewModel.onFavIconClicked(isFavIconClicked = true, index = index!!)
-            } else {
-                viewModel.onFavIconClicked(isFavIconClicked = false, index = index!!)
-            }
-        }
-//        if (isFavorite) {
-//            indexes.forEach { index ->
-//                viewModel.onFavIconClicked(isFavIconClicked = true, index = index!!)
-//            }
-//        } else {
-//            indexes.forEach { index ->
-//                viewModel.onFavIconClicked(isFavIconClicked = false, index = index!!)
-//            }
-//        }
-    }
-
     HomeScreenContent(
         modifier = modifier.clickable(
             interactionSource = interactionSource,
@@ -155,7 +131,6 @@ fun HomeScreen(
         ) { focusManager.clearFocus() },
         uiState = uiState,
         onSearchQueryChanged = viewModel::onSearchQueryChange,
-        isFocusedChanged = viewModel::isFocusedChanged,
         focusRequester = focusRequester,
         isMealsReachingTheEnd = {
             viewModel.getRandomMeals()
@@ -169,8 +144,12 @@ fun HomeScreen(
         },
         onSearch = {
             viewModel.onSearchImeActionClicked()
-        }
-
+        },
+        onCloseIconClicked = {
+            viewModel.onSearchQueryChange(searchQuery = "")
+        },
+        onSearchFavIconClicked = viewModel::onSearchFavIconClicked,
+        onCategoryFavIconClicked = viewModel::onCategoryFavIconClicked
     )
 
 }
@@ -180,16 +159,17 @@ fun HomeScreenContent(
     modifier: Modifier = Modifier,
     uiState: HomeScreenUiState,
     onSearchQueryChanged: (String) -> Unit,
-    isFocusedChanged: (Boolean) -> Unit,
     focusRequester: FocusRequester,
     isMealsReachingTheEnd: () -> Unit,
     onNavigateToAllRecipesScreen: (List<SingleMealLocal>, String) -> Unit,
     onItemClicked: (SingleMealLocal, Color, Int) -> Unit,
     onButtonClicked: () -> Unit = {},
     onOneCategoryClicked: (String?, Int) -> Unit = { _, _ -> },
-    onSearch: (KeyboardActionScope.() -> Unit)? = null
+    onSearch: (KeyboardActionScope.() -> Unit)? = null,
+    onCloseIconClicked: () -> Unit = {},
+    onSearchFavIconClicked: (Boolean, index: Int) -> Unit = { _, _ -> },
+    onCategoryFavIconClicked: (Boolean, index: Int) -> Unit = { _, _ -> }
 ) {
-
     LazyColumn(
         modifier = modifier
             .fillMaxWidth()
@@ -201,10 +181,9 @@ fun HomeScreenContent(
             HomeScreenSearchBar(
                 searchQuery = uiState.searchQuery,
                 onSearchQueryChanged = onSearchQueryChanged,
-                isFocusedChanged = isFocusedChanged,
                 focusRequester = focusRequester,
-                isFocused = uiState.isFocused,
-                onSearch = onSearch
+                onSearch = onSearch,
+                onCloseIconClicked = onCloseIconClicked,
             )
         }
 
@@ -230,7 +209,8 @@ fun HomeScreenContent(
                 onItemClicked = { meal, color ->
                     onItemClicked(meal, color, 0)
                 },
-                onFavIconClicked = { isFavorite, index -> }
+                onFavIconClicked = onCategoryFavIconClicked,
+                isFavClicked = uiState.isFavClicked
             )
 
         } else if (uiState.searchResult != null && !uiState.isSearchLoading && uiState.searchQuery.isNotEmpty()) {
@@ -241,7 +221,8 @@ fun HomeScreenContent(
                 onItemClicked = { meal, color ->
                     onItemClicked(meal, color, 0)
                 },
-                onFavIconClicked = { isFavorite, index -> }
+                onFavIconClicked = onSearchFavIconClicked,
+                isFavClicked = uiState.isFavClicked
             )
         } else {
             item {
@@ -271,17 +252,18 @@ fun HomeScreenContent(
                     onButtonClicked = onButtonClicked
                 )
             }
-
             item {
+
                 MealsSection(
-                    title = "Favourite recipes",
+                    title = "Trending recipes",
                     onSeeAllClicked = { },
-                    meals = uiState.meals,
+                    meals = uiState.meals.shuffled(),
                     isLoading = uiState.meals.isEmpty(),
                     isMealsReachingTheEnd = isMealsReachingTheEnd,
                     isLoadingMoreMeals = uiState.isLoadingMoreMeals,
                     onItemClicked = onItemClicked
                 )
+
             }
         }
 
@@ -292,21 +274,21 @@ fun HomeScreenContent(
 fun HomeScreenSearchBar(
     searchQuery: String,
     onSearchQueryChanged: (String) -> Unit,
-    isFocusedChanged: (Boolean) -> Unit,
     focusRequester: FocusRequester,
-    isFocused: Boolean = false,
-    onSearch: (KeyboardActionScope.() -> Unit)? = null
+    onSearch: (KeyboardActionScope.() -> Unit)? = null,
+    onCloseIconClicked: () -> Unit = {},
+    error: String? = null
 ) {
     MainTextField(
         value = searchQuery,
         onValueChange = onSearchQueryChanged,
         label = Constants.CustomTextFieldLabel.SEARCH,
         leadingIcon = Icons.Default.Search,
-        isFocusedChanged = isFocusedChanged,
         focusRequester = focusRequester,
-        isFocused = isFocused,
         imeAction = ImeAction.Search,
-        onSearch = onSearch
+        onSearch = onSearch,
+        onTrailingIconClicked = onCloseIconClicked,
+        error = error
     )
 }
 

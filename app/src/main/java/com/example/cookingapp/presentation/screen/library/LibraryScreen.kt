@@ -1,5 +1,6 @@
 package com.example.cookingapp.presentation.screen.library
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -15,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -29,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.cookingapp.R
 import com.example.cookingapp.model.SingleMealLocal
+import com.example.cookingapp.navigation.LottieAnimationBox
 import com.example.cookingapp.presentation.components.MainTextField
 import com.example.cookingapp.presentation.screen.allrecipes.mealsSectionBody
 import com.example.cookingapp.presentation.screen.home.GenerateRecipeSection
@@ -48,6 +51,7 @@ fun LibraryScreen(
     }
     val interactionSource = remember { MutableInteractionSource() }
     val focusManager = LocalFocusManager.current
+
     ScreenContent(
         modifier = modifier.clickable(
             interactionSource = interactionSource,
@@ -61,6 +65,12 @@ fun LibraryScreen(
         focusRequester = focusRequester,
         onSearch = {
             viewModel.searchForMeal()
+        },
+        onFavIconClicked = { isFavorite, index ->
+            viewModel.onFavIconClicked(isFavorite, index)
+        },
+        onCloseIconClicked = {
+            viewModel.onSearchQueryChanged(searchQuery = "")
         }
     )
 }
@@ -74,7 +84,9 @@ fun ScreenContent(
     isMealsReachingTheEnd: () -> Unit = {},
     onButtonClicked: () -> Unit = {},
     focusRequester: FocusRequester,
-    onSearch: (KeyboardActionScope.() -> Unit)? = null
+    onSearch: (KeyboardActionScope.() -> Unit)? = null,
+    onFavIconClicked: (Boolean, index: Int) -> Unit = { _, _ -> },
+    onCloseIconClicked: () -> Unit = {}
 ) {
     LazyColumn(
         modifier = modifier
@@ -92,33 +104,41 @@ fun ScreenContent(
                 searchQuery = uiState.searchQuery,
                 onSearchQueryChanged = onSearchQueryChanged,
                 focusRequester = focusRequester,
-                onSearch = onSearch
+                onSearch = onSearch,
+                onCloseIconClicked = onCloseIconClicked
             )
         }
         item { Spacer(modifier = Modifier.height(10.dp)) }
         if (uiState.searchResult != null && !uiState.isSearchLoading && uiState.searchQuery.isNotEmpty()) {
+            Log.d("library", "ScreenContent: search result")
             mealsSectionBody(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 meals = uiState.searchResult,
                 isMealsReachingTheEnd = isMealsReachingTheEnd,
                 isLoading = uiState.isLoading,
-                onItemClicked = { meal, color ->
-                    onItemClicked(meal, color)
-                },
-                onFavIconClicked = { isFavorite, index -> }
+                onItemClicked = onItemClicked,
+                onFavIconClicked = onFavIconClicked
+            )
+        } else if (!uiState.meals.isNullOrEmpty()) {
+            Log.d("library", "ScreenContent: null")
+            mealsSectionBody(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                meals = uiState.meals,
+                isMealsReachingTheEnd = isMealsReachingTheEnd,
+                isLoading = uiState.isLoading,
+                onItemClicked = onItemClicked,
+                onFavIconClicked = onFavIconClicked
             )
         } else {
-            uiState.meals?.let {
-                mealsSectionBody(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    meals = it,
-                    isMealsReachingTheEnd = isMealsReachingTheEnd,
-                    isLoading = uiState.isLoading,
-                    onItemClicked = onItemClicked,
-                    onFavIconClicked = { isFavorite, index -> }
+            item {
+                Log.d("library", "ScreenContent: animation")
+                LottieAnimationBox(
+                    resId = R.raw.your_empty,
+                    animationText = "Create your first recipe..."
                 )
             }
         }
+
     }
 }
 
@@ -143,7 +163,8 @@ fun LibraryScreenSearchBar(
     searchQuery: String,
     onSearchQueryChanged: (String) -> Unit,
     focusRequester: FocusRequester,
-    onSearch: (KeyboardActionScope.() -> Unit)? = null
+    onSearch: (KeyboardActionScope.() -> Unit)? = null,
+    onCloseIconClicked: () -> Unit = {},
 ) {
     MainTextField(
         modifier = Modifier.padding(horizontal = 16.dp),
@@ -153,6 +174,7 @@ fun LibraryScreenSearchBar(
         leadingIcon = Icons.Default.Search,
         focusRequester = focusRequester,
         imeAction = ImeAction.Search,
-        onSearch = onSearch
+        onSearch = onSearch,
+        onTrailingIconClicked = onCloseIconClicked
     )
 }

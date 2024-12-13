@@ -58,11 +58,10 @@ fun AllRecipesScreen(
     viewModel: AllRecipesViewModel = hiltViewModel(),
     meals: List<SingleMealLocal>,
     title: String,
-    onBackIconClicked: (List<Pair<Boolean, Int?>>) -> Unit = {},
+    onBackIconClicked: () -> Unit = {},
     onNavigateToSingleRecipeScreen: (SingleMealLocal, Color) -> Unit,
-    onFavIconClicked: (Boolean, index: Int, indexedList: List<Pair<Boolean, Int?>>) -> Unit = { _, _, _ -> },
-    favIndexesListAndValue: List<Pair<Boolean, Int?>>?
-) {
+
+    ) {
     val focusRequester = remember {
         FocusRequester()
     }
@@ -71,21 +70,8 @@ fun AllRecipesScreen(
     LaunchedEffect(key1 = true) {
         viewModel.onReceiveMeals(meals = meals)
     }
-    LaunchedEffect(key1 = true) {
-        favIndexesListAndValue?.forEach {
-            val isFavIconClicked = it.first
-            val index = it.second
-            if (isFavIconClicked) {
-                viewModel.onFavIconClicked(isFavIconClicked = true, index = index!!)
-            } else {
-                viewModel.onFavIconClicked(isFavIconClicked = false, index = index!!)
-            }
-        }
-    }
 
     val uiState by viewModel.uiState.collectAsState()
-    Log.d("FavList", "AllRecipesScreenFirst: ${uiState.favIndexesList}")
-    val favIndexesList = uiState.favIndexesList
     ScreenContent(
         modifier = modifier.clickable(
             interactionSource = interactionSource,
@@ -97,22 +83,19 @@ fun AllRecipesScreen(
         isMealsReachingTheEnd = { viewModel.getRandomMeals() },
         meals = uiState.meals,
         title = title,
-        onBackIconClicked = { onBackIconClicked(uiState.favIndexesListAndValue) },
+        onBackIconClicked = onBackIconClicked,
         onItemClicked = onNavigateToSingleRecipeScreen,
         onFavIconClicked = { isFavorite, index ->
-            Log.d("FavList", "index: $index")
             viewModel.onFavIconClicked(isFavorite, index)
-            onFavIconClicked(isFavorite, index, uiState.favIndexesListAndValue)
-            Log.d("FavList", "AllRecipesScreenSecond: ${uiState.favIndexesList}")
 
         },
         onSearch = {
             viewModel.onSearchImeActionClicked()
-        }
+        },
+        onCloseIconClicked = {viewModel.onSearchQueryChanged(searchQuery = "")}
     )
     BackHandler {
-        Log.d("Ya rab", "AllRecipesScreenSecond: ${uiState.favIndexesListAndValue}")
-        onBackIconClicked(uiState.favIndexesListAndValue)
+        onBackIconClicked()
     }
 }
 
@@ -128,7 +111,8 @@ fun ScreenContent(
     onItemClicked: (SingleMealLocal, Color) -> Unit,
     onFavIconClicked: (Boolean, index: Int) -> Unit,
     focusRequester: FocusRequester,
-    onSearch: (KeyboardActionScope.() -> Unit)? = null
+    onSearch: (KeyboardActionScope.() -> Unit)? = null,
+    onCloseIconClicked: () -> Unit = {},
 ) {
     LazyColumn(
         modifier = modifier
@@ -144,7 +128,8 @@ fun ScreenContent(
                 searchQuery = uiState.searchQuery,
                 onSearchQueryChanged = onSearchQueryChanged,
                 focusRequester = focusRequester,
-                onSearch = onSearch
+                onSearch = onSearch,
+                onCloseIconClicked = onCloseIconClicked
             )
         }
         item { Spacer(modifier = Modifier.height(10.dp)) }
@@ -157,7 +142,8 @@ fun ScreenContent(
                 onItemClicked = { meal, color ->
                     onItemClicked(meal, color)
                 },
-                onFavIconClicked = { isFavorite, index -> }
+                onFavIconClicked = onFavIconClicked,
+                isFavClicked = uiState.isFavClicked
             )
         } else {
             mealsSectionBody(
@@ -166,7 +152,8 @@ fun ScreenContent(
                 isMealsReachingTheEnd = isMealsReachingTheEnd,
                 isLoading = uiState.isLoading,
                 onItemClicked = onItemClicked,
-                onFavIconClicked = onFavIconClicked
+                onFavIconClicked = onFavIconClicked,
+                isFavClicked = uiState.isFavClicked
             )
 
         }
@@ -179,7 +166,8 @@ fun AllRecipesScreenSearchBar(
     searchQuery: String,
     onSearchQueryChanged: (String) -> Unit,
     focusRequester: FocusRequester,
-    onSearch: (KeyboardActionScope.() -> Unit)? = null
+    onSearch: (KeyboardActionScope.() -> Unit)? = null,
+    onCloseIconClicked: () -> Unit = {},
 ) {
     MainTextField(
         modifier = Modifier.padding(horizontal = 16.dp),
@@ -189,7 +177,8 @@ fun AllRecipesScreenSearchBar(
         leadingIcon = Icons.Default.Search,
         focusRequester = focusRequester,
         imeAction = ImeAction.Search,
-        onSearch = onSearch
+        onSearch = onSearch,
+        onTrailingIconClicked = onCloseIconClicked
     )
 }
 
@@ -208,7 +197,8 @@ fun LazyListScope.mealsSectionBody(
     isMealsReachingTheEnd: () -> Unit = {},
     onFavIconClicked: (Boolean, index: Int) -> Unit,
     onItemClicked: (SingleMealLocal, Color) -> Unit,
-    icon: Int = R.drawable.fav
+    icon: Int = R.drawable.fav,
+    isFavClicked: Boolean = false
 ) {
     items(meals.size) { index: Int ->
         Log.d(TAG, "MealsSectionBody: Index$index")
@@ -223,7 +213,8 @@ fun LazyListScope.mealsSectionBody(
             onFacIconClicked = { isFavorite ->
                 onFavIconClicked(isFavorite, index)
             },
-            onItemClicked = { onItemClicked(meals[index], listOfColors[num]) }
+            onItemClicked = { onItemClicked(meals[index], listOfColors[num]) },
+            isFavClicked = isFavClicked
         )
         LaunchedEffect(key1 = meals.size) {
             if (index == meals.size - 1) {

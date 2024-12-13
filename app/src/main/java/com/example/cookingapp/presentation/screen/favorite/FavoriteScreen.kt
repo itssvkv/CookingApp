@@ -1,5 +1,6 @@
 package com.example.cookingapp.presentation.screen.favorite
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -26,8 +27,10 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.cookingapp.R
 import com.example.cookingapp.model.FavoriteMealLocal
 import com.example.cookingapp.model.SingleMealLocal
+import com.example.cookingapp.navigation.LottieAnimationBox
 import com.example.cookingapp.presentation.components.CommonHeaderSection
 import com.example.cookingapp.presentation.screen.allrecipes.AllRecipesScreenSearchBar
 import com.example.cookingapp.presentation.screen.allrecipes.AllRecipesScreenUiState
@@ -61,7 +64,8 @@ fun FavoriteScreen(
         onItemClicked = onNavigateToSingleRecipeScreen,
         onSearch = {
             viewModel.searchForMeal()
-        }
+        },
+        onCloseIconClicked = {viewModel.onSearchQueryChanged(searchQuery = "")}
     )
 }
 
@@ -73,7 +77,8 @@ fun ScreenContent(
     onItemClicked: (SingleMealLocal, Color) -> Unit,
     onFavIconClicked: (Boolean, index: Int) -> Unit,
     focusRequester: FocusRequester,
-    onSearch: (KeyboardActionScope.() -> Unit)? = null
+    onSearch: (KeyboardActionScope.() -> Unit)? = null,
+    onCloseIconClicked: () -> Unit = {}
 ) {
     LazyColumn(
         modifier = modifier
@@ -102,7 +107,8 @@ fun ScreenContent(
                 searchQuery = uiState.searchQuery,
                 onSearchQueryChanged = onSearchQueryChanged,
                 focusRequester = focusRequester,
-                onSearch = onSearch
+                onSearch = onSearch,
+                onCloseIconClicked = onCloseIconClicked
             )
         }
         item { Spacer(modifier = Modifier.height(10.dp)) }
@@ -116,7 +122,7 @@ fun ScreenContent(
                 },
                 onFavIconClicked = { isFavorite, index -> }
             )
-        } else {
+        } else if (uiState.meals.isNotEmpty()) {
             mealsSectionBody(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 meals = uiState.meals,
@@ -124,7 +130,15 @@ fun ScreenContent(
                 onItemClicked = onItemClicked,
                 onFavIconClicked = onFavIconClicked
             )
-
+        }else{
+            item {
+                Log.d("library", "ScreenContent: animation")
+                LottieAnimationBox(
+                    resId = R.raw.favorite_resipe_empty,
+                    animationText = "Do some likes....",
+                    animationSize = 400.dp
+                )
+            }
         }
     }
 }

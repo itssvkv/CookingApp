@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.cookingapp.data.local.room.repository.RoomRepository
 import com.example.cookingapp.data.remote.api.NetworkRepository
 import com.example.cookingapp.model.SingleMealLocal
+import com.example.cookingapp.utils.Common.fromFavToSingle
 import com.example.cookingapp.utils.Common.toFavoriteMealLocal
 import com.example.cookingapp.utils.Constants.TAG
 import com.example.cookingapp.utils.onResponse
@@ -36,6 +37,38 @@ class AllRecipesViewModel @Inject constructor(
 
     fun onReceiveMeals(meals: List<SingleMealLocal>) {
         _uiState.update { it.copy(meals = meals) }
+        getAllFromFavorite()
+    }
+
+    private fun getAllFromFavorite() {
+        viewModelScope.launch(Dispatchers.IO) {
+            roomRepository.getAllFavoriteMeals().onResponse(
+                onLoading = {},
+                onFailure = {},
+                onSuccess = { favMeals ->
+                    Log.d("tez", "getAllFromFavorite: $favMeals")
+                    val new = favMeals?.map { meal ->
+                        fromFavToSingle(meal)
+                    }
+                    new?.let {
+                        _uiState.value = _uiState.value.copy(favMeals = it)
+                    }
+
+                    _uiState.update {
+                        it.copy(
+                            meals = it.meals.map { meal ->
+                                if (_uiState.value.favMeals.any { singleMeal -> singleMeal.idMeal == meal.idMeal }) {
+                                    meal.copy(isFavorite = true)
+                                } else {
+                                    meal
+                                }
+                            }
+                        )
+                    }
+
+                }
+            )
+        }
     }
 
     fun onSearchImeActionClicked() {
@@ -82,32 +115,19 @@ class AllRecipesViewModel @Inject constructor(
 
     fun onFavIconClicked(isFavIconClicked: Boolean, index: Int) {
         _uiState.update {
-            val favIndexesListAndValue = listOf(Pair(isFavIconClicked, index))
-            val favIndexesList = listOf(index)
-            it.copy(meals = it.meals.mapIndexed { i, meal ->
-                Log.d("Fav", "second: ${it.meals[index].isFavorite}")
-                if (i == index) {
-                    Log.d("Fav", "third: ${it.meals[index].isFavorite}")
-                    meal.copy(
-                        isFavorite = isFavIconClicked,
-                        favIndexesList = it.meals[index].favIndexesList + favIndexesList
-                    )
+            it.copy(
+                meals = it.meals.mapIndexed { i, meal ->
+                    if (i == index) {
+                        meal.copy(
+                            isFavorite = isFavIconClicked,
+                        )
 
-                } else {
-                    Log.d("Fav", "last: ${it.meals[index].isFavorite}")
-                    meal
-                }
-            }, favIndexesListAndValue = it.favIndexesListAndValue.mapIndexed { i, pair ->
-                if (pair.second == index) {
-                    Pair(isFavIconClicked, index)
-                } else {
-                    pair
-                }
-            } + favIndexesListAndValue
+                    } else {
+                        meal
+                    }
+                },
             )
-
         }
-        //it.favIndexesListAndValue + favIndexesListAndValue
         Log.d("FavList", "onFavIconClickedAll: ${_uiState.value.favIndexesList}")
         if (_uiState.value.meals[index].isFavorite) {
             viewModelScope.launch(Dispatchers.IO) {
@@ -119,9 +139,5 @@ class AllRecipesViewModel @Inject constructor(
                 _uiState.value.meals[index].idMeal?.let { roomRepository.deleteRecipeFromFavorite(it) }
             }
         }
-
-
-        Log.d("FavList", "Finished")
-        onFinishedClick.invoke(_uiState.value.favIndexesList)
     }
 }

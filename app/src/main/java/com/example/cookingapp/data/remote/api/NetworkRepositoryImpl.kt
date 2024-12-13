@@ -147,6 +147,7 @@ class NetworkRepositoryImpl @Inject constructor(
             try {
                 val response = api.searchForMealByName(searchQuery = searchQuery)
                 emit(Resource.Success(response.toListOfRandomMeals()))
+                Log.d("home", "searchForMealByName: $response")
             } catch (e: HttpException) {
                 emit(Resource.Failure(msg = e.message!!))
             } catch (e: IOException) {

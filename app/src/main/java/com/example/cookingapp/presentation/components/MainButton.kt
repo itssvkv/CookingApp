@@ -57,8 +57,7 @@ fun MainButton(
         }
         if (isLoading) {
             CircularProgressIndicator(
-                modifier
-                    .padding(8.dp)
+                Modifier
                     .size(24.dp)
                     .align(Alignment.CenterVertically),
                 color = Color.White,

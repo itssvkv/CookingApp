@@ -8,6 +8,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,13 +31,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -65,7 +70,11 @@ fun NewRecipeScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
-
+    val focusRequester = remember {
+        FocusRequester()
+    }
+    val interactionSource = remember { MutableInteractionSource() }
+    val focusManager = LocalFocusManager.current
 
     val multiImageLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -107,7 +116,11 @@ fun NewRecipeScreen(
 
 
     ScreenContent(
-        modifier = modifier,
+        modifier = modifier.clickable(
+            interactionSource = interactionSource,
+            indication = null
+        ) { focusManager.clearFocus() },
+        focusRequester = focusRequester,
         uiState = uiState,
         onBackIconClicked = onBackIconClicked,
         onRecipeNameChanged = viewModel::onRecipeNameChanged,
@@ -142,6 +155,7 @@ fun NewRecipeScreen(
 fun ScreenContent(
     modifier: Modifier = Modifier,
     onBackIconClicked: () -> Unit = {},
+    focusRequester: FocusRequester,
     uiState: NewRecipeScreenUiState,
     onRecipeNameChanged: (String) -> Unit = {},
     onRecipeAreaChanged: (String) -> Unit = {},
@@ -181,6 +195,7 @@ fun ScreenContent(
         item {
             ScreenBody(
                 uiState = uiState,
+                focusRequester = focusRequester,
                 onRecipeNameChanged = onRecipeNameChanged,
                 onRecipeAreaChanged = onRecipeAreaChanged,
                 onRecipeCategoryChanged = onRecipeCategoryChanged,
@@ -263,6 +278,7 @@ fun UploadRecipeImage(
 @Composable
 fun ScreenBody(
     modifier: Modifier = Modifier,
+    focusRequester: FocusRequester,
     uiState: NewRecipeScreenUiState,
     onRecipeNameChanged: (String) -> Unit = {},
     onRecipeAreaChanged: (String) -> Unit = {},
@@ -288,6 +304,7 @@ fun ScreenBody(
             title = "Recipe Name * ",
             value = uiState.strMeal ?: "",
             onValueChange = onRecipeNameChanged,
+            focusRequester = focusRequester
         )
         Spacer(modifier = Modifier.height(8.dp))
         Row(
@@ -299,14 +316,16 @@ fun ScreenBody(
                 modifier = Modifier.weight(5f),
                 title = "Recipe Area * ",
                 value = uiState.strArea ?: "",
-                onValueChange = onRecipeAreaChanged
+                onValueChange = onRecipeAreaChanged,
+                focusRequester = focusRequester
             )
             Spacer(modifier = Modifier.width(4.dp))
             NewTextField(
                 modifier = Modifier.weight(5f),
                 title = "Recipe Category * ",
                 value = uiState.strCategory ?: "",
-                onValueChange = onRecipeCategoryChanged
+                onValueChange = onRecipeCategoryChanged,
+                focusRequester = focusRequester
             )
         }
 
@@ -323,7 +342,8 @@ fun ScreenBody(
                 onValueChange = onPrepTimeChanged,
                 isCounter = true,
                 onPlusCounter = onPrepTimePlusCounter,
-                onMinusCounter = onPrepTimeMinusCounter
+                onMinusCounter = onPrepTimeMinusCounter,
+                focusRequester = focusRequester
             )
             Spacer(modifier = Modifier.width(4.dp))
             NewTextField(
@@ -333,7 +353,8 @@ fun ScreenBody(
                 onValueChange = onCookTimeChanged,
                 isCounter = true,
                 onPlusCounter = onCookTimePlusCounter,
-                onMinusCounter = onCookTimeMinusCounter
+                onMinusCounter = onCookTimeMinusCounter,
+                focusRequester = focusRequester
             )
         }
         Spacer(modifier = Modifier.height(8.dp))
@@ -342,6 +363,7 @@ fun ScreenBody(
             value = "${uiState.strMealThumb ?: ""} ${uiState.strYoutube ?: ""} ${uiState.strSource ?: ""}",
             onValueChange = onRecipeLinksChanged,
             singleLine = false,
+            focusRequester = focusRequester
         )
         Spacer(modifier = Modifier.height(8.dp))
         Row(
@@ -354,6 +376,7 @@ fun ScreenBody(
                 title = "Ingredients",
                 value = fromListToString(uiState.ingredient),
                 onValueChange = onRecipeIngredientsChanged,
+                focusRequester = focusRequester
             )
             Spacer(modifier = Modifier.width(4.dp))
             Text(
@@ -377,6 +400,7 @@ fun ScreenBody(
             title = "Measures",
             value = fromListToString(uiState.measure),
             onValueChange = onRecipeMeasuresChanged,
+            focusRequester = focusRequester
         )
         Spacer(modifier = Modifier.height(8.dp))
         NewTextField(
@@ -384,6 +408,8 @@ fun ScreenBody(
             value = uiState.strInstructions ?: "",
             onValueChange = onRecipeInstructionsChanged,
             singleLine = false,
+            imeAction = ImeAction.Done,
+            focusRequester = focusRequester
         )
     }
 }

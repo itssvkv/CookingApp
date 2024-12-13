@@ -5,7 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cookingapp.data.local.room.repository.RoomRepository
 import com.example.cookingapp.model.SingleMealLocal
+import com.example.cookingapp.utils.Common.fromFavToSingle
 import com.example.cookingapp.utils.Common.toFavoriteMealLocal
+import com.example.cookingapp.utils.onResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,41 +23,53 @@ class SingleRecipeScreenViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(SingleRecipeUiScreen())
     val uiState = _uiState.asStateFlow()
 
+
     fun onReceiveMealInfo(mealInfo: SingleMealLocal) {
         _uiState.update { it.copy(mealInfo = mealInfo) }
+        getAllFromFavorite()
     }
 
 
-    fun onFavIconClicked(isFavIconClicked: Boolean, index: Int) {
-        _uiState.update {
-            val favIndexesListAndValue = listOf(Pair(isFavIconClicked, index))
-            it.copy(
-                mealInfo = it.mealInfo?.copy(isFavorite = isFavIconClicked),
-                isFavClicked = isFavIconClicked,
-                favIndexesListAndValue = it.favIndexesListAndValue.mapIndexed { i, pair ->
-                    if (pair.second == index) {
-                        Pair(isFavIconClicked, index)
-                    } else {
-                        pair
+    private fun getAllFromFavorite() {
+        viewModelScope.launch(Dispatchers.IO) {
+            roomRepository.getAllFavoriteMeals().onResponse(
+                onLoading = {},
+                onFailure = {},
+                onSuccess = { favMeals ->
+                    Log.d("tez", "getAllFromFavorite: $favMeals")
+                    val new = favMeals?.map { meal ->
+                        fromFavToSingle(meal)
                     }
-                } + favIndexesListAndValue
+                    new?.let {
+                        _uiState.value = _uiState.value.copy(favMeals = it)
+                    }
+                    if (_uiState.value.favMeals.any { it.idMeal == _uiState.value.mealInfo?.idMeal }) {
+                        _uiState.update { it.copy(isFavClicked = true) }
+                    }
+                }
             )
         }
-        _uiState.value.mealInfo?.let {
-            if (it.isFavorite) {
-                viewModelScope.launch(Dispatchers.IO) {
-                    roomRepository.insertRecipeToFavorite(toFavoriteMealLocal(it))
-                }
+    }
 
-            } else {
-                viewModelScope.launch(Dispatchers.IO) {
-                    it.idMeal?.let { id ->
-                        roomRepository.deleteRecipeFromFavorite(id)
-                    }
+
+    fun onFavIconClicked(isFavIconClicked: Boolean) {
+        _uiState.update {
+            it.copy(
+                mealInfo = it.mealInfo?.copy(isFavorite = isFavIconClicked),
+                isFavClicked = isFavIconClicked
+            )
+        }
+        if (uiState.value.isFavClicked) {
+            viewModelScope.launch(Dispatchers.IO) {
+                roomRepository.insertRecipeToFavorite(toFavoriteMealLocal(uiState.value.mealInfo!!))
+            }
+        } else {
+            viewModelScope.launch(Dispatchers.IO) {
+                uiState.value.mealInfo?.idMeal?.let { id ->
+                    roomRepository.deleteRecipeFromFavorite(id)
                 }
             }
+
         }
-
-
     }
 }

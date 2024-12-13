@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -35,15 +36,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
@@ -55,6 +61,7 @@ import coil3.request.crossfade
 import com.example.cookingapp.R
 import com.example.cookingapp.model.Meal
 import com.example.cookingapp.model.SingleMealLocal
+import com.example.cookingapp.navigation.LottieAnimationBox
 import com.example.cookingapp.presentation.components.MainBoxShape
 import com.example.cookingapp.presentation.components.MainButton
 import com.example.cookingapp.presentation.components.NewTextField
@@ -82,8 +89,13 @@ fun GenerateRecipesScreen(
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val focusRequester = remember {
+        FocusRequester()
+    }
+
     GenerateRecipeScreenContent(
         modifier = modifier,
+        focusRequester = focusRequester,
         onButtonClicked = {
             viewModel.updateIsShowBottomSheet(value = true)
         },
@@ -122,9 +134,12 @@ fun GenerateRecipesScreen(
                     Toast.makeText(context, "Not found", Toast.LENGTH_SHORT).show()
                 }
             }
-        }
+        },
+        onIngredientCloseClicked = { viewModel.onIngredientValueChange(ingredient = "") },
+        onCategoryCloseClicked = { viewModel.onCategoryValueChange(category = "") },
+        onAreaCloseClicked = { viewModel.onAreaValueChange(area = "") },
 
-    )
+        )
     LaunchedEffect(key1 = uiState.resultMeals) {
         viewModel.getALLPreviousMeals()
     }
@@ -144,7 +159,11 @@ fun GenerateRecipeScreenContent(
     onIngredientValueChange: (String) -> Unit = {},
     onCategoryValueChange: (String) -> Unit = {},
     onAreaValueChange: (String) -> Unit = {},
-    onSheetButtonClicked: () -> Unit = {}
+    onSheetButtonClicked: () -> Unit = {},
+    onIngredientCloseClicked: () -> Unit = {},
+    onCategoryCloseClicked: () -> Unit = {},
+    onAreaCloseClicked: () -> Unit = {},
+    focusRequester: FocusRequester,
 ) {
     LazyColumn(
         modifier = modifier
@@ -159,15 +178,21 @@ fun GenerateRecipeScreenContent(
             )
         }
         item {
-
-            PreviousMealsSection(
-                title = title,
-                onSeeAllClicked = onSeeAllClicked,
-                meals = uiState.previousMeals,
-                isLoading = uiState.isIngredientLoading || uiState.isCategoryLoading || uiState.isAreaLoading,
-                onItemClicked = onItemClicked
-            )
-
+            if (uiState.previousMeals.isNotEmpty()) {
+                PreviousMealsSection(
+                    title = title,
+                    onSeeAllClicked = onSeeAllClicked,
+                    meals = uiState.previousMeals,
+                    isLoading = uiState.isIngredientLoading || uiState.isCategoryLoading || uiState.isAreaLoading,
+                    onItemClicked = onItemClicked
+                )
+            } else {
+                LottieAnimationBox(
+                    resId = R.raw.generate_recipe_empty,
+                    animationText = "Generate your first recipe now?",
+                    animationSize = 200.dp
+                )
+            }
 
         }
         item {
@@ -185,7 +210,11 @@ fun GenerateRecipeScreenContent(
                 isLoading = uiState.isIngredientLoading || uiState.isCategoryLoading || uiState.isAreaLoading,
                 isIngredientError = uiState.isIngredientError,
                 isCategoryError = uiState.isCategoryError,
-                isAreaError = uiState.isAreaError
+                isAreaError = uiState.isAreaError,
+                onIngredientCloseClicked = onIngredientCloseClicked,
+                onCategoryCloseClicked = onCategoryCloseClicked,
+                onAreaCloseClicked = onAreaCloseClicked,
+                focusRequester = focusRequester,
             )
 
         }
@@ -461,7 +490,14 @@ fun GenerateRecipesBottomSheet(
     isIngredientError: Boolean = false,
     isCategoryError: Boolean = false,
     isAreaError: Boolean = false,
+    onIngredientCloseClicked: () -> Unit = {},
+    onCategoryCloseClicked: () -> Unit = {},
+    onAreaCloseClicked: () -> Unit = {},
+    focusRequester: FocusRequester,
+
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val focusManager = LocalFocusManager.current
     if (isShowBottomSheet) {
         ModalBottomSheet(
             modifier = modifier,
@@ -470,7 +506,10 @@ fun GenerateRecipesBottomSheet(
             containerColor = Color.White
         ) {
             Column(
-                modifier = Modifier
+                modifier = Modifier.clickable(
+                    interactionSource = interactionSource,
+                    indication = null
+                ) { focusManager.clearFocus() }
                     .fillMaxWidth()
                     .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
             ) {
@@ -480,7 +519,9 @@ fun GenerateRecipesBottomSheet(
                     title = "Main ingredient",
                     onValueChange = onIngredientValueChange,
                     value = ingredientValue,
-                    error = isIngredientError
+                    error = isIngredientError,
+                    onTrailingIconClicked = onIngredientCloseClicked,
+                    focusRequester = focusRequester
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 NewTextField(
@@ -489,7 +530,9 @@ fun GenerateRecipesBottomSheet(
                     title = "Category",
                     onValueChange = onCategoryValueChange,
                     value = categoryValue,
-                    error = isCategoryError
+                    error = isCategoryError,
+                    onTrailingIconClicked = onCategoryCloseClicked,
+                    focusRequester = focusRequester
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 NewTextField(
@@ -498,7 +541,10 @@ fun GenerateRecipesBottomSheet(
                     title = "Area",
                     onValueChange = onAreaValueChange,
                     value = areaValue,
-                    error = isAreaError
+                    error = isAreaError,
+                    onTrailingIconClicked = onAreaCloseClicked,
+                    focusRequester = focusRequester,
+                    imeAction = ImeAction.Done
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 MainButton(

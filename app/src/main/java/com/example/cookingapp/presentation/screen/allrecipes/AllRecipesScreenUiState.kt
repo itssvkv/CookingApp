@@ -10,5 +10,7 @@ data class AllRecipesScreenUiState(
     val isLoading: Boolean = false,
     val searchQuery: String = "",
     val isSearchLoading: Boolean = false,
-    val searchResult:  List<SingleMealLocal>? = null
+    val searchResult:  List<SingleMealLocal>? = null,
+    val favMeals: List<SingleMealLocal> = emptyList(),
+    val isFavClicked: Boolean = false,
 )

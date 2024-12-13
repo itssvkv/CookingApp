@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Icon
@@ -26,6 +27,10 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -64,8 +69,11 @@ fun NewTextField(
     isFocused: Boolean = false,
     onPlusCounter: () -> Unit = {},
     onMinusCounter: () -> Unit = {},
-
-    ) {
+    trailingIcon: ImageVector = Icons.Default.Close,
+    onTrailingIconClicked: () -> Unit = {},
+    imeAction: ImeAction = ImeAction.Next
+) {
+    var isFocus by remember { mutableStateOf(false) }
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
             text = title,
@@ -87,7 +95,7 @@ fun NewTextField(
                 .clip(roundedShape)
                 .onFocusChanged {
                     Log.d(TAG, "MainTextField: $isFocused")
-                    isFocusedChanged(it.isFocused)
+                    isFocus = it.isFocused
                 }
                 .focusRequester(focusRequester),
             colors = OutlinedTextFieldDefaults.colors(
@@ -128,9 +136,26 @@ fun NewTextField(
                         }
 
                     }
+                } else {
+                    if (isFocus) {
+                        IconButton(
+                            modifier = Modifier.size(16.dp),
+                            onClick = { onValueChange("") }
+                        ) {
+                            Icon(
+                                imageVector = trailingIcon,
+                                contentDescription = "",
+                                tint = if (isFocus) primary else onPrimary,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                    }
                 }
             },
-            keyboardOptions = KeyboardOptions(keyboardType = if (isCounter) KeyboardType.Number else KeyboardType.Text)
+            keyboardOptions = KeyboardOptions(
+                imeAction = imeAction,
+                keyboardType = if (isCounter) KeyboardType.Number else KeyboardType.Text
+            )
         )
     }
 }

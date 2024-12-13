@@ -143,9 +143,7 @@ fun LoginDataSection(
             value = email,
             onValueChange = onEmailChange,
             label = Constants.CustomTextFieldLabel.EMAIL,
-            isFocusedChanged = isFocusedChanged,
             focusRequester = focusRequester,
-            isFocused = isFocused
         )
         Spacer(modifier = Modifier.height(20.dp))
         MainTextField(
@@ -154,9 +152,7 @@ fun LoginDataSection(
             label = Constants.CustomTextFieldLabel.PASSWORD,
             isPassword = true,
             trailingText = "Show",
-            isFocusedChanged = isFocusedChanged,
             focusRequester = focusRequester,
-            isFocused = isFocused
         )
         if (isError) {
             Text(text = errorType!!, style = MaterialTheme.typography.bodySmall, color = Color.Red)

@@ -7,7 +7,9 @@ import com.example.cookingapp.data.local.room.repository.RoomRepository
 import com.example.cookingapp.data.remote.api.NetworkRepository
 import com.example.cookingapp.model.SingleMealLocal
 import com.example.cookingapp.model.SingleMealRemote
+import com.example.cookingapp.utils.Common.fromFavToSingle
 import com.example.cookingapp.utils.Common.mapRecipe
+import com.example.cookingapp.utils.Common.toFavoriteMealLocal
 import com.example.cookingapp.utils.Constants.TAG
 import com.example.cookingapp.utils.onResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -39,6 +41,45 @@ class HomeScreenViewModel @Inject constructor(
     init {
         Log.d(TAG, "uiState: ${_uiState.value.meals}")
         getAllCategories()
+        getAllFromFavorite()
+    }
+
+    private fun getAllFromFavorite() {
+        viewModelScope.launch(Dispatchers.IO) {
+            roomRepository.getAllFavoriteMeals().onResponse(
+                onLoading = {},
+                onFailure = {},
+                onSuccess = { favMeals ->
+                    Log.d("tez", "getAllFromFavorite: $favMeals")
+                    val new = favMeals?.map { meal ->
+                        fromFavToSingle(meal)
+                    }
+                    new?.let {
+                        _uiState.value = _uiState.value.copy(favMeals = it)
+                    }
+
+                    _uiState.update {
+                        it.copy(
+                            searchResult = it.meals.map { meal ->
+                                if (_uiState.value.favMeals.any { singleMeal -> singleMeal.idMeal == meal.idMeal }) {
+                                    meal.copy(isFavorite = true)
+                                } else {
+                                    meal
+                                }
+                            },
+                            categoryMeals = it.meals.map { meal ->
+                                if (_uiState.value.favMeals.any { singleMeal -> singleMeal.idMeal == meal.idMeal }) {
+                                    meal.copy(isFavorite = true)
+                                } else {
+                                    meal
+                                }
+                            }
+                        )
+                    }
+
+                }
+            )
+        }
     }
 
     fun onSearchImeActionClicked() {
@@ -51,14 +92,92 @@ class HomeScreenViewModel @Inject constructor(
                         }
                     },
                     onSuccess = { meals ->
+                        Log.d("home", "onSearchImeActionClicked: $meals")
                         _uiState.update { it.copy(searchResult = meals, isSearchLoading = false) }
                     },
                     onFailure = {
                         _uiState.update {
-                            it.copy(isSearchLoading = false)
+                            it.copy(
+                                isSearchLoading = false,
+                                searchError = "No meals found"
+                            )
                         }
                     }
                 )
+        }
+    }
+
+    fun onSearchFavIconClicked(isFavIconClicked: Boolean, index: Int) {
+        _uiState.update {
+            it.copy(
+                searchResult = it.searchResult?.mapIndexed { i, meal ->
+                    if (i == index) {
+                        meal.copy(
+                            isFavorite = isFavIconClicked,
+                        )
+
+                    } else {
+                        meal
+                    }
+                },
+            )
+        }
+        uiState.value.searchResult?.let {
+            if (it[index].isFavorite) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    roomRepository.insertRecipeToFavorite(
+                        toFavoriteMealLocal(
+                            it[index]
+                        )
+                    )
+                }
+
+            } else {
+                viewModelScope.launch(Dispatchers.IO) {
+                    it[index].idMeal?.let { id ->
+                        roomRepository.deleteRecipeFromFavorite(
+                            id
+                        )
+                    }
+                }
+            }
+        }
+
+    }
+    fun onCategoryFavIconClicked(isFavIconClicked: Boolean, index: Int) {
+        _uiState.update {
+            it.copy(
+                categoryMeals = it.categoryMeals.mapIndexed { i, meal ->
+                    if (i == index) {
+                        meal.copy(
+                            isFavorite = isFavIconClicked,
+                        )
+
+                    } else {
+                        meal
+                    }
+                },
+            )
+        }
+        uiState.value.categoryMeals.let {
+            if (it[index].isFavorite) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    roomRepository.insertRecipeToFavorite(
+                        toFavoriteMealLocal(
+                            it[index]
+                        )
+                    )
+                }
+
+            } else {
+                viewModelScope.launch(Dispatchers.IO) {
+                    it[index].idMeal?.let { id ->
+                        roomRepository.deleteRecipeFromFavorite(
+                            id
+                        )
+                    }
+                }
+            }
         }
     }
 
@@ -249,16 +368,5 @@ class HomeScreenViewModel @Inject constructor(
         }
     }
 
-    fun onFavIconClicked(isFavIconClicked: Boolean, index: Int) {
-        _uiState.update {
-            it.copy(meals = it.meals.mapIndexed { i, meal ->
-                if (i == index) {
-                    meal.copy(isFavorite = isFavIconClicked)
-                } else {
-                    meal
-                }
-            })
-        }
-    }
 
 }

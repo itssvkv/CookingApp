@@ -65,7 +65,8 @@ fun SingleMealCard(
     backgroundColor: Color,
     favIcon: Painter? = null,
     onFacIconClicked: (Boolean) -> Unit = {},
-    onItemClicked: () -> Unit = {}
+    onItemClicked: () -> Unit = {},
+    isFavClicked: Boolean = false
 ) {
     var isFavIconClicked by remember {
         mutableStateOf(false)

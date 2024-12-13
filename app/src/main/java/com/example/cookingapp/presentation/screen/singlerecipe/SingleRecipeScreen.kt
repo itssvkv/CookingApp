@@ -58,11 +58,8 @@ fun SingleRecipeScreen(
     modifier: Modifier = Modifier,
     viewModel: SingleRecipeScreenViewModel = hiltViewModel(),
     mealInfo: SingleMealLocal,
-    onBackIconClicked: (List<Pair<Boolean, Int?>>) -> Unit = {},
+    onBackIconClicked: () -> Unit = {},
     mealColor: Color,
-    index: Int,
-    onFavIconClicked: (Boolean) -> Unit,
-//    favIndexesListAndValue: Pair<Boolean, Int?>?
 ) {
     LaunchedEffect(key1 = true) {
         viewModel.onReceiveMealInfo(mealInfo = mealInfo)
@@ -72,11 +69,12 @@ fun SingleRecipeScreen(
 
     uiState.mealInfo?.let { meal ->
         ScreenContent(
+            modifier = modifier,
+            uiState = uiState,
             mealInfo = meal,
-            onBackIconClicked = { onBackIconClicked(uiState.favIndexesListAndValue) },
+            onBackIconClicked = onBackIconClicked,
             onFavIconClicked = { isFavorite ->
-                viewModel.onFavIconClicked(isFavorite, index = index)
-                onFavIconClicked(isFavorite)
+                viewModel.onFavIconClicked(isFavorite)
             },
             mealColor = mealColor,
             onTheMealImageLinkClicked = {
@@ -90,15 +88,8 @@ fun SingleRecipeScreen(
             }
         )
     }
-//    LaunchedEffect(key1 = true) {
-//        if (favIndexesListAndValue?.first == true) {
-//            viewModel.onFavIconClicked(isFavIconClicked = true, index = index)
-//        } else {
-//            viewModel.onFavIconClicked(isFavIconClicked = false, index = index)
-//        }
-//    }
     BackHandler {
-        onBackIconClicked(uiState.favIndexesListAndValue)
+        onBackIconClicked()
     }
 }
 
@@ -108,6 +99,7 @@ fun ScreenContent(
     modifier: Modifier = Modifier,
     mealInfo: SingleMealLocal,
     onBackIconClicked: () -> Unit,
+    uiState: SingleRecipeUiScreen,
     onFavIconClicked: (Boolean) -> Unit,
     mealColor: Color,
     onTheMealImageLinkClicked: (String) -> Unit = {},
@@ -122,7 +114,7 @@ fun ScreenContent(
     ) {
         item {
             ScreenHeader(
-                isFavorite = mealInfo.isFavorite,
+                isFavorite = uiState.isFavClicked,
                 onBackIconClicked = onBackIconClicked,
                 onFavIconClicked = onFavIconClicked
             )

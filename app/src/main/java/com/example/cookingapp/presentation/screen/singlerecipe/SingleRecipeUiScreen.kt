@@ -6,4 +6,5 @@ data class SingleRecipeUiScreen(
     val mealInfo: SingleMealLocal? = null,
     val isFavClicked :Boolean = false,
     val favIndexesListAndValue: List<Pair<Boolean, Int?>> = emptyList(),
+    val favMeals: List<SingleMealLocal> = emptyList(),
 )

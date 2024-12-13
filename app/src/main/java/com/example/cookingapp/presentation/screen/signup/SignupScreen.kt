@@ -203,9 +203,7 @@ fun SignupScreenDataSection(
             value = email,
             onValueChange = onEmailChanged,
             label = Constants.CustomTextFieldLabel.EMAIL,
-            isFocusedChanged = isFocusedChanged,
             focusRequester = focusRequester,
-            isFocused = isFocused
         )
         Spacer(modifier = Modifier.height(20.dp))
         MainTextField(
@@ -214,9 +212,7 @@ fun SignupScreenDataSection(
             label = Constants.CustomTextFieldLabel.PASSWORD,
             isPassword = true,
             trailingText = "Show",
-            isFocusedChanged = isFocusedChanged,
             focusRequester = focusRequester,
-            isFocused = isFocused
         )
         Spacer(modifier = Modifier.height(20.dp))
         MainTextField(
@@ -225,9 +221,7 @@ fun SignupScreenDataSection(
             label = Constants.CustomTextFieldLabel.PASSWORD,
             isPassword = true,
             trailingText = "Show",
-            isFocusedChanged = isFocusedChanged,
             focusRequester = focusRequester,
-            isFocused = isFocused
         )
         if (isError) {
             Text(text = errorType!!, style = MaterialTheme.typography.bodySmall, color = Color.Red)

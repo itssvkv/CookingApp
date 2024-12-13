@@ -179,8 +179,7 @@ fun EditProfileScreenContent(
 ) {
     Column(
         modifier = modifier
-            .statusBarsPadding()
-            .padding(horizontal = 16.dp),
+            .statusBarsPadding(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         EditProfileScreenHeader(
@@ -191,6 +190,7 @@ fun EditProfileScreenContent(
                     uiState.userPhoto == null)
         )
         EditProfileScreenBody(
+            modifier = Modifier.padding(horizontal = 16.dp),
             userPhoto = uiState.userPhoto,
             name = uiState.userName ?: "",
             email = uiState.userEmail ?: "",
@@ -221,14 +221,15 @@ fun EditProfileScreenHeader(
         horizontalArrangement = Arrangement.Absolute.SpaceBetween
     ) {
         CommonHeaderSection(
-            modifier = Modifier.weight(5f),
+            modifier = Modifier.weight(2f),
             title = "",
             onBackIconClicked = onBackIconClicked
         )
         MainButton(
             modifier = Modifier
-                .weight(1.8f)
-                .height(40.dp),
+                .weight(1f)
+                .height(40.dp)
+                .padding(end = 16.dp),
             onButtonClicked = onButtonClicked,
             text = "Save",
             isLoading = isLoading,
@@ -252,7 +253,7 @@ fun EditProfileScreenBody(
     onChangeClicked: () -> Unit = {},
     isChangeClicked: Boolean = false,
     onEmailChanged: (String) -> Unit = {},
-    focusRequester : FocusRequester
+    focusRequester: FocusRequester
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         ProfileImageBox(

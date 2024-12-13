@@ -8,5 +8,7 @@ data class LibraryScreenUiState(
     val meals: List<SingleMealLocal>? = emptyList(),
     val isMealsReachingTheEnd: Boolean = false,
     val isSearchLoading: Boolean = false,
-    val searchResult:  List<SingleMealLocal>? = null
+    val searchResult:  List<SingleMealLocal>? = null,
+    val favMeals: List<SingleMealLocal> = emptyList(),
+    val isFavClicked: Boolean = false,
 )

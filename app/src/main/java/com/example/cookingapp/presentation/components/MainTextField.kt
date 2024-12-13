@@ -3,11 +3,15 @@ package com.example.cookingapp.presentation.components
 import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActionScope
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -49,14 +53,14 @@ fun MainTextField(
     imeAction: ImeAction = ImeAction.Next,
     isPassword: Boolean = false,
     enabled: Boolean = true,
-    keyboardType: KeyboardType = KeyboardType.Text,
     label: Constants.CustomTextFieldLabel = Constants.CustomTextFieldLabel.EMAIL,
     trailingText: String? = null,
     leadingIcon: ImageVector? = null,
-    isFocusedChanged: (Boolean) -> Unit = {},
     focusRequester: FocusRequester = FocusRequester(),
-    isFocused: Boolean = false,
     onSearch: (KeyboardActionScope.() -> Unit)? = null,
+    trailingIcon: ImageVector = Icons.Default.Close,
+    onTrailingIconClicked: () -> Unit = {}
+
 ) {
 
 //    var isFocused: Boolean by remember { mutableStateOf(false) }
@@ -64,7 +68,7 @@ fun MainTextField(
     var visualTransformation: VisualTransformation by remember { mutableStateOf(VisualTransformation.None) }
     visualTransformation =
         if (isPassword && !isShowPassword) PasswordVisualTransformation() else VisualTransformation.None
-
+    var isFocus by remember { mutableStateOf(false) }
 
     OutlinedTextField(
         value = value,
@@ -77,7 +81,8 @@ fun MainTextField(
         modifier = modifier
             .fillMaxWidth()
             .clip(roundedShape)
-            .focusRequester(focusRequester),
+            .focusRequester(focusRequester)
+            .onFocusChanged { isFocus = it.isFocused },
         colors = OutlinedTextFieldDefaults.colors(
             focusedBorderColor = primary,
             focusedTextColor = Color.Black,
@@ -88,8 +93,7 @@ fun MainTextField(
             errorContainerColor = errorLight,
             errorLabelColor = errorLight,
             errorTextColor = errorLight,
-
-            ),
+        ),
         textStyle = MaterialTheme.typography.bodyLarge,
         label = {
             Text(text = label.name)
@@ -131,6 +135,18 @@ fun MainTextField(
                     }
                 }
             }
+
+            if (label == Constants.CustomTextFieldLabel.SEARCH && value.isNotEmpty()) {
+                IconButton(modifier = Modifier.size(16.dp), onClick = onTrailingIconClicked) {
+                    Icon(
+                        imageVector = trailingIcon,
+                        contentDescription = "",
+                        tint = if (isFocus) primary else onPrimary,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+            }
+
         },
         visualTransformation = visualTransformation,
         leadingIcon = if (leadingIcon != null) {
@@ -138,7 +154,7 @@ fun MainTextField(
                 Icon(
                     imageVector = leadingIcon,
                     contentDescription = "",
-                    tint = if (isFocused) primary else onPrimary
+                    tint = if (isFocus) primary else onPrimary
                 )
             }
         } else null
