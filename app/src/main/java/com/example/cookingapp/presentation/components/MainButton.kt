@@ -1,7 +1,6 @@
 package com.example.cookingapp.presentation.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -23,7 +22,6 @@ import mainButtonColor
 fun MainButton(
     modifier: Modifier = Modifier,
     text: String? = null,
-    icon: Int? = null,
     cornerRadius: Dp = 6.dp,
     onButtonClicked: () -> Unit = {},
     isLoading: Boolean = false,

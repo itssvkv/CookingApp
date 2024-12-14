@@ -11,7 +11,6 @@ import com.example.cookingapp.model.FavoriteMealLocal
 import com.example.cookingapp.model.Meal
 import com.example.cookingapp.model.SingleMealLocal
 import com.example.cookingapp.model.SingleMealRemote
-import com.example.cookingapp.utils.Common
 import com.example.cookingapp.utils.Converters
 
 @Database(

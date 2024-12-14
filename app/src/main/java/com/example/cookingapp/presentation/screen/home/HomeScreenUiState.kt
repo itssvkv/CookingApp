@@ -17,7 +17,7 @@ data class HomeScreenUiState(
     val categoryMeals: List<SingleMealLocal> = emptyList(),
     val isSearchLoading: Boolean = false,
     val searchResult:  List<SingleMealLocal>? = null,
-    val searchError: String? = null,
+    val searchError: Boolean = false,
     val favMeals: List<SingleMealLocal> = emptyList(),
     val isFavClicked: Boolean = false,
 )

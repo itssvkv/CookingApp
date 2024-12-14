@@ -4,14 +4,9 @@ import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
-import com.example.cookingapp.presentation.screen.login.LoginScreenUiState
 import com.example.cookingapp.utils.Constants.TAG
-import com.example.cookingapp.utils.Resource
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 

@@ -2,7 +2,6 @@ package com.example.cookingapp.presentation.screen.generaterecipes
 
 import com.example.cookingapp.model.Meal
 import com.example.cookingapp.model.SingleMealLocal
-import com.example.cookingapp.model.SingleMealRemote
 
 data class GenerateRecipesScreenUiState(
     val isIngredientLoading: Boolean = false,

@@ -21,19 +21,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.cookingapp.R
-import com.example.cookingapp.model.FavoriteMealLocal
 import com.example.cookingapp.model.SingleMealLocal
 import com.example.cookingapp.navigation.LottieAnimationBox
-import com.example.cookingapp.presentation.components.CommonHeaderSection
 import com.example.cookingapp.presentation.screen.allrecipes.AllRecipesScreenSearchBar
-import com.example.cookingapp.presentation.screen.allrecipes.AllRecipesScreenUiState
 import com.example.cookingapp.presentation.screen.allrecipes.mealsSectionBody
 
 @Composable
@@ -120,7 +116,7 @@ fun ScreenContent(
                 onItemClicked = { meal, color ->
                     onItemClicked(meal, color)
                 },
-                onFavIconClicked = { isFavorite, index -> }
+                onFavIconClicked = { _, _ -> }
             )
         } else if (uiState.meals.isNotEmpty()) {
             mealsSectionBody(

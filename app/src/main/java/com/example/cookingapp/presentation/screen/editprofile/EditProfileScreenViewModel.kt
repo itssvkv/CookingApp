@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.math.log
 
 @HiltViewModel
 class EditProfileScreenViewModel @Inject constructor(
@@ -104,8 +103,7 @@ class EditProfileScreenViewModel @Inject constructor(
                         )
                     }
                 },
-                onFailure = { e ->
-                    Log.d("profile", "onSaveButtonClicked faluire: $e")
+                onFailure = { _ ->
                     _uiState.update { it.copy(isLoading = false, error = "Password incorrect") }
                 }
             )

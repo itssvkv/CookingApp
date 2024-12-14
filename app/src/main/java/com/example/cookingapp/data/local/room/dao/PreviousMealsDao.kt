@@ -4,7 +4,6 @@ import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
 import com.example.cookingapp.model.Meal
-import com.example.cookingapp.model.SingleMealRemote
 
 @Dao
 interface PreviousMealsDao {

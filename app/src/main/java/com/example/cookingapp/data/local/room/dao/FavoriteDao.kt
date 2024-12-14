@@ -5,7 +5,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.cookingapp.model.FavoriteMealLocal
-import com.example.cookingapp.model.SingleMealLocal
 @Dao
 interface FavoriteDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)

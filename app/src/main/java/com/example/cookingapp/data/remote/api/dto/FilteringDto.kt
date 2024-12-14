@@ -1,7 +1,6 @@
 package com.example.cookingapp.data.remote.api.dto
 
 
-import androidx.room.PrimaryKey
 import com.example.cookingapp.model.Meal
 import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.Serializable
@@ -17,11 +16,5 @@ data class FilteringDto(
         var idMeal: String? = null
     )
 
-    fun toMeal(): Meal {
-        return Meal(
-            strMeal = this.meals[0].strMeal,
-            strMealThumb = this.meals[0].strMealThumb,
-            idMeal = this.meals[0].idMeal?.toInt()
-        )
-    }
+
 }

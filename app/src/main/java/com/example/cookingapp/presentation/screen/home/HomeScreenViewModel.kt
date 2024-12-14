@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.cookingapp.data.local.room.repository.RoomRepository
 import com.example.cookingapp.data.remote.api.NetworkRepository
 import com.example.cookingapp.model.SingleMealLocal
-import com.example.cookingapp.model.SingleMealRemote
 import com.example.cookingapp.utils.Common.fromFavToSingle
 import com.example.cookingapp.utils.Common.mapRecipe
 import com.example.cookingapp.utils.Common.toFavoriteMealLocal
@@ -14,6 +13,7 @@ import com.example.cookingapp.utils.Constants.TAG
 import com.example.cookingapp.utils.onResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -30,13 +30,24 @@ class HomeScreenViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     fun onSearchQueryChange(searchQuery: String) {
+        if (searchQuery != _uiState.value.searchQuery) {
+            _uiState.update {
+                it.copy(
+                    searchResult = emptyList(),
+                    isSearchLoading = true,
+                    searchError = false
+                )
+            }
+
+        }
         _uiState.update { it.copy(searchQuery = searchQuery) }
+        viewModelScope.launch {
+            delay(2000)
+            onSearchImeActionClicked()
+        }
 
     }
 
-    fun isFocusedChanged(isFocused: Boolean) {
-        _uiState.update { it.copy(isFocused = isFocused) }
-    }
 
     init {
         Log.d(TAG, "uiState: ${_uiState.value.meals}")
@@ -99,7 +110,7 @@ class HomeScreenViewModel @Inject constructor(
                         _uiState.update {
                             it.copy(
                                 isSearchLoading = false,
-                                searchError = "No meals found"
+                                searchError = true
                             )
                         }
                     }
@@ -144,6 +155,7 @@ class HomeScreenViewModel @Inject constructor(
         }
 
     }
+
     fun onCategoryFavIconClicked(isFavIconClicked: Boolean, index: Int) {
         _uiState.update {
             it.copy(
@@ -200,12 +212,19 @@ class HomeScreenViewModel @Inject constructor(
     }
 
     fun onOneCategoryClicked(category: String, index: Int) {
-        _uiState.update {
-            it.copy(
-                isOneCategoryClick = !uiState.value.isOneCategoryClick,
-                categoryIndex = index,
-                categoryMeals = emptyList()
-            )
+        if (index == _uiState.value.categoryIndex) {
+            _uiState.update {
+                it.copy(
+                    isOneCategoryClick = false,
+                    categoryIndex = null,
+                )
+            }
+        } else {
+            _uiState.update {
+                it.copy(
+                    isOneCategoryClick = true, categoryIndex = index,
+                )
+            }
         }
         viewModelScope.launch(Dispatchers.IO) {
             getAllMealsWithMainCategory(category = category)
@@ -214,84 +233,55 @@ class HomeScreenViewModel @Inject constructor(
 
     private suspend fun getAllMealsWithMainCategory(category: String) {
         if (category.isNotEmpty() && _uiState.value.isOneCategoryClick) {
-            networkRepository.getAllMealsWithMainCategory(category = category.trim())
-                .onResponse(
-                    onLoading = {
-                        _uiState.update {
-                            it.copy(isCategoryLoading = true)
-                        }
-                    },
-                    onSuccess = { meals ->
-                        if (meals != null) {
-                            meals.forEach {
-                                viewModelScope.launch(Dispatchers.IO) {
-                                    networkRepository.getMealInfoById(id = it.idMeal.toString())
-                                        .onResponse(
-                                            onLoading = {
-                                                _uiState.update {
-                                                    it.copy(isCategoryLoading = true)
-                                                }
-                                            },
-                                            onSuccess = { oneMeal ->
-                                                oneMeal?.let {
-                                                    val prepTime = Random.nextInt(10, 40)
-                                                    val cookTime = Random.nextInt(10, 40)
-                                                    val totalTime = prepTime + cookTime
-                                                    val finalMeal = SingleMealLocal(
-                                                        idMeal = oneMeal.idMeal,
-                                                        strMeal = oneMeal.strMeal,
-                                                        strDrinkAlternate = oneMeal.strDrinkAlternate,
-                                                        strCategory = oneMeal.strCategory,
-                                                        strArea = oneMeal.strArea,
-                                                        strInstructions = oneMeal.strInstructions,
-                                                        strMealThumb = oneMeal.strMealThumb,
-                                                        strTags = oneMeal.strTags,
-                                                        strYoutube = oneMeal.strYoutube,
-                                                        strSource = oneMeal.strSource,
-                                                        ingredient = oneMeal.ingredient,
-                                                        measure = oneMeal.measure,
-                                                        prepTime = prepTime,
-                                                        cookTime = cookTime,
-                                                        totalTime = totalTime,
-                                                        recipeImageFormDevice = oneMeal.recipeImageFormDevice,
-                                                        ingredientsImagesFromDevice = oneMeal.ingredientsImagesFromDevice,
-                                                        isFavorite = oneMeal.isFavorite,
-                                                        lastUpdated = oneMeal.lastUpdated
-                                                    )
-                                                    _uiState.update {
-                                                        it.copy(
-                                                            categoryMeals = it.categoryMeals + finalMeal,
-                                                            isCategoryLoading = false
-                                                        )
-                                                    }
-                                                }
-                                            },
-                                            onFailure = {
-                                                _uiState.update {
-                                                    it.copy(isCategoryLoading = false)
-                                                }
-                                            }
-                                        )
-                                }
-                            }
-                            _uiState.update {
-                                it.copy(isCategoryLoading = false)
-                            }
-
-                        } else {
-                            _uiState.update {
-                                it.copy(
+            _uiState.update { it.copy(categoryMeals = emptyList()) }
+            networkRepository.getAllCategoriesMeals(category.trim()).onResponse(
+                onLoading = {
+                    _uiState.update {
+                        it.copy(isCategoryLoading = true)
+                    }
+                },
+                onFailure = {
+                    _uiState.update {
+                        it.copy(isCategoryLoading = false)
+                    }
+                },
+                onSuccess = {
+                    it?.forEach { oneMeal ->
+                        oneMeal.let {
+                            val prepTime = Random.nextInt(10, 40)
+                            val cookTime = Random.nextInt(10, 40)
+                            val totalTime = prepTime + cookTime
+                            val finalMeal = SingleMealLocal(
+                                idMeal = oneMeal.idMeal,
+                                strMeal = oneMeal.strMeal,
+                                strDrinkAlternate = oneMeal.strDrinkAlternate,
+                                strCategory = oneMeal.strCategory,
+                                strArea = oneMeal.strArea,
+                                strInstructions = oneMeal.strInstructions,
+                                strMealThumb = oneMeal.strMealThumb,
+                                strTags = oneMeal.strTags,
+                                strYoutube = oneMeal.strYoutube,
+                                strSource = oneMeal.strSource,
+                                ingredient = oneMeal.ingredient,
+                                measure = oneMeal.measure,
+                                prepTime = prepTime,
+                                cookTime = cookTime,
+                                totalTime = totalTime,
+                                recipeImageFormDevice = oneMeal.recipeImageFormDevice,
+                                ingredientsImagesFromDevice = oneMeal.ingredientsImagesFromDevice,
+                                isFavorite = oneMeal.isFavorite,
+                                lastUpdated = oneMeal.lastUpdated
+                            )
+                            _uiState.update { state ->
+                                state.copy(
+                                    categoryMeals = state.categoryMeals + finalMeal,
                                     isCategoryLoading = false
                                 )
                             }
                         }
-                    },
-                    onFailure = {
-                        _uiState.update {
-                            it.copy(isCategoryLoading = false)
-                        }
                     }
-                )
+                }
+            )
         }
     }
 

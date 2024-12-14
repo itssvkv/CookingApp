@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cookingapp.data.local.room.repository.RoomRepository
 import com.example.cookingapp.utils.Common.fromFavToSingle
-import com.example.cookingapp.utils.Common.toFavoriteMealLocal
 import com.example.cookingapp.utils.onResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

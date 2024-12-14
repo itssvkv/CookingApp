@@ -2,8 +2,6 @@ package com.example.cookingapp.data.remote.firebase
 
 import android.net.Uri
 import com.example.cookingapp.utils.Resource
-import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.Flow
 

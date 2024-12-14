@@ -1,6 +1,5 @@
 package com.example.cookingapp.presentation.components
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
@@ -27,7 +26,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.PathSegment
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -36,7 +34,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.example.cookingapp.utils.Constants
-import com.example.cookingapp.utils.Constants.TAG
 import errorLight
 import primary
 import onPrimary
@@ -63,7 +60,6 @@ fun MainTextField(
 
 ) {
 
-//    var isFocused: Boolean by remember { mutableStateOf(false) }
     var isShowPassword: Boolean by remember { mutableStateOf(false) }
     var visualTransformation: VisualTransformation by remember { mutableStateOf(VisualTransformation.None) }
     visualTransformation =

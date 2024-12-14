@@ -1,11 +1,8 @@
 package com.example.cookingapp.data.local.room.dao
 
 import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Upsert
-import com.example.cookingapp.model.SingleMealLocal
 import com.example.cookingapp.model.SingleMealRemote
 
 @Dao

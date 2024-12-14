@@ -157,6 +157,34 @@ class NetworkRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun getAllCategoriesMeals(category: String): Flow<Resource<List<SingleMealLocal>>> {
+        return flow {
+            emit(Resource.Loading())
+            try {
+                val response = api.getAllMealsWithCategory(category = category)
+                val list = response.meals.map {
+                    Meal(
+                        strMeal = it.strMeal,
+                        strMealThumb = it.strMealThumb,
+                        idMeal = it.idMeal?.toInt()
+                    )
+                }
+                val newList = list.map {
+                    val meal = api.getMealInfoById(id = it.idMeal.toString())
+                    meal.toRandomMeal()
+                }
+                emit(Resource.Success(newList))
+
+            } catch (e: HttpException) {
+                emit(Resource.Failure(msg = e.message!!))
+            } catch (e: IOException) {
+                emit(Resource.Failure(msg = "Can't reach server, check your internet connection"))
+            } catch (e: Exception) {
+                emit(Resource.Failure(msg = "Unknown error happened, try again later"))
+            }
+        }
+    }
 }
 
 

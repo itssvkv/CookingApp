@@ -61,7 +61,6 @@ fun LoginScreen(
         onLoginClicked = viewModel::onLoginButtonClicked,
         onForgetPasswordClicked = onNavigateToForgetPassword,
         onNavigateToRegister = onNavigateToRegister,
-        isFocusedChanged = viewModel::isFocusedChanged,
         focusRequester = focusRequester
     )
 
@@ -82,7 +81,6 @@ fun LoginScreenContent(
     onLoginClicked: () -> Unit,
     onForgetPasswordClicked: () -> Unit,
     onNavigateToRegister: () -> Unit = {},
-    isFocusedChanged: (Boolean) -> Unit,
     focusRequester: FocusRequester
 ) {
     LazyColumn(
@@ -111,9 +109,7 @@ fun LoginScreenContent(
                 onNavigateToRegister = onNavigateToRegister,
                 isError = uiState.isError,
                 errorType = uiState.errorType,
-                isFocusedChanged = isFocusedChanged,
                 focusRequester = focusRequester,
-                isFocused = uiState.isFocused
             )
         }
 
@@ -133,9 +129,7 @@ fun LoginDataSection(
     onNavigateToRegister: () -> Unit = {},
     isError: Boolean,
     errorType: String? = null,
-    isFocusedChanged: (Boolean) -> Unit,
     focusRequester: FocusRequester,
-    isFocused: Boolean = false
 ) {
 
     Column(modifier = modifier.fillMaxWidth()) {

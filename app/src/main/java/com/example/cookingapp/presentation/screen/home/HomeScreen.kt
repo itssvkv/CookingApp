@@ -2,13 +2,9 @@ package com.example.cookingapp.presentation.screen.home
 
 import android.annotation.SuppressLint
 import android.util.Log
-import android.widget.Toast
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -41,23 +37,16 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
@@ -90,7 +79,6 @@ import com.example.cookingapp.utils.Common.isInternetAvailable
 import com.example.cookingapp.utils.Constants
 import com.example.cookingapp.utils.Constants.TAG
 import dots
-import kotlinx.coroutines.launch
 import primary
 import primaryContainerLight
 import primaryDark
@@ -197,9 +185,20 @@ fun HomeScreenContent(
             )
         }
 
-        if (uiState.isCategoryLoading) {
+        if (uiState.isCategoryLoading && uiState.isOneCategoryClick
+            || uiState.searchResult.isNullOrEmpty() && uiState.isSearchLoading && uiState.searchQuery.isNotEmpty()
+        ) {
             item {
                 HomeScreenLoadingOneCategoryMeals()
+            }
+
+        } else if (uiState.searchError) {
+            item {
+                LottieAnimationBox(
+                    resId = R.raw.your_empty,
+                    animationSize = 150.dp,
+                    animationText = "No meal found"
+                )
             }
         } else if (uiState.categoryMeals.isNotEmpty() && uiState.isOneCategoryClick) {
             mealsSectionBody(
@@ -210,7 +209,6 @@ fun HomeScreenContent(
                     onItemClicked(meal, color, 0)
                 },
                 onFavIconClicked = onCategoryFavIconClicked,
-                isFavClicked = uiState.isFavClicked
             )
 
         } else if (uiState.searchResult != null && !uiState.isSearchLoading && uiState.searchQuery.isNotEmpty()) {
@@ -222,7 +220,6 @@ fun HomeScreenContent(
                     onItemClicked(meal, color, 0)
                 },
                 onFavIconClicked = onSearchFavIconClicked,
-                isFavClicked = uiState.isFavClicked
             )
         } else {
             item {
@@ -709,46 +706,6 @@ fun GenerateRecipeBody(
     }
 }
 
-
-@Composable
-fun HomeTabsFooter(
-    modifier: Modifier = Modifier,
-    tabViewIcons: List<Painter>,
-    onTabSelected: (selectedIndex: Int) -> Unit
-) {
-    var selectedIndex by remember {
-        mutableIntStateOf(0)
-    }
-    val inactiveColor = Color(0xFF777777)
-
-    TabRow(
-        selectedTabIndex = selectedIndex,
-        containerColor = Color.White,
-        contentColor = Color.Black,
-        modifier = modifier
-    ) {
-        tabViewIcons.forEachIndexed { index, item ->
-            Tab(
-                selected = selectedIndex == index,
-                onClick = {
-                    selectedIndex = index
-                    onTabSelected(index)
-                },
-                selectedContentColor = Color.Black,
-                unselectedContentColor = primary
-            ) {
-                Icon(
-                    painter = item,
-                    contentDescription = "",
-                    tint = if (selectedIndex == index) Color.Black else primary,
-                    modifier = Modifier
-                        .padding(10.dp)
-                        .size(20.dp)
-                )
-            }
-        }
-    }
-}
 
 @Composable
 fun Test(modifier: Modifier = Modifier) {

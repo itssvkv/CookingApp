@@ -50,8 +50,6 @@ class SingleRecipeScreenViewModel @Inject constructor(
             )
         }
     }
-
-
     fun onFavIconClicked(isFavIconClicked: Boolean) {
         _uiState.update {
             it.copy(

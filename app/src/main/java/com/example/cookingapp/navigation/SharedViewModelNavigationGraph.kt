@@ -37,22 +37,7 @@ class SharedViewModelNavigationGraph @Inject constructor() : ViewModel() {
         _uiState.update { it.copy(singleMeal = meal, singleMealColor = color) }
     }
 
-    fun updateFavIndexesListAndValue(favIndexesListAndValue: List<Pair<Boolean, Int?>>) {
-        _uiState.update {
-            it.copy(
-                favIndexesListAndValue = favIndexesListAndValue.toSet().toList()
-            )
-        }
-    }
 
-    fun updateFavIndexesListAndValueFromSingleRecipe(favIndexesListAndValue: List<Pair<Boolean, Int?>>) {
-        _uiState.update {
-            it.copy(
-                favIndexesListAndValue = it.favIndexesListAndValue + favIndexesListAndValue.toSet()
-                    .toList()
-            )
-        }
-    }
 
     fun onFavIconClicked(
         isFavIconClicked: Boolean,
@@ -78,29 +63,6 @@ class SharedViewModelNavigationGraph @Inject constructor() : ViewModel() {
         Log.d("FavList", "onFavIconClickedShare: ${_uiState.value.favIndexesList}")
     }
 
-    fun onFavIconClickedInSingleRecipeScreen(
-        isFavIconClicked: Boolean,
-        index: Int,
-    ) {
-        val favIndexesList = listOf(index)
-        _uiState.update {
-            it.copy(meals = it.meals.mapIndexed { i, meal ->
-                if (i == index) {
-                    testFavIconClicked(
-                        isFavIconClicked = isFavIconClicked,
-                        index = index,
-                    )
-                    meal.copy(
-                        isFavorite = isFavIconClicked,
-                    )
-                } else {
-                    meal
-                }
-            }, favIndexesListFromSingleRecipe = it.favIndexesListFromSingleRecipe + favIndexesList)
-        }
-        checkTheStateOfFavIconList(isFavIconClicked)
-        Log.d("FavList", "onFavIconClickedShare: ${_uiState.value.favIndexesList}")
-    }
 
     private fun checkTheStateOfFavIconList(isClicked: Boolean) {
         if (isClicked) {
@@ -113,10 +75,6 @@ class SharedViewModelNavigationGraph @Inject constructor() : ViewModel() {
         }
     }
 
-    fun updateFavIndexesList(favIndexesList: List<Int?>) {
-        _uiState.update { it.copy(favIndexesList = favIndexesList) }
-
-    }
 
     private fun testFavIconClicked(
         isFavIconClicked: Boolean,

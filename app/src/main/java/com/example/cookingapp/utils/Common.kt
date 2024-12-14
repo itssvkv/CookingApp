@@ -13,7 +13,6 @@ import androidx.core.content.ContextCompat
 import com.example.cookingapp.model.FavoriteMealLocal
 import com.example.cookingapp.model.SingleMealLocal
 import com.example.cookingapp.presentation.screen.newrecipe.NewRecipeScreenUiState
-import kotlin.reflect.KClass
 
 
 object Common {
@@ -114,9 +113,6 @@ object Common {
         return str
     }
 
-    fun fromStringToList(data: String): List<String?> {
-        return data.split(" ")
-    }
 
     fun openGalleryForMultipleImages(
         context: Context,

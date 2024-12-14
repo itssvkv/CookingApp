@@ -41,7 +41,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -65,12 +64,8 @@ import com.example.cookingapp.navigation.LottieAnimationBox
 import com.example.cookingapp.presentation.components.MainBoxShape
 import com.example.cookingapp.presentation.components.MainButton
 import com.example.cookingapp.presentation.components.NewTextField
-import com.example.cookingapp.presentation.components.SingleMealCard
 import com.example.cookingapp.utils.Constants.TAG
 import dots
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.launch
 import primaryDark
 import randomColor
@@ -102,7 +97,7 @@ fun GenerateRecipesScreen(
         title = "Previous generated recipes",
         onSeeAllClicked = {},
         uiState = uiState,
-        onItemClicked = { meal, color, index ->
+        onItemClicked = { meal, color, _ ->
             scope.launch {
                 viewModel.onItemClicked(meal = meal)
                 onNavigateToSingleRecipeScreen(uiState.singleMealInfo, color)
@@ -135,9 +130,6 @@ fun GenerateRecipesScreen(
                 }
             }
         },
-        onIngredientCloseClicked = { viewModel.onIngredientValueChange(ingredient = "") },
-        onCategoryCloseClicked = { viewModel.onCategoryValueChange(category = "") },
-        onAreaCloseClicked = { viewModel.onAreaValueChange(area = "") },
 
         )
     LaunchedEffect(key1 = uiState.resultMeals) {
@@ -160,9 +152,6 @@ fun GenerateRecipeScreenContent(
     onCategoryValueChange: (String) -> Unit = {},
     onAreaValueChange: (String) -> Unit = {},
     onSheetButtonClicked: () -> Unit = {},
-    onIngredientCloseClicked: () -> Unit = {},
-    onCategoryCloseClicked: () -> Unit = {},
-    onAreaCloseClicked: () -> Unit = {},
     focusRequester: FocusRequester,
 ) {
     LazyColumn(
@@ -211,9 +200,6 @@ fun GenerateRecipeScreenContent(
                 isIngredientError = uiState.isIngredientError,
                 isCategoryError = uiState.isCategoryError,
                 isAreaError = uiState.isAreaError,
-                onIngredientCloseClicked = onIngredientCloseClicked,
-                onCategoryCloseClicked = onCategoryCloseClicked,
-                onAreaCloseClicked = onAreaCloseClicked,
                 focusRequester = focusRequester,
             )
 
@@ -424,9 +410,6 @@ fun PreviousSingleCard(
     meal: Meal,
     backgroundColor: Color,
     onItemClicked: () -> Unit,
-    ingredient: String = "",
-    category: String = "",
-    area: String = ""
 ) {
     Column(
         modifier = modifier
@@ -490,9 +473,6 @@ fun GenerateRecipesBottomSheet(
     isIngredientError: Boolean = false,
     isCategoryError: Boolean = false,
     isAreaError: Boolean = false,
-    onIngredientCloseClicked: () -> Unit = {},
-    onCategoryCloseClicked: () -> Unit = {},
-    onAreaCloseClicked: () -> Unit = {},
     focusRequester: FocusRequester,
 
 ) {
@@ -520,7 +500,6 @@ fun GenerateRecipesBottomSheet(
                     onValueChange = onIngredientValueChange,
                     value = ingredientValue,
                     error = isIngredientError,
-                    onTrailingIconClicked = onIngredientCloseClicked,
                     focusRequester = focusRequester
                 )
                 Spacer(modifier = Modifier.height(4.dp))
@@ -531,7 +510,6 @@ fun GenerateRecipesBottomSheet(
                     onValueChange = onCategoryValueChange,
                     value = categoryValue,
                     error = isCategoryError,
-                    onTrailingIconClicked = onCategoryCloseClicked,
                     focusRequester = focusRequester
                 )
                 Spacer(modifier = Modifier.height(4.dp))
@@ -542,7 +520,6 @@ fun GenerateRecipesBottomSheet(
                     onValueChange = onAreaValueChange,
                     value = areaValue,
                     error = isAreaError,
-                    onTrailingIconClicked = onAreaCloseClicked,
                     focusRequester = focusRequester,
                     imeAction = ImeAction.Done
                 )

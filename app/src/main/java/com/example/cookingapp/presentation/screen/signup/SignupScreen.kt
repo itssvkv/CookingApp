@@ -1,5 +1,6 @@
 package com.example.cookingapp.presentation.screen.signup
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -29,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -44,7 +46,6 @@ fun SignupScreen(
     modifier: Modifier = Modifier,
     viewModel: SignupScreenViewModel = hiltViewModel(),
     onNavigateToLogin: () -> Unit = {},
-    onNavigateToHome: () -> Unit = {},
     onBackClicked: () -> Unit = {}
 ) {
 
@@ -52,7 +53,9 @@ fun SignupScreen(
     val focusRequester = remember {
         FocusRequester()
     }
+    val context = LocalContext.current
     SignupScreenContent(
+        modifier = modifier,
         uiState = uiState,
         onEmailChanged = viewModel::onEmailChanged,
         onPasswordChanged = viewModel::onPasswordChanged,
@@ -60,13 +63,13 @@ fun SignupScreen(
         onSignupClicked = { viewModel.onSignupButtonClicked() },
         onLoginClicked = onNavigateToLogin,
         onBackClicked = onBackClicked,
-        isFocusedChanged = viewModel::isFocusedChanged,
         focusRequester = focusRequester
     )
 
     LaunchedEffect(key1 = uiState.isRegisterSuccessful) {
         if (uiState.isRegisterSuccessful) {
-            onNavigateToHome()
+            Toast.makeText(context, "Please verify your email", Toast.LENGTH_SHORT).show()
+            onNavigateToLogin()
         }
     }
 }
@@ -82,7 +85,6 @@ fun SignupScreenContent(
     onSignupClicked: () -> Unit,
     onLoginClicked: () -> Unit,
     onBackClicked: () -> Unit,
-    isFocusedChanged: (Boolean) -> Unit,
     focusRequester: FocusRequester
 ) {
 
@@ -90,8 +92,7 @@ fun SignupScreenContent(
         modifier = modifier
             .fillMaxSize()
             .navigationBarsPadding()
-            .statusBarsPadding()
-            , horizontalAlignment = Alignment.CenterHorizontally
+            .statusBarsPadding(), horizontalAlignment = Alignment.CenterHorizontally
     ) {
         item {
             HeaderSection(
@@ -114,9 +115,7 @@ fun SignupScreenContent(
                 isButtonLoading = uiState.isLoading,
                 isError = uiState.isError,
                 errorType = uiState.errorType,
-                isFocusedChanged = isFocusedChanged,
                 focusRequester = focusRequester,
-                isFocused = uiState.isFocused
             )
         }
 
@@ -149,13 +148,6 @@ fun HeaderSection(
                     contentDescription = "Back Arrow"
                 )
             }
-
-            Text(
-                text = "Back",
-                style = MaterialTheme.typography.bodyLarge,
-                color = Color.Black,
-                fontWeight = FontWeight.Bold
-            )
 
         }
         Spacer(modifier = Modifier.height(10.dp))
@@ -193,12 +185,12 @@ fun SignupScreenDataSection(
     onLoginClicked: () -> Unit,
     isError: Boolean,
     errorType: String? = null,
-    isFocusedChanged: (Boolean) -> Unit,
     focusRequester: FocusRequester,
-    isFocused: Boolean = false
 ) {
 
-    Column(modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
+    Column(modifier = modifier
+        .fillMaxWidth()
+        .padding(horizontal = 16.dp)) {
         MainTextField(
             value = email,
             onValueChange = onEmailChanged,

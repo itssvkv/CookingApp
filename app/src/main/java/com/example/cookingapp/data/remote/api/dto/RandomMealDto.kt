@@ -64,10 +64,7 @@ data class RandomMealDto(
         @SerializedName("strCreativeCommonsConfirmed") var strCreativeCommonsConfirmed: String? = null,
         @SerializedName("dateModified") var dateModified: String? = null
 
-    ) {
-
-
-    }
+    )
 
     fun toRandomMeal(): SingleMealLocal {
         return SingleMealLocal(

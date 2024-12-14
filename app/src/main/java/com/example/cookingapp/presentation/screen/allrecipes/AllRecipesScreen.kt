@@ -6,7 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,13 +15,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.text.KeyboardActionScope
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -34,7 +28,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -81,7 +74,6 @@ fun AllRecipesScreen(
         focusRequester = focusRequester,
         onSearchQueryChanged = viewModel::onSearchQueryChanged,
         isMealsReachingTheEnd = { viewModel.getRandomMeals() },
-        meals = uiState.meals,
         title = title,
         onBackIconClicked = onBackIconClicked,
         onItemClicked = onNavigateToSingleRecipeScreen,
@@ -105,7 +97,6 @@ fun ScreenContent(
     uiState: AllRecipesScreenUiState,
     onSearchQueryChanged: (String) -> Unit,
     isMealsReachingTheEnd: () -> Unit = {},
-    meals: List<SingleMealLocal>,
     title: String,
     onBackIconClicked: () -> Unit = {},
     onItemClicked: (SingleMealLocal, Color) -> Unit,
@@ -143,7 +134,6 @@ fun ScreenContent(
                     onItemClicked(meal, color)
                 },
                 onFavIconClicked = onFavIconClicked,
-                isFavClicked = uiState.isFavClicked
             )
         } else {
             mealsSectionBody(
@@ -153,7 +143,6 @@ fun ScreenContent(
                 isLoading = uiState.isLoading,
                 onItemClicked = onItemClicked,
                 onFavIconClicked = onFavIconClicked,
-                isFavClicked = uiState.isFavClicked
             )
 
         }
@@ -198,7 +187,6 @@ fun LazyListScope.mealsSectionBody(
     onFavIconClicked: (Boolean, index: Int) -> Unit,
     onItemClicked: (SingleMealLocal, Color) -> Unit,
     icon: Int = R.drawable.fav,
-    isFavClicked: Boolean = false
 ) {
     items(meals.size) { index: Int ->
         Log.d(TAG, "MealsSectionBody: Index$index")
@@ -214,7 +202,6 @@ fun LazyListScope.mealsSectionBody(
                 onFavIconClicked(isFavorite, index)
             },
             onItemClicked = { onItemClicked(meals[index], listOfColors[num]) },
-            isFavClicked = isFavClicked
         )
         LaunchedEffect(key1 = meals.size) {
             if (index == meals.size - 1) {
@@ -231,7 +218,7 @@ fun LazyListScope.mealsSectionBody(
 }
 
 
-@Preview()
+@Preview
 @Composable
 private fun AllRecipesScreenPreview() {
     Box(

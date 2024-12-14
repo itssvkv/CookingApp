@@ -66,11 +66,7 @@ fun SingleMealCard(
     favIcon: Painter? = null,
     onFacIconClicked: (Boolean) -> Unit = {},
     onItemClicked: () -> Unit = {},
-    isFavClicked: Boolean = false
 ) {
-    var isFavIconClicked by remember {
-        mutableStateOf(false)
-    }
     val isLarge = if (width > 200.dp) 16.dp else 0.dp
     val isSmall = if (width <= 200.dp) 16.dp else 0.dp
     Column(

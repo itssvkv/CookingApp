@@ -1,7 +1,6 @@
 package com.example.cookingapp.presentation.screen.generaterecipes
 
 import android.util.Log
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cookingapp.data.local.room.repository.RoomRepository
@@ -85,7 +84,7 @@ class GenerateRecipesScreenViewModel @Inject constructor(
                         }
 
                     },
-                    onFailure = { error ->
+                    onFailure = {
                         _uiState.update {
                             it.copy(isIngredientLoading = false)
                         }

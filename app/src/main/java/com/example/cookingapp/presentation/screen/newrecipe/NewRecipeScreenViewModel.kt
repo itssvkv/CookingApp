@@ -1,14 +1,9 @@
 package com.example.cookingapp.presentation.screen.newrecipe
 
-import android.graphics.ImageDecoder
-import android.net.Uri
-import android.os.Build
-import android.provider.MediaStore
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cookingapp.data.local.room.repository.RoomRepository
-import com.example.cookingapp.model.SingleMealLocal
 import com.example.cookingapp.utils.Common.toSingleMealLocal
 import com.example.cookingapp.utils.Constants.TAG
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,26 +22,15 @@ class NewRecipeScreenViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(NewRecipeScreenUiState())
     val uiState = _uiState.asStateFlow()
 
-    //    init {
-//        _uiState.update { it.copy(singleRecipe = SingleMealLocal(
-//            prepTime = 0,
-//            cookTime = 0
-//        )) }
-//    }
     fun isSaveButtonEnabled(): Boolean {
-        if (_uiState.value.strMeal != null &&
-            _uiState.value.strMeal!!.isNotEmpty()
-            && _uiState.value.strArea != null
-            && _uiState.value.strArea!!.isNotEmpty()
-            && _uiState.value.strCategory != null
-            && _uiState.value.strCategory!!.isNotEmpty()
-            && _uiState.value.strInstructions != null
-            && _uiState.value.strInstructions!!.isNotEmpty()
-        ) {
-            return true
-        } else {
-            return false
-        }
+        return (_uiState.value.strMeal != null &&
+                _uiState.value.strMeal!!.isNotEmpty()
+                && _uiState.value.strArea != null
+                && _uiState.value.strArea!!.isNotEmpty()
+                && _uiState.value.strCategory != null
+                && _uiState.value.strCategory!!.isNotEmpty()
+                && _uiState.value.strInstructions != null
+                && _uiState.value.strInstructions!!.isNotEmpty())
     }
 
     private fun changeTotalTime() {

@@ -46,7 +46,6 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.example.cookingapp.R
 import com.example.cookingapp.model.SingleMealLocal
-import com.example.cookingapp.presentation.screen.newrecipe.ScreenContent
 import com.example.cookingapp.utils.Constants.INGREDIENT
 import com.example.cookingapp.utils.Constants.TAG
 import linkColor
@@ -416,8 +415,9 @@ fun IngredientsSection(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        items(ingredients.size) {
-            val lastIndex = ingredients.size - 1
+        val size = (ingredients.size + measure.size + ingredientsImagesFromDevice.size) / 3
+        items(size) {
+            val lastIndex = size - 1
             val isLastIndex = lastIndex == it
 
             if (ingredients[it] != null && measure[it]

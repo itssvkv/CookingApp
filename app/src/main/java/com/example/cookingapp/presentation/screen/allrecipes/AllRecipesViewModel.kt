@@ -26,9 +26,6 @@ class AllRecipesViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(AllRecipesScreenUiState())
     val uiState = _uiState.asStateFlow()
 
-    private var onFinishedClick: (List<Int?>) -> Unit = { favIndexesList ->
-
-    }
 
     fun onSearchQueryChanged(searchQuery: String) {
         _uiState.update { it.copy(searchQuery = searchQuery) }

@@ -13,8 +13,7 @@ object Constants {
     var isLoggedIn = false
 
     const val BASE_URL = "https://www.themealdb.com/"
-    const val COMMON_URL = "api/json/v1/1/"
-    const val LIST = "list.php"
+    private const val COMMON_URL = "api/json/v1/1/"
     const val ALL_CATEGORIES = COMMON_URL + "categories.php"
     const val RANDOM_MEAL = COMMON_URL + "random.php"
     const val FILTER_INGREDIENT = COMMON_URL + "filter.php"
@@ -22,8 +21,6 @@ object Constants {
     const val SEARCH_MEAL_BY_NAME = COMMON_URL + "search.php"
     const val INGREDIENT = "https://www.themealdb.com/images/ingredients/"
 
-    val theIngredient = ""
-    val INGREDIENT_CALL_URL = "$INGREDIENT$theIngredient.png"
 
     enum class CustomTextFieldLabel {
         EMAIL,
@@ -33,7 +30,6 @@ object Constants {
     }
 
     //Screens Routes
-    const val SPLASH_SCREEN_ROUTE = "splash_screen_route"
     const val ONBOARDING_SCREEN_ROUTE = "onboarding_screen_route"
     const val LOGIN_SCREEN_ROUTE = "login_screen_route"
     const val SIGNUP_SCREEN_ROUTE = "signup_screen_route"
@@ -48,10 +44,6 @@ object Constants {
     const val PROFILE_SCREEN_ROUTE = "profile_screen_route"
     const val EDIT_PROFILE_SCREEN_ROUTE = "edit_profile_screen_route"
     const val YOUR_RECIPES_SCREEN_ROUTE = "your_recipes_screen_route"
-    const val SEARCH_SCREEN_ROUTE = "search_screen_route"
-    const val CREATE_TASK_SCREEN_ROUTE = "create_task_screen_route/{task_id}"
-    const val ANALYTICS_SCREEN_ROUTE = "analytics_screen_route"
-    const val TASK_DETAILS_SCREEN_ROUTE = "task_details_screen_route/{task_id}"
 
     //NavGraphs Routes
     const val MAIN_GRAPH_ROUTE = "main_graph_route"

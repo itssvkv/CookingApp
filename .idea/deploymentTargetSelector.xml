@@ -4,6 +4,17 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
+        <DropdownSelection timestamp="2024-12-14T12:06:12.025485700Z">
+          <Target type="DEFAULT_BOOT">
+            <handle>
+              <DeviceId pluginId="FirebaseDirectAccess" identifier="reservation=projects/cooking-app-2e685/deviceSessions/session-3acuskopwn0yh" />
+            </handle>
+            <template>
+              <DeviceId pluginId="FirebaseDirectAccess" type="TEMPLATE" identifier="model_id=caiman/34" />
+            </template>
+          </Target>
+        </DropdownSelection>
+        <DialogSelection />
       </SelectionState>
       <SelectionState runConfigName="TestPreview">
         <option name="selectionMode" value="DROPDOWN" />

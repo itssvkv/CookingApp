@@ -5,19 +5,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cookingapp.data.local.datastore.DataStoreRepository
 import com.example.cookingapp.data.remote.firebase.FirebaseRepository
-import com.example.cookingapp.model.uistate.MainButtonStateValue
 import com.example.cookingapp.utils.Constants.IS_LOGGED_IN
 import com.example.cookingapp.utils.Constants.TAG
 import com.example.cookingapp.utils.onResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.math.truncate
 
 @HiltViewModel
 class LoginScreenViewModel @Inject constructor(
@@ -36,9 +33,6 @@ class LoginScreenViewModel @Inject constructor(
         _uiState.update { it.copy(password = newValue) }
     }
 
-    fun isFocusedChanged(isFocused: Boolean) {
-        _uiState.update { it.copy(isFocused = isFocused) }
-    }
 
     fun onLoginButtonClicked(
 

@@ -2,27 +2,13 @@ package com.example.cookingapp.data.remote.firebase
 
 import android.net.Uri
 import android.util.Log
-import androidx.compose.runtime.rememberCoroutineScope
-import com.example.cookingapp.utils.Constants.TAG
 import com.example.cookingapp.utils.Resource
-import com.google.android.gms.tasks.Task
-import com.google.firebase.Firebase
-import com.google.firebase.auth.ActionCodeSettings
-import com.google.firebase.auth.AuthCredential
-import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.userProfileChangeRequest
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -46,6 +32,7 @@ class FirebaseRepositoryImpl @Inject constructor(
                     val firebaseUser = suspendCoroutine { continuation ->
                         auth.createUserWithEmailAndPassword(email, password)
                             .addOnSuccessListener { authResult ->
+                                authResult.user?.sendEmailVerification()
                                 continuation.resume(authResult.user) // Resume with the user
                             }
                             .addOnFailureListener { exception ->
@@ -70,7 +57,12 @@ class FirebaseRepositoryImpl @Inject constructor(
                 val firebaseUser = suspendCoroutine { continuation ->
                     auth.signInWithEmailAndPassword(email, password)
                         .addOnSuccessListener { authResult ->
-                            continuation.resume(authResult.user)
+                            val emailVerified = authResult.user?.isEmailVerified
+                            if (emailVerified == true) {
+                                continuation.resume(authResult.user) // Resume with the user
+                            } else {
+                                continuation.resumeWithException(Exception("Email not verified"))
+                            }
 
                         }
                         .addOnFailureListener { exception ->
@@ -104,24 +96,15 @@ class FirebaseRepositoryImpl @Inject constructor(
             emit(Resource.Loading())
             try {
                 val user = auth.currentUser
-                val userCredential = EmailAuthProvider.getCredential(user?.email!!, "12345678")
                 val profileUpdates = userProfileChangeRequest {
                     displayName = name
                     photo?.let {
                         photoUri = it
                     }
                 }
-//                val firebaseUser = suspendCoroutine { continuation ->
-//                    user.updateProfile(profileUpdates)
-//                    user.reauthenticate(userCredential).addOnSuccessListener {
-//                        val newUser = auth.currentUser!!
-//                        newUser.verifyBeforeUpdateEmail(email).addOnSuccessListener {
-//                            continuation.resume(newUser)
-//                        }
-//                    }
-//                }
+
                 val firebaseUser = suspendCoroutine { continuation ->
-                    user.updateProfile(profileUpdates).addOnSuccessListener {
+                    user?.updateProfile(profileUpdates)?.addOnSuccessListener {
                         continuation.resume(user)
                     }
                 }
